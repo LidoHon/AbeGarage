@@ -94,7 +94,7 @@ function AddEmployeeForm(props) {
           // For now, just redirect to the home page
           setTimeout(() => {
             // window.location.href = '/admin/employees';
-            window.location.href = "/";
+            window.location.href = "/admin/employees";
           }, 2000);
         }
       })

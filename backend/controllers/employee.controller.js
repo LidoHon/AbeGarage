@@ -2,7 +2,7 @@
 const employeeService = require("../services/employee.service");
 // Create the add employee controller
 async function createEmployee(req, res, next) {
-  // console.log(req.headers);
+
 
   // Check if employee email already exists in the database
   const employeeExists = await employeeService.checkIfEmployeeExists(

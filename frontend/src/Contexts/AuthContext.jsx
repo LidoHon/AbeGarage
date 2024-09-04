@@ -1,4 +1,3 @@
-// Import React and the Hooks we need here
 import React, { useState, useEffect, useContext } from "react";
 // Import the Util function we created to handle the reading from the local storage
 import getAuth from "../Components/util/auth";

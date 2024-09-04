@@ -1,12 +1,12 @@
 import React from "react";
 // Import the auth hook 
-import { useAuth } from "../../../Contexts/AuthContext";
+import { useAuth } from "../../Contexts/AuthContext";
 // Import the login form component 
-import LoginForm from '../../components/LoginForm/LoginForm';
+import LoginForm from '../../Components/LoginForm/LoginForm';
 // Import the admin menu component
-import AdminMenu from "../../components/Admin/AdminMenu/AdminMenu";
+import AdminMenu from "../../Components/Admin/AdminMenu/AdminMenu";
 // Import the EmployeesList component 
-import EmployeesList from "../../components/Admin/EmployeesList/EmployeesList";
+import EmployeesList from "../../Components/Admin/EmployeesList/EmployeesList";
 function Employees() {
   // Destructure the auth hook 
   const { isLogged, isAdmin } = useAuth();

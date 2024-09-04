@@ -66,7 +66,8 @@ function LoginForm() {
             // navigate('/admin');
             // window.location.replace('/admin');
             // To home for now
-            window.location.replace("/");
+            // window.location.replace("/");
+            navigate("/")
           } else {
             window.location.reload();
           }
