@@ -10,6 +10,7 @@ import Customer from "./Components/customer/Customer";
 import Orders from "./Components/order/Order";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
+import Contact from "./pages/contactPage/Contact";
 function App() {
   return (
     <Router>
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/contact" element={<Contact />} />
           <Route
             path="/admin/customer"
             element={
@@ -47,7 +49,7 @@ function App() {
             path="/admin/employees"
             element={
               <PrivateAuthRoute roles={[3, 2]}>
-                <Employees/>
+                <Employees />
               </PrivateAuthRoute>
             }
           />

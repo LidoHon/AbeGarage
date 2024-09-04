@@ -13,7 +13,7 @@ const Footer = () => {
                       <span className="flaticon-pin"></span>
                     </div>
                     <div className="text">
-                      54B, Tailstoi Town 5238 MT, <br /> La city, IA 522364
+                      54B, Wolayta Sodo Town 5238 MT, <br /> La city, IA 522364
                     </div>
                   </div>
                 </div>
@@ -27,8 +27,8 @@ const Footer = () => {
                     </div>
                     <div className="text">
                       Email us : <br />{" "}
-                      <a href="mailto:contact.contact@autorex.com">
-                        contact@autorex.com
+                      <a href="mailto:contact.contact@Abe-Garage.com">
+                        contact@Abe-Garage.com
                       </a>
                     </div>
                   </div>
@@ -178,10 +178,10 @@ const Footer = () => {
         <div className="auto-container">
           <div className="footer-bottom">
             <div className="copyright-text">
-              © Copyright <a href="#">Autorex</a> 2020 . All right reserved.
+              © Copyright <a href="#">Abe-Garage</a> 2020 . All right reserved.
             </div>
             <div className="text">
-              Created by <a href="#">ThemeArc</a>
+              Created by <a href="#">Evangadi group 2</a>
             </div>
           </div>
         </div>
