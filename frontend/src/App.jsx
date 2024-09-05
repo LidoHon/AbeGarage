@@ -11,6 +11,7 @@ import Orders from "./Components/order/Order";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
 import Contact from "./pages/contactPage/Contact";
+import AboutUs from "./pages/About";
 function App() {
   return (
     <Router>
@@ -19,6 +20,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route
             path="/admin/customer"
             element={
