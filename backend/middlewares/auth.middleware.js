@@ -4,7 +4,8 @@ const employeeService = require("../services/employee.service");
 
 // A function to verify the token received from the frontend 
 const verifyToken = async (req, res, next) => {
-  let token = req.headers["x-access-token"];
+  // let token = req.headers["x-access-token"];
+  const token = req.cookies.token;
   if (!token) {
     return res.status(403).send({
       status: "fail",

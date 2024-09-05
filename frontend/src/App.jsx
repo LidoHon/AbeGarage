@@ -12,6 +12,7 @@ import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
+import AdminDashboard from "./Components/Admin/dashboard/AdminDashboard";
 function App() {
   return (
     <Router>
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route
             path="/admin/customer"
             element={

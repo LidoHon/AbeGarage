@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `customer_info` (
   `customer_last_name` varchar(255) NOT NULL,
   `active_customer_status` int(11) NOT NULL,
   PRIMARY KEY (customer_info_id),
-  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id)
+  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `customer_vehicle_info` (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `customer_vehicle_info` (
   `vehicle_serial` varchar(255) NOT NULL,
   `vehicle_color` varchar(255) NOT NULL,
   PRIMARY KEY (vehicle_id),
-  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id)
+  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- Company tables 
@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS `common_services` (
   `service_description` TEXT,
   PRIMARY KEY (service_id)
 ) ENGINE=InnoDB;
-
 
 -- Employee tables 
 CREATE TABLE IF NOT EXISTS `employee` (
@@ -67,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `employee_info` (
   `employee_last_name` varchar(255) NOT NULL,
   `employee_phone` varchar(255) NOT NULL,
   PRIMARY KEY (employee_info_id),
-  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `employee_pass` (
@@ -75,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `employee_pass` (
   `employee_id` int(11) NOT NULL,
   `employee_password_hashed` varchar(255) NOT NULL,
   PRIMARY KEY (employee_pass_id),
-  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `employee_role` (
@@ -83,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `employee_role` (
   `employee_id` int(11) NOT NULL,
   `company_role_id` int(11) NOT NULL,
   PRIMARY KEY (employee_role_id),
-  FOREIGN KEY (employee_id) REFERENCES employee(employee_id),
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE,
   FOREIGN KEY (company_role_id) REFERENCES company_roles(company_role_id)
 ) ENGINE=InnoDB;
 
@@ -97,9 +96,9 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `active_order` int(11) NOT NULL,
   `order_hash` varchar(255) NOT NULL,
   PRIMARY KEY (order_id),
-  FOREIGN KEY (employee_id) REFERENCES employee(employee_id), 
-  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id),
-  FOREIGN KEY (vehicle_id) REFERENCES customer_vehicle_info(vehicle_id)
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE, 
+  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id) ON DELETE CASCADE,
+  FOREIGN KEY (vehicle_id) REFERENCES customer_vehicle_info(vehicle_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `order_info` (
@@ -113,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `order_info` (
   `notes_for_customer` TEXT,
   `additional_requests_completed` int(11) NOT NULL,
   PRIMARY KEY (order_info_id),
-  FOREIGN KEY (order_id) REFERENCES orders(order_id)
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `order_services` (
@@ -122,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `order_services` (
   `service_id` int(11) NOT NULL,
   `service_completed` int(11) NOT NULL,
   PRIMARY KEY (order_service_id),
-  FOREIGN KEY (order_id) REFERENCES orders(order_id),
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
   FOREIGN KEY (service_id) REFERENCES common_services(service_id)
 ) ENGINE=InnoDB;
 
@@ -131,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `order_status` (
   `order_id` int(11) NOT NULL,
   `order_status` int(11) NOT NULL,
   PRIMARY KEY (order_status_id),
-  FOREIGN KEY (order_id) REFERENCES orders(order_id)
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- Add the roles to the database 
@@ -143,11 +142,11 @@ INSERT INTO employee (employee_email, active_employee, added_date)
 VALUES ('admin@admin.com', 1, CURRENT_TIMESTAMP);
 
 INSERT INTO employee_info (employee_id, employee_first_name, employee_last_name, employee_phone)
-VALUES (1, 'Admin', 'Admin', 555-555-5555); 
+VALUES (1, 'Admin', 'Admin', '555-555-5555'); 
 
 -- Password is 123456
 INSERT INTO employee_pass (employee_id, employee_password_hashed)
 VALUES (1, '$2b$10$B6yvl4hECXploM.fCDbXz.brkhmgqNlawh9ZwbfkFX.F3xrs.15Xi');  
 
 INSERT INTO employee_role (employee_id, company_role_id)
-VALUES (1, 3); 
+VALUES (1, 3);
