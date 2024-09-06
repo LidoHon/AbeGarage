@@ -1,20 +1,17 @@
 import React from "react";
-// Import the auth hook 
+// Import the auth hook
 import { useAuth } from "../../Contexts/AuthContext";
-// Import the login form component 
-import LoginForm from '../../Components/LoginForm/LoginForm';
+// Import the login form component
+import LoginForm from "../../Components/LoginForm/LoginForm";
 // Import the admin menu component
 import AdminMenu from "../../Components/Admin/AdminMenu/AdminMenu";
-// Import the EmployeesList component 
+// Import the EmployeesList component
 import EmployeesList from "../../Components/Admin/EmployeesList/EmployeesList";
 function Employees() {
-  // Destructure the auth hook 
+  // Destructure the auth hook
   const { isLogged, isAdmin } = useAuth();
 
   if (isLogged) {
-
-    console.log("Kebede");
-
     if (isAdmin) {
       return (
         <div>
@@ -44,7 +41,6 @@ function Employees() {
       </div>
     );
   }
-
 }
 
-export default Employees; 
+export default Employees;
