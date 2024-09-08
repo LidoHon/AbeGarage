@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `customer_info` (
   `customer_phone` VARCHAR(20) NOT NULL,
   `active_customer_status` int(11) NOT NULL,
   PRIMARY KEY (customer_info_id),
-  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id) ON DELETE CASCADE
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `customer_pass` (
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `order_hash` varchar(255) NOT NULL,
   PRIMARY KEY (order_id),
   FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE, 
-  FOREIGN KEY (customer_id) REFERENCES customer_identifier(customer_id) ON DELETE CASCADE,
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
   FOREIGN KEY (vehicle_id) REFERENCES customer_vehicle_info(vehicle_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
