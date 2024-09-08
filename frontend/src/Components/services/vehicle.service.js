@@ -3,25 +3,23 @@ const api_url = import.meta.env.VITE_API_URL;
 
 // A function to send POST request to create a new vehicle
 const createVehicle = async (formData) => {
-    const { employee } = useAuth();  // Get employee from AuthContext
+    const { employee } = useAuth();  
 
-    const loggedInEmployeeToken = employee?.employee_token;  // Retrieve the employee token
-    console.log("Admin Token (Employee Token):", loggedInEmployeeToken);  // Log the token
+    const loggedInEmployeeToken = employee?.employee_token; 
+    console.log("Admin Token (Employee Token):", loggedInEmployeeToken); 
 
     const requestOptions = {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "x-access-token": loggedInEmployeeToken,  // Use employee token here
+            "x-access-token": loggedInEmployeeToken, 
         },
         body: JSON.stringify(formData),
     };
 
-    console.log("Request Options:", requestOptions);  // Ensure that the token is present in the request options
-
+    console.log("Request Options:", requestOptions);  
     const response = await fetch(`${api_url}/api/vehicle`, requestOptions);
-    console.log("Response from server:", response);  // Log server response
-
+    console.log("Response from server:", response);  
     return response;
 };
 
