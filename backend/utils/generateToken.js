@@ -2,13 +2,25 @@ const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
 
 // Function to generate and set token in cookies
-function generateToken(res, employee) {
-  const payload = {
-    employee_id: employee.employee_id,
-    employee_email: employee.employee_email,
-    employee_role: employee.company_role_id,
-    employee_first_name: employee.employee_first_name,
-  };
+function generateToken(res, user, userType) {
+  let payload = {};
+
+  if (userType === "employee") {
+    payload = {
+      user_id: user.employee_id,
+      user_email: user.employee_email,
+      user_role: user.company_role_id,  // Only employees have roles
+      user_first_name: user.employee_first_name,
+      type: "employee", // To distinguish between customer and employee in the token
+    };
+  } else if (userType === "customer") {
+    payload = {
+      user_id: user.customer_id,
+      user_email: user.customer_email,
+      user_first_name: user.customer_first_name,
+      type: "customer", // To distinguish between customer and employee in the token
+    };
+  }
 
   const token = jwt.sign(payload, jwtSecret, {
     expiresIn: "30d",

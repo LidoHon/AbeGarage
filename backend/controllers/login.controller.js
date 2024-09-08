@@ -3,43 +3,78 @@ const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
 
 // Handle employee login
-async function logIn(req, res, next) {
+async function logInEmployee(req, res, next) {
   try {
     const employeeData = req.body;
-    console.log(req.body);
-    // Call the logIn method from the login service
-    const employee = await loginService.logIn(employeeData);
-    // If the employee is not found
+    const employee = await loginService.logInEmployee(employeeData);
+
     if (employee.status === "fail") {
-      res.status(403).json({
-        status: employee.status,
-        message: employee.message,
-      });
-      // console.log(employee.message);
+      return res.status(403).json({ status: employee.status, message: employee.message });
     }
-    // If successful, send a response to the client
+
+    // Create JWT payload with employee role
     const payload = {
       employee_id: employee.data.employee_id,
       employee_email: employee.data.employee_email,
-      employee_role: employee.data.company_role_id,
       employee_first_name: employee.data.employee_first_name,
+      employee_role: employee.data.company_role_id, 
+      type: "employee"  
     };
-    const token = jwt.sign(payload, jwtSecret, {
-      expiresIn: "30d",
-    });
-    // console.log(token);
-    const sendBack = {
-      employee_token: token,
-    };
+
+    // Generate token
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: "30d" });
+
+    // Send response with token and employee's first name and role
     res.status(200).json({
       status: "success",
       message: "Employee logged in successfully",
-      data: sendBack,
+      data: {
+        employee_token: token,
+        employee_first_name: employee.data.employee_first_name,
+        employee_role: employee.data.company_role_id, 
+      },
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ status: "error", message: "An error occurred during login" });
+  }
 }
 
-// Export the functions
+// Handle customer login
+async function logInCustomer(req, res, next) {
+  try {
+    const customerData = req.body;
+    const customer = await loginService.logInCustomer(customerData);
+
+    if (customer.status === "fail") {
+      return res.status(403).json({ status: customer.status, message: customer.message });
+    }
+
+    // Create JWT payload with customer type
+    const payload = {
+      customer_id: customer.data.customer_id,
+      customer_email: customer.data.customer_email,
+      customer_first_name: customer.data.customer_first_name,
+      type: "customer"  
+    };
+
+    // Generate token
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: "30d" });
+
+    // Send response with token and customer's first name
+    res.status(200).json({
+      status: "success",
+      message: "Customer logged in successfully",
+      data: {
+        customer_token: token,
+        customer_first_name: customer.data.customer_first_name,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: "An error occurred during login" });
+  }
+}
+
 module.exports = {
-  logIn,
+  logInEmployee,
+  logInCustomer,
 };
