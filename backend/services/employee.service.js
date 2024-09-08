@@ -135,6 +135,18 @@ async function updateEmployee(employee_id, employeeData) {
         );
     }
 
+    // Update employee status, if provided
+    if (employeeData.hasOwnProperty("active_employee")) {
+      // console.log("Updating active employee status...");
+      const query5 =
+        "UPDATE employee SET active_employee = ? WHERE employee_id = ?";
+      await conn
+        .query(query5, [employeeData.active_employee, employee_id])
+        .catch((err) =>
+          console.log("Error in updating active employee status:", err)
+        );
+    }
+
     return true;
   } catch (err) {
     console.log("Error updating employee:", err);

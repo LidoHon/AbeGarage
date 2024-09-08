@@ -168,10 +168,14 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
         <Form.Control
           as="select"
           value={active_employee}
-          onChange={(event) => setActive_employee(Number(event.target.value))}
+          onChange={(event) => {
+            const newValue = Number(event.target.value);
+            console.log("Selected Active Value:", newValue); // Log the selected value
+            setActive_employee(newValue);
+          }}
         >
-          <option value={1}>Yes</option>
           <option value={0}>No</option>
+          <option value={1}>Yes</option>
         </Form.Control>
       </Form.Group>
 
@@ -180,11 +184,15 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
         <Form.Control
           as="select"
           value={company_role_id}
-          onChange={(event) => setCompany_role_id(Number(event.target.value))}
+          onChange={(event) => {
+            const newValue = Number(event.target.value);
+            console.log("Selected Role Value:", newValue); // Log the selected value
+            setCompany_role_id(newValue);
+          }}
         >
           <option value={1}>Employee</option>
-          <option value={1}>Manager</option>
-          <option value={1}>Admin</option>
+          <option value={2}>Manager</option>
+          <option value={3}>Admin</option>
         </Form.Control>
       </Form.Group>
 

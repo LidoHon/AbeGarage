@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Modal, Button } from "react-bootstrap";
+import { Popconfirm } from "antd";
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
 import employeeService from "../../services/employee.service";
@@ -47,20 +48,18 @@ const EmployeesList = () => {
   };
 
   const handleDelete = async (employeeId) => {
-    if (window.confirm("Are you sure you want to delete this employee?")) {
-      try {
-        const res = await employeeService.deleteEmployee(employeeId, token);
-        if (!res.ok) {
-          setApiError(true);
-          setApiErrorMessage(getErrorMessage(res.status));
-          return;
-        }
-        // Refresh the employee list after deletion
-        setEmployees(employees.filter((emp) => emp.employee_id !== employeeId));
-      } catch (err) {
+    try {
+      const res = await employeeService.deleteEmployee(employeeId, token);
+      if (!res.ok) {
         setApiError(true);
-        setApiErrorMessage("An error occurred. Please try again later.");
+        setApiErrorMessage(getErrorMessage(res.status));
+        return;
       }
+      // Refresh the employee list after deletion
+      setEmployees(employees.filter((emp) => emp.employee_id !== employeeId));
+    } catch (err) {
+      setApiError(true);
+      setApiErrorMessage("An error occurred. Please try again later.");
     }
   };
 
@@ -90,7 +89,6 @@ const EmployeesList = () => {
                   <th>Email</th>
                   <th>Phone</th>
                   <th>Added Date</th>
-                  {/* <th>Role</th> */}
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -108,21 +106,22 @@ const EmployeesList = () => {
                         "MM/dd/yyyy | HH:mm"
                       )}
                     </td>
-                    {/* <td>{employee.company_role_name}</td> */}
                     <td>
                       <div className="action-buttons">
-                        <button
-                          className="btn btn-primary"
+                        <Button
+                          variant="primary"
                           onClick={() => handleEdit(employee)}
                         >
                           Edit
-                        </button>
-                        <button
-                          className="btn btn-danger"
-                          onClick={() => handleDelete(employee.employee_id)}
+                        </Button>
+                        <Popconfirm
+                          title="Are you sure you want to delete this employee?"
+                          onConfirm={() => handleDelete(employee.employee_id)}
+                          okText="Yes"
+                          cancelText="No"
                         >
-                          Delete
-                        </button>
+                          <Button variant="danger">Delete</Button>
+                        </Popconfirm>
                       </div>
                     </td>
                   </tr>
