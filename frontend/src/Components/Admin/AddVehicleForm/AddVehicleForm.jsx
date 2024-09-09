@@ -2,7 +2,7 @@ import { useState } from "react";
 import vehicleService from "../../services/vehicle.service"; // Adjust the path accordingly
 import { useAuth } from "../../../Contexts/AuthContext";
 
-function AddVehicleForm({ customer_id, onVehicleAdded }) { 
+function AddVehicleForm({ customer_id, onVehicleAdded }) { // Add onVehicleAdded prop
     const [vehicle_year, setVehicleYear] = useState("");
     const [vehicle_make, setVehicleMake] = useState("");
     const [vehicle_model, setVehicleModel] = useState("");
@@ -57,7 +57,7 @@ function AddVehicleForm({ customer_id, onVehicleAdded }) {
             vehicle_serial,
             vehicle_color,
             active_vehicle,
-            customer_id, 
+            customer_id, // Ensure the customer_id is included in the form data
         };
 
         // Pass the form data to the service
@@ -69,7 +69,8 @@ function AddVehicleForm({ customer_id, onVehicleAdded }) {
                     setServerError(data.error);
                 } else {
                     // Call the onVehicleAdded function from props to update the parent component
-                    onVehicleAdded(formData);
+                    onVehicleAdded(formData); // Pass the new vehicle data
+                }
             })
             .catch((error) => {
                 const resMessage =
