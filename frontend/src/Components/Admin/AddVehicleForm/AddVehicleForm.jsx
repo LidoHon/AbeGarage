@@ -57,7 +57,7 @@ function AddVehicleForm({ customer_id, onVehicleAdded }) {
             vehicle_serial,
             vehicle_color,
             active_vehicle,
-            customer_id, // Ensure the customer_id is included in the form data
+            customer_id, 
         };
 
         // Pass the form data to the service
@@ -69,8 +69,7 @@ function AddVehicleForm({ customer_id, onVehicleAdded }) {
                     setServerError(data.error);
                 } else {
                     // Call the onVehicleAdded function from props to update the parent component
-                    onVehicleAdded(formData); // Pass the new vehicle data
-                }
+                    onVehicleAdded(formData);
             })
             .catch((error) => {
                 const resMessage =
