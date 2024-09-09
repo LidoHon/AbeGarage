@@ -7,6 +7,8 @@ const orderController = require("../controllers/order.controller");
 // Import middleware
 const authMiddleware = require("../middlewares/auth.middleware");
 
+// Route to fetch customers for order creation
+router.get('/api/orders/customers', orderController.getAllCustomersForOrder);
 // Create a route to handle adding a new order
 router.post(
     "/api/order",

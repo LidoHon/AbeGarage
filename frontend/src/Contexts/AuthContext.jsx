@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }) => {
       
     } else if (storedCustomer) {
       const parsedCustomer = JSON.parse(storedCustomer);
-      console.log("Parsed Customer:", parsedCustomer); 
-      setIsLogged(true);
+        console.log("Parsed Customer in AuthContext:", parsedCustomer); 
+        setIsLogged(true);
+        localStorage.setItem("customer_token", parsedCustomer.customer_token); 
+        setCustomer(parsedCustomer);
       
       // Store the customer token (if needed)
       localStorage.setItem("customer_token", parsedCustomer.customer_token); 

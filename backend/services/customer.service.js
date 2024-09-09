@@ -87,21 +87,42 @@ async function getCustomerByEmail(customer_email) {
     }
 }
 
-// A function to get all customers
-async function getAllCustomers() {
-    const query = `
-    SELECT * 
-    FROM customer 
-    INNER JOIN customer_info ON customer.customer_id = customer_info.customer_id
-    ORDER BY customer.customer_id`;
-    try {
-        const rows = await conn.query(query);
-        return rows;
-    } catch (err) {
-        console.log("Error fetching customers:", err);
-        throw err;
-    }
+
+// Modified backend code to handle both listing and searching of customers
+async function getAllCustomers(searchQuery = null) { // Default searchQuery to null for normal list fetching
+  let query = `
+  SELECT * 
+  FROM customer 
+  INNER JOIN customer_info ON customer.customer_id = customer_info.customer_id
+  WHERE 1=1
+  `;
+  const queryParams = [];
+
+  if (searchQuery) {
+      const likeSearchQuery = `%${searchQuery}%`;
+      query += `
+      AND (
+          customer_info.customer_first_name LIKE ? 
+          OR customer_info.customer_last_name LIKE ? 
+          OR customer.customer_email LIKE ? 
+          OR customer_info.customer_phone LIKE ?
+      )`;
+      queryParams.push(likeSearchQuery, likeSearchQuery, likeSearchQuery, likeSearchQuery);
+  }
+
+  console.log("Executing query:", query, "with params:", queryParams);
+
+  try {
+      const rows = await conn.query(query, queryParams);
+      console.log("Fetched rows:", rows);
+      return rows;
+  } catch (err) {
+      console.log("Error fetching customers:", err);
+      throw err;
+  }
 }
+
+
 
 // A function to get a specific customer by ID
 async function getCustomer(customerId) {

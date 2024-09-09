@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS `customer` (
   `customer_email` varchar(255) NOT NULL,
   `active_customer` int(11) NOT NULL,
   `customer_added_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `customer_hash` varchar(255) NOT NULL,
   PRIMARY KEY (customer_id),
   UNIQUE (customer_email)
 ) ENGINE=InnoDB;
@@ -15,7 +14,6 @@ CREATE TABLE IF NOT EXISTS `customer_info` (
   `customer_first_name` varchar(255) NOT NULL,
   `customer_last_name` varchar(255) NOT NULL,
   `customer_phone` VARCHAR(20) NOT NULL,
-  `active_customer_status` int(11) NOT NULL,
   PRIMARY KEY (customer_info_id),
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

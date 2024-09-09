@@ -15,12 +15,22 @@ const CustomersList = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const { customer } = useAuth();
-    const token = customer?.customer_token || null;
+
+    // Try to fetch token from AuthContext or fallback to localStorage
+    const token = customer?.customer_token || localStorage.getItem("customer_token");
+
+    console.log("Token in customerList.jsx:", token); // Debug log for token
 
     const [searchQuery, setSearchQuery] = useState(''); 
 
     useEffect(() => {
         const fetchCustomers = async () => {
+            if (!token) {
+                setApiError(true);
+                setApiErrorMessage("No token found, please log in again.");
+                return;
+            }
+
             try {
                 const res = await customerService.getAllCustomers(token);
                 if (!res.ok) {
@@ -29,10 +39,13 @@ const CustomersList = () => {
                     return;
                 }
                 const data = await res.json();
-                if (data.data.length !== 0) {
-                    setCustomers(data.data);
+                if (data.customers.length !== 0) {
+                    setCustomers(data.customers);
+                } else {
+                    setApiErrorMessage("No customers found.");
                 }
             } catch (err) {
+                console.error("Error fetching customers:", err);
                 setApiError(true);
                 setApiErrorMessage("An error occurred. Please try again later.");
             }

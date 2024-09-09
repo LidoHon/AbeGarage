@@ -41,10 +41,10 @@ async function createOrder({ employee_id, customer_id, vehicle_id, active_order,
         }
     } catch (err) {
         console.log("Error creating order:", err);
-        await connection.rollback();  // Rollback the transaction in case of error
+        await connection.rollback();  
         throw err;
     } finally {
-        connection.release();  // Release the connection back to the pool
+        connection.release();  
     }
 }
 
@@ -132,24 +132,24 @@ async function addOrderServices(orderId, services) {
         INSERT INTO order_services (order_id, service_id, service_completed)
         VALUES (?, ?, ?)`;
 
-    const connection = await conn.getconnection();  // Get a connection to perform a transaction
+    const connection = await conn.getconnection();  
 
     try {
-        await connection.beginTransaction();  // Start transaction
+        await connection.beginTransaction();  
 
         for (const service of services) {
             const { service_id, service_completed } = service;
             await connection.query(query, [orderId, service_id, service_completed]);
         }
 
-        await connection.commit();  // Commit transaction
+        await connection.commit();  
         return { message: "Services added to order" };
     } catch (err) {
         console.log("Error adding services to order:", err);
-        await connection.rollback();  // Rollback transaction in case of error
+        await connection.rollback(); 
         throw err;
     } finally {
-        connection.release();  // Release the connection back to the pool
+        connection.release();  
     }
 }
 

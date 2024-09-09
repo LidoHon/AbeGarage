@@ -1,5 +1,5 @@
 
-// Import the AddEmployeeForm component 
+// Import the AddOrderForm component 
 import AddOrderForm from "../../Components/Admin/AddOrderForm/AddOrderForm"
 // Import the AdminMenu component 
 import AdminMenu from '../../Components/Admin/AdminMenu/AdminMenu';

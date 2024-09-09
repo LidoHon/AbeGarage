@@ -1,5 +1,26 @@
 const orderService = require("../services/order.service");
+const customerService = require('../services/customer.service'); 
 
+// Example function to fetch customers within order context
+async function getAllCustomersForOrder(req, res) {
+    try {
+        const searchQuery = req.query.search || '';
+        const customers = await customerService.getAllCustomers(searchQuery);  
+        res.status(200).json({
+            status: 'success',
+            customers,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch customers for order',
+        });
+    }
+}
+
+module.exports = { getAllCustomersForOrder };
+
+// Controller for creating a new order
 async function createOrder(req, res) {
     try {
         const orderData = req.body;
@@ -17,6 +38,8 @@ async function createOrder(req, res) {
         });
     }
 }
+
+
 
 async function getAllOrders(req, res) {
     try {

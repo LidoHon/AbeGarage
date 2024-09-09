@@ -34,10 +34,11 @@ async function createCustomer(req, res, next) {
     }
 }
 
-// Create the getAllCustomers controller
+// Get all customers or search based on query
 async function getAllCustomers(req, res, next) {
-    // Call the getAllCustomers method from the customer service
-    const customers = await customerService.getAllCustomers();
+    const searchQuery = req.query.search || '';
+    // Pass the query to the service
+    const customers = await customerService.getAllCustomers(searchQuery);  
     if (!customers) {
         res.status(400).json({
             error: "Failed to get all customers!",
@@ -45,7 +46,7 @@ async function getAllCustomers(req, res, next) {
     } else {
         res.status(200).json({
             status: "success",
-            data: customers,
+            customers: customers,
         });
     }
 }

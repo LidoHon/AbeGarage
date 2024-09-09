@@ -15,19 +15,31 @@ const createCustomer = async (formData, loggedInCustomerToken) => {
     return response;
 };
 
-// A function to send get request to get all employees
-const getAllCustomers = async (token) => {
-  // console.log(token);
+// A function to send get request to get all customers
+const getAllCustomers = async (token, searchQuery = "") => {
+    // Fallback to specific tokens based on the type of user
+    const accessToken = token || localStorage.getItem("employee_token");
+
+    if (!accessToken) {
+        throw new Error("No access token found");
+    }
+
     const requestOptions = {
         method: "GET",
         headers: {
-        "Content-Type": "application/json",
-        "x-access-token": token,
+            "Content-Type": "application/json",
+            "x-access-token": accessToken,
         },
     };
-    const response = await fetch(`${api_url}/api/customers`, requestOptions);
+
+    const url = searchQuery 
+        ? `${api_url}/api/customers?search=${searchQuery}` 
+        : `${api_url}/api/customers`;
+
+    const response = await fetch(url, requestOptions);
     return response;
 };
+
 
 // A function to send DELETE request to remove a customer
 const deleteCustomer = async (customerId, token) => {
