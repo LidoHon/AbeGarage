@@ -102,7 +102,7 @@ async function getAllCustomers() {
         throw err;
     }
 }
-
+``
 // A function to get a specific customer by ID
 async function getCustomer(customerId) {
   const query = `

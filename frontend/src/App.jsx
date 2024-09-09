@@ -10,7 +10,7 @@ import PrivateAuthRoute from "./Components/Auth/PrivateAuthRoute";
 import Orders from "./Components/order/Order";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
-import Customers from './pages/admin/Customers';
+import Customers from "./pages/admin/Customers";
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
 import AdminLanding from "./pages/admin/AdminLanding";
