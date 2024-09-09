@@ -13,8 +13,8 @@ function LoginForm() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [serverError, setServerError] = useState("");
-  const [isEmployeeLogin, setIsEmployeeLogin] = useState(true); // Toggle between employee and customer
-
+  // Toggle between employee and customer
+  const [isEmployeeLogin, setIsEmployeeLogin] = useState(true); 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -70,7 +70,7 @@ function LoginForm() {
           setEmployee(employeeData);
         } else {
           // Clear previous employee data and store new customer data
-          localStorage.removeItem("employee"); // Clear employee data if logging in as customer
+          localStorage.removeItem("employee"); 
           const customerData = {
             customer_token: response.data.customer_token,
             customer_first_name: response.data.customer_first_name,
