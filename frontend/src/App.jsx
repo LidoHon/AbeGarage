@@ -16,6 +16,7 @@ import AboutUs from "./pages/About";
 import AdminLanding from "./pages/admin/AdminLanding";
 import AddCustomer from "./pages/admin/AddCustomer";
 import CustomerProfile from "./pages/CustomerProfile";
+import Services from "./pages/admin/services";
 function App() {
   return (
     <Router>
@@ -33,14 +34,6 @@ function App() {
               </PrivateAuthRoute>
             }
           />
-          {/* <Route
-            path="/admin/customer"
-            element={
-              <PrivateAuthRoute roles={[2, 3]}>
-                <Customer />
-              </PrivateAuthRoute>
-            }
-          /> */}
           <Route
             path="/admin/orders"
             element={
@@ -88,6 +81,14 @@ function App() {
             element={
               <PrivateAuthRoute roles={[3, 1]}>
                 <CustomerProfile />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/services"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <Services />
               </PrivateAuthRoute>
             }
           />
