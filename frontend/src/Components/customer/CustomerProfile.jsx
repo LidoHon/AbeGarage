@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import customerService from "../../Components/services/customer.service";
-import { Button, Row, Col, Card } from "react-bootstrap";
+import { Button, Row, Col, Card, Modal, Form } from "react-bootstrap";
 import AddVehicleForm from "../../Components/Admin/AddVehicleForm/AddVehicleForm";
-
+const api_url = import.meta.env.VITE_API_URL;
+import { FcFullTrash } from "react-icons/fc";
 const CustomerProfile = () => {
   const { customer_id } = useParams();
 
@@ -11,6 +12,18 @@ const CustomerProfile = () => {
   const [vehicles, setVehicles] = useState([]);
   const [orders, setOrders] = useState([]);
   const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState(null); // Vehicle being edited
+
+  const [formData, setFormData] = useState({
+    vehicle_make: "",
+    vehicle_model: "",
+    vehicle_year: "",
+    vehicle_color: "",
+    vehicle_tag: "",
+    vehicle_mileage: "",
+    vehicle_serial: "",
+  });
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -58,19 +71,55 @@ const CustomerProfile = () => {
   const handleDeleteVehicle = async (vehicleId) => {
     console.log("Deleting vehicle with ID:", vehicleId);
     try {
-      const res = await fetch(`/api/vehicles/${vehicleId}`, {
+      const res = await fetch(`${api_url}/api/vehicles/${vehicleId}`, {
         method: "DELETE",
       });
       if (res.ok) {
         console.log("Vehicle deleted successfully");
         setVehicles((prevVehicles) =>
-          prevVehicles.filter((vehicle) => vehicle.id !== vehicleId)
+          prevVehicles.filter((vehicle) => vehicle.vehicle_id !== vehicleId)
         );
-      } else {
-        console.error("Failed to delete vehicle");
       }
     } catch (error) {
       console.error("Error deleting vehicle", error);
+    }
+  };
+
+  const handleEditVehicleClick = (vehicle) => {
+    setEditingVehicle(vehicle);
+    setFormData(vehicle); // Populate form with current vehicle data
+    setShowEditModal(true); // Show the modal
+  };
+
+  const handleUpdateVehicle = async () => {
+    try {
+      const res = await fetch(
+        `${api_url}/api/vehicles/${editingVehicle.vehicle_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (res.ok) {
+        console.log("Vehicle updated successfully");
+        // Update the vehicle list
+        setVehicles((prevVehicles) =>
+          prevVehicles.map((vehicle) =>
+            vehicle.vehicle_id === editingVehicle.vehicle_id
+              ? formData
+              : vehicle
+          )
+        );
+        setShowEditModal(false);
+      } else {
+        console.error("Failed to update vehicle");
+      }
+    } catch (error) {
+      console.error("Error updating vehicle", error);
     }
   };
 
@@ -138,7 +187,7 @@ const CustomerProfile = () => {
               {vehicles.length > 0 ? (
                 <ul>
                   {vehicles.map((vehicle) => (
-                    <li key={vehicle.id}>
+                    <li key={vehicle.vehicle_id}>
                       <strong>
                         {vehicle.vehicle_make} {vehicle.vehicle_model}
                       </strong>
@@ -149,15 +198,16 @@ const CustomerProfile = () => {
                       <p>Vehicle serial: {vehicle.vehicle_serial}</p>
                       <Button
                         variant="link"
-                        href={`/admin/edit-vehicle/${vehicle.id}`}
+                        onClick={() => handleEditVehicleClick(vehicle)}
                       >
                         <i className="fa fa-edit"></i> Edit vehicle info
                       </Button>
                       <Button
-                        variant="danger"
-                        onClick={() => handleDeleteVehicle(vehicle.id)}
+                        className="bg-inherit border-0"
+                        // variant="danger"
+                        onClick={() => handleDeleteVehicle(vehicle.vehicle_id)}
                       >
-                        Delete
+                        <FcFullTrash />
                       </Button>
                     </li>
                   ))}
@@ -202,6 +252,85 @@ const CustomerProfile = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Bootstrap Modal for editing vehicle */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Vehicle Info</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Vehicle Make</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.vehicle_make}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicle_make: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Vehicle Model</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.vehicle_model}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicle_model: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Vehicle Year</Form.Label>
+              <Form.Control
+                type="number"
+                value={formData.vehicle_year}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicle_year: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Vehicle Color</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.vehicle_color}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicle_color: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Vehicle Mileage</Form.Label>
+              <Form.Control
+                type="number"
+                value={formData.vehicle_mileage}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicle_mileage: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Vehicle Serial</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.vehicle_serial}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicle_serial: e.target.value })
+                }
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdateVehicle}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
