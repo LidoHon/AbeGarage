@@ -44,17 +44,7 @@ const FeatureBlock = ({ title, icon }) => (
 const Services = () => {
 	return (
     <div>
-      {/* <section className="page-title" style="">
-        <div className="auto-container">
-            <h2>Services</h2>
-            <ul className="page-breadcrumb">
-                <li><a href="index.html">home</a></li>
-                <li>Services</li>
-            </ul>
-        </div>
-        <h1 data-parallax='{"x": 200}'>Car Repairing</h1>
-    </section> */}
-      {/* Page Title Section */}
+      
       <>
         <div
           className="page-title"
@@ -167,17 +157,7 @@ const Services = () => {
         </div>
       </section>
 
-      {/* <section className="video-section">
-        <div data-parallax='{"y": 50}' className="sec-bg" style=""></div>
-        <div className="auto-container">
-            <h5>Working since 1992</h5>
-            <h2>We are leader <br/> in Car Mechanical Work</h2>
-            <div className="video-box">
-                <div className="video-btn"><a href="" className="overlay-link lightbox-image video-fancybox ripple"><i className="flaticon-play"></i></a></div>
-                <div className="text">Watch intro video <br/> about us</div>
-            </div>
-        </div>
-    </section> */}
+      
       <div className="why-choose-us">
         <div className="row" style={{ width: "90%", margin: "0 auto" }}>
           <div className="col-lg-6">
