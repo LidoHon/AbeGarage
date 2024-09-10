@@ -122,7 +122,6 @@ const CustomerProfile = () => {
       console.error("Error updating vehicle", error);
     }
   };
-
   if (!customerData) {
     return <div>Loading...</div>;
   }
@@ -203,8 +202,8 @@ const CustomerProfile = () => {
                         <i className="fa fa-edit"></i> Edit vehicle info
                       </Button>
                       <Button
-                        className="bg-inherit border-0"
                         // variant="danger"
+                        className="bg-inherit border-0"
                         onClick={() => handleDeleteVehicle(vehicle.vehicle_id)}
                       >
                         <FcFullTrash />
