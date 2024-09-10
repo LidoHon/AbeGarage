@@ -9,15 +9,32 @@ const authMiddleware = require("../middlewares/auth.middleware");
 // Create a route to handle the add employee request on post
 router.post(
   "/api/employee",
-  [authMiddleware.verifyToken, authMiddleware.isAdmin],
+  // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+
   employeeController.createEmployee
 );
 // router.post("/api/employee", employeeController.createEmployee);
+
+
 // Create a route to handle the get all employees request on get
 router.get(
   "/api/employees",
-  
+  // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+
   employeeController.getAllEmployees
 );
+
+router.put(
+  "/api/employees/:id",
+  // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+  employeeController.updateEmployee
+);
+
+router.delete(
+  "/api/employees/:id",
+  // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+  employeeController.deleteEmployee
+);
+
 // Export the router
 module.exports = router;

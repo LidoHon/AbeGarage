@@ -1,0 +1,95 @@
+[33mcommit 793b88595851a7bba2f655cc18cd5ba7b9bd983f[m[33m ([m[1;36mHEAD -> [m[1;32mcustomers[m[33m)[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Tue Sep 10 12:25:05 2024 +0300
+
+    Add update and delete features for vehicles
+
+[33mcommit ebb3c9cb3dd177ff9f6e7e30280db094a5467019[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Mon Sep 9 22:10:01 2024 +0300
+
+    Add functionality to add new vehicles to customer profiles
+
+[33mcommit b274507c7c39f2ff0d7f7ccf48ecb34c209b3b5b[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Mon Sep 9 14:38:42 2024 +0300
+
+    vehicle edited
+
+[33mcommit 88cf2faeaab35a9cb3274f2c7e018284b12f7245[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Mon Sep 9 14:37:43 2024 +0300
+
+    vehicle edited
+
+[33mcommit 44c675bde07c96c73ed8360e2f9c2a92baf169b5[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Mon Sep 9 10:04:42 2024 +0300
+
+    logIn corrected
+
+[33mcommit e8e890415f3260303acb1e503e4fc4339578b823[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Sun Sep 8 22:33:06 2024 +0300
+
+    improved
+
+[33mcommit e1218eedde47669d2ca90d61263d9d06e56a6e65[m[33m ([m[1;31morigin/vehicles[m[33m)[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Sun Sep 8 21:11:07 2024 +0300
+
+    vehicle service edited
+
+[33mcommit 205e01a79f6fb961f5136121e0684a78e2a186de[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Sun Sep 8 21:00:53 2024 +0300
+
+    initial vehicle commit
+
+[33mcommit 3392d8b5171472dfb02d6437e07dcc722867c72f[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Sun Sep 8 20:55:57 2024 +0300
+
+    initial customer pages commit
+
+[33mcommit ac71ad0a113e19f269627aecf9755e50cee61a5b[m
+Author: Hiwiii <42866660+Hiwiii@users.noreply.github.com>
+Date:   Sun Sep 8 20:32:43 2024 +0300
+
+    Update .gitignore
+
+[33mcommit 2e84daad244c943cdc8969d1bb47c201fe18e257[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Fri Sep 6 14:02:47 2024 +0300
+
+    just doing some trials on  updating and deleting employee
+
+[33mcommit 8ed9cb6618fea16ff017e0c14beb50995f39a5a8[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Thu Sep 5 21:40:29 2024 +0300
+
+    Modify SQL schema to cascade on delete; update and delete employee feature added to backend
+
+[33mcommit cc64cc40a76fc36f4844c9b38cb597cbd1c742ef[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/EAGP-FE-021[m[33m, [m[1;32mmain[m[33m)[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Thu Sep 5 11:27:04 2024 +0300
+
+    about page and header modification
+
+[33mcommit 216dbf94e1d15bddd22b2296ed2adbd05313dd2d[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Wed Sep 4 17:37:11 2024 +0300
+
+    contact page added
+
+[33mcommit c70a38ded251e8fd5a25895af419a8e523210c79[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Wed Sep 4 14:13:03 2024 +0300
+
+    update gitignore
+
+[33mcommit 5aa9ac145aad55042c793d96f8071c7f62f60a64[m
+Author: LidoHon <lidohon10@gmail.com>
+Date:   Wed Sep 4 14:09:21 2024 +0300
+
+    update gitignore
