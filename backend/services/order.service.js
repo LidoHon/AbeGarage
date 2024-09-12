@@ -16,7 +16,6 @@ async function checkOrders(orderId) {
 //creating new order 🤩
 
 async function createNewOrder(order) {
-  
   try {
     //creating a query to add orders
     //the capitalization of the "Orderder_date"
@@ -65,7 +64,45 @@ async function createNewOrder(order) {
     return { message: "Order Created Successfully", success: true, orderId };
   } catch (error) {
     throw error;
-  } 
+  }
 }
 
-module.exports = { createNewOrder };
+//getting all the orderds
+async function getAllOrders() {
+  try {
+    // Query to get all orders along with their services
+    const ordersQuery = `
+     SELECT 
+  o.order_id, 
+  o.employee_id, 
+  o.customer_id, 
+  o.vehicle_id, 
+  o.order_date, 
+  oi.estimated_completion_date, 
+  oi.completion_date, 
+  oi.additional_request, 
+  oi.additional_requests_completed, 
+  os.service_completed,
+  GROUP_CONCAT(
+    CONCAT(
+      '{"order_service_id": ', os.order_service_id, 
+      ', "service_id": ', os.service_id, 
+      ', "service_completed": ', os.service_completed, '}'
+    )
+  ) AS order_services
+FROM orders o
+JOIN order_info oi ON o.order_id = oi.order_id
+LEFT JOIN order_services os ON o.order_id = os.order_id
+GROUP BY o.order_id;
+
+    `;
+
+    const [orders] = await dbConnection.query(ordersQuery);
+
+    return orders;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = { createNewOrder, getAllOrders };

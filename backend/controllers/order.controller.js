@@ -2,6 +2,8 @@ const orderService = require("../services/order.service");
 const bcrypt = require("bcrypt");
 const { StatusCodes } = require("status-codes");
 
+
+//creating new orders
 async function createOrder(req, res, next) {
   try {
     const {
@@ -58,4 +60,27 @@ async function createOrder(req, res, next) {
   }
 }
 
-module.exports = { createOrder };
+// getting all the orders 
+async function getAllOrders(req, res, next) {
+  try {
+    // Fetch all orders with their associated services
+    const orders = await orderService.getAllOrders();
+
+    // Send success response
+    res.status(201).json({
+      message: "Orders retrieved successfully",
+      success: true,
+      data: orders,
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+
+    // Send error response
+    res.status(500).json({
+      message: "An error occurred while retrieving orders",
+      error: error.message,
+    });
+  }
+}
+
+module.exports = { createOrder , getAllOrders};

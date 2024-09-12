@@ -6,6 +6,8 @@ const ordersController = require("../controllers/order.controller");
 //This created a new order
 router.post("/api/order", ordersController.createOrder);
 
+router.get("/api/orders", ordersController.getAllOrders)
+
 
 
 
