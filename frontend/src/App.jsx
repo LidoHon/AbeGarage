@@ -18,6 +18,7 @@ import AddCustomer from "./pages/admin/AddCustomer";
 import CustomerProfile from "./pages/CustomerProfile";
 import AddOrder from "./pages/admin/AddOrder";
 import Services from "./pages/admin/Services";
+import ServiceSelection from "./Components/Admin/AddServiceForm/SelectService";
 function App() {
   return (
     <Router>
@@ -108,6 +109,22 @@ function App() {
               <PrivateAuthRoute roles={[3, 1]}>
                 <Services />
               </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/services"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <Services />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/services"
+            element={
+              
+                <ServiceSelection />
+             
             }
           />
 

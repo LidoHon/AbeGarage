@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Service from "../../services/order.service";
 import { Modal } from "react-bootstrap";
+import ServiceSelection from "../AddServiceForm/SelectService";
 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,7 +13,10 @@ const AddOrderForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [noResults, setNoResults] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  // const [showEditModal, setShowEditModal] = useState(false);
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+
 
   useEffect(() => {
     if (searchQuery) {
@@ -93,6 +97,10 @@ const AddOrderForm = () => {
     }
   };
 
+  const handleSelectServices = (services) => {
+    setSelectedServices(services);
+  };
+
   return (
     <div className="container">
       <h2 className="mb-4">Create a new order</h2>
@@ -114,7 +122,7 @@ const AddOrderForm = () => {
                 onClick={() => {
                   setSelectedCustomer(null);
                   setSelectedVehicle(null);
-                  setVehicles([]); // Clear vehicles when customer is deselected
+                  setVehicles([]); 
                 }}
               >
                 <i className="fa fa-times"></i>
@@ -183,8 +191,11 @@ const AddOrderForm = () => {
             </div>
           )}
 
+              {/* Render Service Selection Component */}
+              <ServiceSelection onSelectServices={handleSelectServices} />
+
           <button className="btn btn-danger mt-4" onClick={handleCreateOrder}>
-            Create Order
+            Submit Order
           </button>
         </div>
       ) : (
