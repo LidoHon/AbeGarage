@@ -144,4 +144,64 @@ async function getOrderById(id) {
     throw error;
   }
 }
-module.exports = { createNewOrder, getAllOrders, getOrderById };
+
+//updating an order
+async function updateOrder(orderId, orderData) {
+  const {
+    customer_id,
+    employee_id,
+    vehicle_id,
+    order_description,
+    order_date,
+    estimated_completion_date,
+    completion_date,
+    order_completed,
+  } = orderData;
+
+  const updateOrderQuery = `
+    UPDATE orders
+    SET 
+      customer_id = ?, 
+      employee_id = ?, 
+      vehicle_id = ?, 
+      order_description = ?, 
+      order_date = ?, 
+      estimated_completion_date = ?, 
+      completion_date = ?, 
+      order_completed = ?
+    WHERE order_id = ?;
+  `;
+
+  await db.query(updateOrderQuery, [
+    customer_id,
+    employee_id,
+    vehicle_id,
+    order_description,
+    order_date,
+    estimated_completion_date,
+    completion_date,
+    order_completed,
+    orderId,
+  ]);
+}
+
+async function updateOrderServices (orderId, orderServices) {
+  // First, remove existing services for the order
+  const deleteServicesQuery = `
+    DELETE FROM order_services
+    WHERE order_id = ?;
+  `;
+  await db.query(deleteServicesQuery, [orderId]);
+
+  // Insert new services
+  const insertServiceQuery = `
+    INSERT INTO order_services (order_id, service_id)
+    VALUES (?, ?);
+  `;
+
+  for (const service of orderServices) {
+    await db.query(insertServiceQuery, [orderId, service.service_id]);
+  }
+
+};
+module.exports = { createNewOrder, getAllOrders, getOrderById,updateOrder,updateOrderServices };
