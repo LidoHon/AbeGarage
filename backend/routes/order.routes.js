@@ -9,9 +9,8 @@ router.get("/api/orders", ordersController.getAllOrders);
 
 router.get("/api/order/:id", ordersController.getOrderById);
 
-router.put('/api/order', ordersController.updateOrder)
+router.put("/api/order", ordersController.updateOrder);
 
-
-
+router.delete("/order/:id", ordersController.deleteOrder);
 
 module.exports = router;

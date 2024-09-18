@@ -106,7 +106,7 @@ GROUP BY o.order_id;
 }
 
 //getting single order
-async function getOrderById(id) {
+async function getOrderById(orderId) {
   try {
     // Query to get the order details without the services
     const orderQuery = `
@@ -204,4 +204,7 @@ async function updateOrderServices (orderId, orderServices) {
   }
 
 };
+
+//delete an order
+
 module.exports = { createNewOrder, getAllOrders, getOrderById,updateOrder,updateOrderServices };

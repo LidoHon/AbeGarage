@@ -173,4 +173,39 @@ async function updateOrder(req, res) {
   }
 }
 
-module.exports = { createOrder, getAllOrders, getOrderById, updateOrder };
+//delete user
+async function deleteOrder(req,res) {
+  const orderId = req.params.id;
+
+  try {
+    // Check if the order exists
+    const existingOrder = await orderService.getOrderById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        error: "Not Found",
+        message: `Order with id ${orderId} not found`,
+      });
+    }
+
+    // Delete the order and associated services
+    await orderService.deleteOrder(orderId);
+
+    return res.status(200).json({
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "An unexpected error occurred while deleting the order.",
+    });
+  }
+}
+
+module.exports = {
+  createOrder,
+  getAllOrders,
+  getOrderById,
+  updateOrder,
+  deleteOrder,
+};
