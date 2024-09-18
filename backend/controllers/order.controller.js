@@ -2,7 +2,6 @@ const orderService = require("../services/order.service");
 const bcrypt = require("bcrypt");
 const { StatusCodes } = require("status-codes");
 
-
 //creating new orders
 async function createOrder(req, res, next) {
   try {
@@ -60,7 +59,7 @@ async function createOrder(req, res, next) {
   }
 }
 
-// getting all the orders 
+// getting all the orders
 async function getAllOrders(req, res, next) {
   try {
     // Fetch all orders with their associated services
@@ -72,6 +71,7 @@ async function getAllOrders(req, res, next) {
       success: true,
       data: orders,
     });
+    next();
   } catch (error) {
     console.error("Error fetching orders:", error);
 
@@ -83,4 +83,33 @@ async function getAllOrders(req, res, next) {
   }
 }
 
-module.exports = { createOrder , getAllOrders};
+//get single order
+async function getOrderById  (req, res) {
+ try {
+   const orderId = req.params.id;
+
+   const order = await OrdersService.getOrderById(orderId);
+
+   if (!order) {
+     return res.status(404).json({
+       error: "Not Found",
+       message: `Order with id ${orderId} not found`,
+     });
+   }
+
+   return res.status(200).json(order);
+ } catch (error) {
+   return res.status(500).json({
+     error: "Internal Server Error",
+     message: "An unexpected error occurred while retrieving the order.",
+   });
+ }
+};
+
+//Update user
+async function updateOrder(req,res) {
+
+}
+
+
+module.exports = { createOrder, getAllOrders, getOrderById, updateOrder };

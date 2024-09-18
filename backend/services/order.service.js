@@ -105,4 +105,43 @@ GROUP BY o.order_id;
   }
 }
 
-module.exports = { createNewOrder, getAllOrders };
+//getting single order
+async function getOrderById(id) {
+  try {
+    // Query to get the order details without the services
+    const orderQuery = `
+      SELECT o.order_id, o.employee_id, o.customer_id, o.vehicle_id, 
+             o.order_description, o.order_date, 
+             o.estimated_completion_date, o.completion_date, o.order_completed
+      FROM orders o
+      WHERE o.order_id = ?;
+    `;
+
+    const [orderRows] = await dbConnection.query(orderQuery, [orderId]);
+
+    // If no order found, return null
+    if (orderRows.length === 0) {
+      return null;
+    }
+
+    const order = orderRows[0];
+
+    // Query to get the order services separately
+    const servicesQuery = `
+      SELECT os.order_service_id, os.order_id, os.service_id
+      FROM order_services os
+      WHERE os.order_id = ?;
+    `;
+
+    const [servicesRows] = await db.query(servicesQuery, [orderId]);
+
+    // Add the services to the order object
+    order.order_services = servicesRows;
+
+    return order;
+  } catch (error) {
+    console.error("Error fetching order by ID:", error);
+    throw error;
+  }
+}
+module.exports = { createNewOrder, getAllOrders, getOrderById };
