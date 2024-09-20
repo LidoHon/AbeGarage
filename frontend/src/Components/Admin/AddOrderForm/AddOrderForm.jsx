@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Service from "../../services/order.service";
 import { Modal } from "react-bootstrap";
+import ServiceSelection from "../AddServiceForm/SelectService";
 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,6 +14,10 @@ const AddOrderForm = () => {
   const [error, setError] = useState("");
   const [noResults, setNoResults] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  // const [showEditModal, setShowEditModal] = useState(false);
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+
 
   useEffect(() => {
     if (searchQuery) {
@@ -27,11 +32,9 @@ const AddOrderForm = () => {
           setLoading(false);
         }
       };
-
       fetchCustomers();
     }
   }, [searchQuery]);
-
   useEffect(() => {
     if (searchQuery) {
       const filtered = customers.filter(
@@ -54,10 +57,8 @@ const AddOrderForm = () => {
       setNoResults(false);
     }
   }, [searchQuery, customers]);
-
   const handleSelectCustomer = async (customer) => {
     setSelectedCustomer(customer);
-
     // Fetch the vehicles for the selected customer
     try {
       setLoading(true);
@@ -69,17 +70,14 @@ const AddOrderForm = () => {
       setLoading(false);
     }
   };
-
   const handleSelectVehicle = (vehicle) => {
     setSelectedVehicle(vehicle);
   };
-
   const handleCreateOrder = async () => {
     if (!selectedCustomer || !selectedVehicle) {
       alert("Please select both a customer and a vehicle.");
       return;
     }
-
     try {
       const orderData = {
         customer_id: selectedCustomer.customer_id,
@@ -93,10 +91,13 @@ const AddOrderForm = () => {
     }
   };
 
+  const handleSelectServices = (services) => {
+    setSelectedServices(services);
+  };
+
   return (
     <div className="container">
       <h2 className="mb-4">Create a new order</h2>
-
       {selectedCustomer ? (
         <div className="selected-customer-details card p-3">
           <div className="row">
@@ -115,13 +116,13 @@ const AddOrderForm = () => {
                   setSelectedCustomer(null);
                   setSelectedVehicle(null);
                   setVehicles([]); // Clear vehicles when customer is deselected
+                  setVehicles([]); 
                 }}
               >
                 <i className="fa fa-times"></i>
               </button>
             </div>
           </div>
-
           {!selectedVehicle && (
             <>
               <h4 className="mt-4">Select a Vehicle</h4>
@@ -171,7 +172,6 @@ const AddOrderForm = () => {
               )}
             </>
           )}
-
           {selectedVehicle && (
             <div className="selected-vehicle-details card p-3 mt-4">
               <h4>{selectedVehicle.vehicle_model}</h4>
@@ -183,8 +183,12 @@ const AddOrderForm = () => {
             </div>
           )}
 
+              {/* Render Service Selection Component */}
+              <ServiceSelection onSelectServices={handleSelectServices} />
+
           <button className="btn btn-danger mt-4" onClick={handleCreateOrder}>
             Create Order
+            Submit Order
           </button>
         </div>
       ) : (
@@ -204,10 +208,8 @@ const AddOrderForm = () => {
               Add New Customer
             </button>
           </div>
-
           {loading && <p>Loading customers...</p>}
           {error && <p className="text-danger">{error}</p>}
-
           {!loading && !error && searchQuery && (
             <table className="table table-hover mt-4">
               <thead>
@@ -244,5 +246,4 @@ const AddOrderForm = () => {
     </div>
   );
 };
-
 export default AddOrderForm;

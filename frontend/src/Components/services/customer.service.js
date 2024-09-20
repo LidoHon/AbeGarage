@@ -104,15 +104,28 @@ const getCustomerOrders = async (customerId, token) => {
     return response;
 };
 
-// Export all the functions
+const getRequestedServicesForOrder = async (orderId, token) => {
+    const requestOptions = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "x-access-token": token,
+        },
+    };
+    const response = await fetch(`${api_url}/api/orders/${orderId}/services`, requestOptions);
+    return response;
+};
 
+// Exporting the complete customerService object
 const customerService = {
     createCustomer,
     getAllCustomers,
     deleteCustomer,
     updateCustomer,
     getCustomer,
-    getCustomerVehicles, 
-    getCustomerOrders,    
+    getCustomerVehicles,
+    getCustomerOrders,
+    getRequestedServicesForOrder,
 };
+
 export default customerService;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import AdminMenu from '../../Components/Admin/AdminMenu/AdminMenu'; 
-import AddServiceForm from '../../Components/Admin/AddServiceForm/AddServiceForm';
+import AddServiceForm from '../../Components/Admin/AddServiceForm/SelectService';
 import Service from '../../Components/services/service.service'; 
 
 const Services = () => {

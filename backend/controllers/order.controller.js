@@ -1,0 +1,208 @@
+const orderService = require("../services/order.service");
+const bcrypt = require("bcrypt");
+const { StatusCodes } = require("status-codes");
+
+//creating new orders
+async function createOrder(req, res, next) {
+  try {
+    const {
+      employee_id,
+      customer_id,
+      vehicle_id,
+      order_description,
+      estimated_completion_date,
+      completion_date,
+      order_completed,
+      order_services,
+    } = req.body;
+
+    if (
+      !employee_id ||
+      !customer_id ||
+      !vehicle_id ||
+      !order_description ||
+      !order_services
+    ) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: "Bad Request",
+        message: "Please provide all required fields",
+      });
+    }
+    //generating hash
+    const salt = await bcrypt.genSalt(10);
+    const rawOrderHash = Math.random().toString(36).substring(2, 15);
+    const order_hash = await bcrypt.hash(rawOrderHash, salt);
+
+    const orderData = {
+      employee_id,
+      customer_id,
+      vehicle_id,
+      order_description,
+      estimated_completion_date,
+      completion_date,
+      order_completed,
+      order_hash,
+      order_services,
+    };
+    const result = await orderService.createNewOrder(orderData);
+
+    res.status(201).json({
+      message: "Order created successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: "An unexpected error occurred.",
+    });
+  }
+}
+
+// getting all the orders
+async function getAllOrders(req, res, next) {
+  try {
+    // Fetch all orders with their associated services
+    const orders = await orderService.getAllOrders();
+
+    // Send success response
+    res.status(201).json({
+      message: "Orders retrieved successfully",
+      success: true,
+      data: orders,
+    });
+    next();
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+
+    // Send error response
+    res.status(500).json({
+      message: "An error occurred while retrieving orders",
+      error: error.message,
+    });
+  }
+}
+
+//get single order
+async function getOrderById(req, res) {
+  try {
+    const orderId = req.params.id;
+
+    const order = await OrdersService.getOrderById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        error: "Not Found",
+        message: `Order with id ${orderId} not found`,
+      });
+    }
+
+    return res.status(200).json(order);
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "An unexpected error occurred while retrieving the order.",
+    });
+  }
+}
+
+//Update user
+async function updateOrder(req, res) {
+  const orderId = req.params.id;
+  const {
+    customer_id,
+    employee_id,
+    vehicle_id,
+    order_description,
+    order_date,
+    estimated_completion_date,
+    completion_date,
+    order_completed,
+    order_services,
+  } = req.body;
+
+  // Validate required fields
+  if (
+    !orderId ||
+    !customer_id ||
+    !employee_id ||
+    !vehicle_id ||
+    !order_description
+  ) {
+    return res.status(400).json({
+      error: "Bad Request",
+      message: "Please provide all required fields",
+    });
+  }
+
+  try {
+    // Check if the order exists
+    const existingOrder = await orderService.getOrderById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        error: "Not Found",
+        message: `Order with id ${orderId} not found`,
+      });
+    }
+
+    // Update the order details
+    await orderService.updateOrder(orderId, {
+      customer_id,
+      employee_id,
+      vehicle_id,
+      order_description,
+      order_date,
+      estimated_completion_date,
+      completion_date,
+      order_completed,
+    });
+
+    // Update the order services
+    await orderService.updateOrderServices(orderId, order_services);
+
+    return res.status(200).json({
+      message: "Order updated successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "An unexpected error occurred while updating the order.",
+    });
+  }
+}
+
+module.exports = { createOrder, getAllOrders, getOrderById, updateOrder };
+//delete user
+async function deleteOrder(req,res) {
+  const orderId = req.params.id;
+  try {
+    // Check if the order exists
+    const existingOrder = await orderService.getOrderById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        error: "Not Found",
+        message: `Order with id ${orderId} not found`,
+      });
+    }
+    // Delete the order and associated services
+    await orderService.deleteOrder(orderId);
+    return res.status(200).json({
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "An unexpected error occurred while deleting the order.",
+    });
+  }
+}
+module.exports = {
+  createOrder,
+  getAllOrders,
+  getOrderById,
+  updateOrder,
+  deleteOrder,
+};
