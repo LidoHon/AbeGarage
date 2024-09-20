@@ -5,18 +5,28 @@ import { loginService } from "./services/login.service.js";
 import { useAuth } from "../Contexts/AuthContext.jsx";
 
 function Header(props) {
-  const { isLogged, setIsLogged, employee } = useAuth();
+  // Include both employee and customer states
+  const { isLogged, setIsLogged, employee, customer } = useAuth(); 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Debugging: Check the logged-in status and user data
+  console.log("Is Logged In:", isLogged);
+  console.log("Employee Data:", employee);
+  console.log("Customer Data:", customer);
 
   const logOut = () => {
     loginService.logOut();
     setIsLogged(false);
+    localStorage.removeItem("employee");
+    localStorage.removeItem("customer");
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+   // Check if the logged-in employee is an admin
+  const isAdmin = employee && employee.employee_role === 3;
   return (
     <header className="main-header bg-white shadow-md">
       {/* Top Header */}
@@ -29,8 +39,13 @@ function Header(props) {
           <div className="right-column flex items-center">
             {isLogged ? (
               <div className="link-btn">
+                {/* Display different welcome messages based on whether it's an employee or a customer */}
                 <div className="phone-number">
-                  <strong>Welcome {employee?.employee_first_name}</strong>
+                  {employee ? (
+                    <strong>Welcome {employee?.employee_first_name}</strong> 
+                  ) : (
+                    <strong>Welcome {customer?.customer_first_name}</strong> 
+                  )}
                 </div>
               </div>
             ) : (
@@ -62,6 +77,11 @@ function Header(props) {
                   <li className="dropdown">
                     <Link to="/" className="hover:text-blue-500">Home</Link>
                   </li>
+                  {isAdmin && (
+                    <li className="dropdown">
+                      <Link to="/admin/admin-landing" className="hover:text-blue-500">Dashboard</Link> {/* Admin-only dashboard link */}
+                    </li>
+                  )}
                   <li className="dropdown">
                     <Link to="/about" className="hover:text-blue-500">About Us</Link>
                   </li>
@@ -112,6 +132,11 @@ function Header(props) {
               <li className="dropdown">
                 <Link to="/" className="hover:text-blue-500">Home</Link>
               </li>
+              {isAdmin && (
+                <li className="dropdown">
+                  <Link to="/admin/admin-landing" className="hover:text-blue-500">Dashboard</Link> {/* Admin-only dashboard link */}
+                </li>
+              )}
               <li className="dropdown">
                 <Link to="/about" className="hover:text-blue-500">About Us</Link>
               </li>

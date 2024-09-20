@@ -13,7 +13,7 @@ function Unauthorized() {
       <BsFillSignNoRightTurnFill size={50} className="text-white" />
       <h1 className="text-danger mb-4">Unauthorized Access</h1>
       <p className="text-secondary mb-5">
-        Who do u think u are? Get ur ass back there!
+        You do not have permission to access this page.
       </p>
       <button className="btn btn-primary" onClick={handleGoBack}>
         Go Back

@@ -1,7 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const sanitize = require("sanitize");
-// const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const corsOptions = {
   origin: "*",
@@ -15,7 +15,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-// app.use(cookieParser());
+app.use(cookieParser());
 
 app.use(sanitize.middleware);
 

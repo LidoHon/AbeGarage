@@ -1,9 +1,11 @@
-import React from 'react'
+import React from "react";
 
-const Order = () => {
+const Orders = () => {
   return (
-    <div>Order page</div>
-  )
+    <div>
+      <h1>Orders Page</h1>
+    </div>
+  );
 }
 
-export default Order
+export default Orders; 

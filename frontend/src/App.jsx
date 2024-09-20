@@ -6,12 +6,19 @@ import AddEmployee from "./pages/admin/AddEmployee";
 import "./assets/styles/custom.css";
 import Unauthorized from "./pages/Unauthorized";
 import PrivateAuthRoute from "./Components/Auth/PrivateAuthRoute";
-import Customer from "./Components/customer/Customer";
 import Orders from "./Components/order/Order";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
+import Customers from "./pages/admin/Customers";
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
+import AdminLanding from "./pages/admin/AdminLanding";
+import AddCustomer from "./pages/admin/AddCustomer";
+import CustomerProfile from "./pages/CustomerProfile";
+import AddOrder from "./pages/admin/AddOrder";
+import Services from "./pages/admin/Services";
+import OrderDetail from "./Components/order/OrderDetails";
+import ServiceSelection from "./Components/Admin/AddServiceForm/SelectService";
 function App() {
   return (
     <Router>
@@ -22,23 +29,30 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutUs />} />
           <Route
-            path="/admin/customer"
+            path="/admin/admin-landing"
             element={
               <PrivateAuthRoute roles={[2, 3]}>
-                <Customer />
+                <AdminLanding />
               </PrivateAuthRoute>
             }
           />
           <Route
-            path="/admin/orders"
+            path="/admin/orders" 
             element={
               <PrivateAuthRoute roles={[1, 2, 3]}>
                 <Orders />
               </PrivateAuthRoute>
             }
           />
+          <Route
+					path="/Order_Detail/:order_id"
+					element={
+						<PrivateAuthRoute roles={[1, 2, 3]}>
+							<OrderDetail />
+						</PrivateAuthRoute>
+					}
+				/>
           <Route path="/unauthorized" element={<Unauthorized />} />
-          {/* <Route path="/admin/add-employee" element={<AddEmployee />} /> */}
           <Route
             path="/admin/add-employee"
             element={
@@ -53,6 +67,52 @@ function App() {
               <PrivateAuthRoute roles={[3, 2]}>
                 <Employees />
               </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/add-customer"
+            element={
+              <PrivateAuthRoute roles={[3]}>
+                <AddCustomer />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/customers"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <Customers />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/customer-profile/:customer_id"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <CustomerProfile />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/add-order"
+            element={
+              <PrivateAuthRoute roles={[3]}>
+                <AddOrder />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/services"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <Services />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/services"
+            element={
+                <ServiceSelection />
             }
           />
           <Route path="*" element={<NotFound />} />
