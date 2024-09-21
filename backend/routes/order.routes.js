@@ -1,48 +1,23 @@
-// Import the express module
-const express = require("express");
-// Call the router method from express to create the router
+const express = require('express');
 const router = express.Router();
-// Import the order controller
-const orderController = require("../controllers/order.controller");
-// Import middleware
-const authMiddleware = require("../middlewares/auth.middleware");
+const orderController = require('../controllers/order.controller');
 
-// Route to fetch customers for order creation
-router.get('/api/orders/customers', orderController.getAllCustomersForOrder);
-// Create a route to handle adding a new order
-router.post(
-    "/api/order",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
-    orderController.createOrder
-);
+// Create new order
+router.post('/api/order', orderController.createOrder); 
 
-// Create a route to handle getting all orders
-router.get(
-    "/api/orders",
-    // [authMiddleware.verifyToken],
-    orderController.getAllOrders
-);
+// Get all orders
+router.get('/api/orders', orderController.getAllOrders);
 
-// Create a route to handle updating an order by ID
-router.put(
-    "/api/orders/:id",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
-    orderController.updateOrder
-);
+// Get single order by ID
+router.get('/api/order/:id', orderController.getOrderById);
 
-// Create a route to handle deleting an order by ID
-router.delete(
-    "/api/orders/:id",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
-    orderController.deleteOrder
-);
+// Update an existing order
+router.put('/api/order/:id', orderController.updateOrder);
 
-// Get a single order by ID
-router.get(
-    "/api/orders/:orderId",
-    // [authMiddleware.verifyToken], 
-    orderController.getOrderById
-);
+// Update order status of an existing order 
+router.put('/api/order/:id/status', orderController.updateOrderStatus);
 
-// Export the router
+// Delete an order by ID
+router.delete('/api/order/:id', orderController.deleteOrderById); 
+
 module.exports = router;

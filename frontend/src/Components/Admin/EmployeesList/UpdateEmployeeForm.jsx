@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import employeeService from "../../services/employee.service";
 import { Button, Form, Alert } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
+import "bootstrap/dist/css/bootstrap.min.css"; 
 
 function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
   const [employee_email, setEmail] = useState("");

@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Service from "../../services/order.service";
-import { Modal } from "react-bootstrap";
 import ServiceSelection from "../AddServiceForm/SelectService";
+import getAuth from "../../util/auth";  
 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [customers, setCustomers] = useState([]); // Ensure customers is initialized as an array
+  const [customers, setCustomers] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [noResults, setNoResults] = useState(false);
-  const [services, setServices] = useState([]);
-  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]); 
+  const [additionalRequest, setAdditionalRequest] = useState("");
+  const [orderPrice, setOrderPrice] = useState("");
+  const [estimatedCompletionDate, setEstimatedCompletionDate] = useState("");
+
+  const navigate = useNavigate();
 
   // Fetch customers based on the search query
   useEffect(() => {
@@ -22,8 +26,12 @@ const AddOrderForm = () => {
       const fetchCustomers = async () => {
         setLoading(true);
         try {
-          const customersData = await Service.getCustomers(searchQuery);
-          setCustomers(customersData || []); // Ensure it defaults to an array if undefined
+          const response = await Service.getCustomers(searchQuery);
+          if (response.status === "success") {
+            setCustomers(response.customers || []);
+          } else {
+            setCustomers([]);
+          }
         } catch (err) {
           setError("Error fetching customers. Please try again.");
         } finally {
@@ -51,10 +59,8 @@ const AddOrderForm = () => {
           customer.customer_phone.includes(searchQuery)
       );
       setFilteredCustomers(filtered);
-      setNoResults(filtered.length === 0);
     } else {
       setFilteredCustomers([]);
-      setNoResults(false);
     }
   }, [searchQuery, customers]);
 
@@ -64,7 +70,7 @@ const AddOrderForm = () => {
     try {
       setLoading(true);
       const vehiclesData = await Service.getVehicles(customer.customer_id);
-      setVehicles(vehiclesData || []); // Ensure vehiclesData defaults to an array
+      setVehicles(vehiclesData || []);
     } catch (err) {
       setError("Error fetching vehicles. Please try again.");
     } finally {
@@ -77,26 +83,76 @@ const AddOrderForm = () => {
   };
 
   const handleCreateOrder = async () => {
-    if (!selectedCustomer || !selectedVehicle) {
-      alert("Please select both a customer and a vehicle.");
+    console.log("handleCreateOrder triggered");
+
+    if (!selectedCustomer || !selectedVehicle || !orderPrice || !estimatedCompletionDate || !additionalRequest) {
+      alert("Please fill in all required fields.");
       return;
     }
 
     try {
+      // Retrieve the employee data
+      const employee = await getAuth(); 
+
+      if (!employee || !employee.employee_id) {
+        throw new Error("Employee not found or not authenticated.");
+      }
+
       const orderData = {
         customer_id: selectedCustomer.customer_id,
         vehicle_id: selectedVehicle.vehicle_id,
-        // Add any other necessary fields for the order
+        employee_id: employee.employee_id,  
+        active_order: 1,
+        order_hash: generateOrderHash(),
+        customer_first_name: selectedCustomer.customer_first_name, 
+        customer_last_name: selectedCustomer.customer_last_name, 
+        customer_email: selectedCustomer.customer_email,           
+        vehicle_tag: selectedVehicle.vehicle_tag,   
+        vehicle_mileage: selectedVehicle.vehicle_mileage,
+        employee_name: `${employee.employee_first_name} ${employee.employee_last_name}`, 
+        order_status: 1 
       };
-      await Service.createOrder(orderData);
+
+      const orderInfoData = {
+        order_total_price: orderPrice,
+        additional_request: additionalRequest,
+        estimated_completion_date: estimatedCompletionDate,
+        additional_requests_completed: 0,
+      };
+
+      console.log("Sending order data:", orderData);
+      console.log("Sending order info data:", orderInfoData);
+      console.log("Sending order services data:", selectedServices);  
+
+      // Create the full order with services
+      await Service.createOrder({
+        orderData,
+        orderInfoData,
+        orderServiceData: selectedServices,  
+      });
+
       alert("Order created successfully.");
+      navigate("/admin/orders");
     } catch (err) {
+      console.error("Error creating the order:", err);
       setError("Error creating the order. Please try again.");
     }
   };
 
+  
+
   const handleSelectServices = (services) => {
-    setSelectedServices(services);
+    const updatedServiceData = services.map(serviceId => ({
+      service_id: serviceId,
+      service_completed: 0,
+    }));
+  
+    setSelectedServices(updatedServiceData);
+    console.log("Selected services updated:", updatedServiceData); 
+  };
+
+  const generateOrderHash = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   };
 
   return (
@@ -120,7 +176,7 @@ const AddOrderForm = () => {
                 onClick={() => {
                   setSelectedCustomer(null);
                   setSelectedVehicle(null);
-                  setVehicles([]); 
+                  setVehicles([]);
                 }}
               >
                 <i className="fa fa-times"></i>
@@ -157,13 +213,10 @@ const AddOrderForm = () => {
                         <td>{vehicle.vehicle_mileage}</td>
                         <td>{vehicle.vehicle_tag}</td>
                         <td>{vehicle.vehicle_serial}</td>
-                        <td>{vehicle.vehicle_color}</td>
                         <td>
                           <button
                             className={`btn btn-sm ${
-                              selectedVehicle === vehicle
-                                ? "btn-success"
-                                : "btn-primary"
+                              selectedVehicle === vehicle ? "btn-success" : "btn-primary"
                             }`}
                             onClick={() => handleSelectVehicle(vehicle)}
                           >
@@ -189,8 +242,31 @@ const AddOrderForm = () => {
             </div>
           )}
 
-              {/* Render Service Selection Component */}
-              <ServiceSelection onSelectServices={handleSelectServices} />
+          {/* Render Service Selection Component */}
+          <ServiceSelection onSelectServices={handleSelectServices} />
+
+          {/* Additional Request, Price, and Estimated Completion Date Inputs */}
+          <input
+            type="text"
+            className="form-control mt-3"
+            placeholder="Enter service description"
+            value={additionalRequest}
+            onChange={(e) => setAdditionalRequest(e.target.value)}
+          />
+          <input
+            type="number"
+            className="form-control mt-3"
+            placeholder="Enter price"
+            value={orderPrice}
+            onChange={(e) => setOrderPrice(e.target.value)}
+          />
+
+          <input
+            type="date"
+            className="form-control mt-3"
+            value={estimatedCompletionDate}
+            onChange={(e) => setEstimatedCompletionDate(e.target.value)}
+          />
 
           <button className="btn btn-danger mt-4" onClick={handleCreateOrder}>
             Submit Order
@@ -229,22 +305,30 @@ const AddOrderForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCustomers.map((customer) => (
-                  <tr key={customer.customer_id}>
-                    <td>{customer.customer_first_name}</td>
-                    <td>{customer.customer_last_name}</td>
-                    <td>{customer.customer_email}</td>
-                    <td>{customer.customer_phone}</td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        onClick={() => handleSelectCustomer(customer)}
-                      >
-                        Select
-                      </button>
+                {filteredCustomers.length > 0 ? (
+                  filteredCustomers.map((customer) => (
+                    <tr key={customer.customer_id}>
+                      <td>{customer.customer_first_name}</td>
+                      <td>{customer.customer_last_name}</td>
+                      <td>{customer.customer_email}</td>
+                      <td>{customer.customer_phone}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => handleSelectCustomer(customer)}
+                        >
+                          Select
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No customers found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           )}

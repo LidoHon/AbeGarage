@@ -7,9 +7,9 @@ import "./assets/styles/custom.css";
 import Unauthorized from "./pages/Unauthorized";
 import PrivateAuthRoute from "./Components/Auth/PrivateAuthRoute";
 // import Customer from "./Components/customer/Customer";
-import Orders from "./Components/order/Order";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
+import EmployeeProfile from "./pages/EmployeeProfile"
 import Customers from './pages/admin/Customers';
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
@@ -17,6 +17,10 @@ import AdminLanding from "./pages/admin/AdminLanding";
 import AddCustomer from "./pages/admin/AddCustomer";
 import CustomerProfile from "./pages/CustomerProfile";
 import AddOrder from "./pages/admin/AddOrder";
+import Orders from "./pages/admin/Orders"
+import OrderDetails from "./pages/admin/OrderDetails"
+import Services from "./pages/admin/Services";
+import EditOrderForm from "./Components/Admin/EditOrderForm/EditOrderForm";
 function App() {
   return (
     <Router>
@@ -69,6 +73,14 @@ function App() {
             }
           />
           <Route
+            path="/admin/employee-profile/:employee_id"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <EmployeeProfile/>
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
             path="/admin/add-customer"
             element={
               <PrivateAuthRoute roles={[3]}>
@@ -97,6 +109,38 @@ function App() {
             element={
               <PrivateAuthRoute roles={[3]}>
                 <AddOrder />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <PrivateAuthRoute roles={[3]}>
+                <Orders/>
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/order/:orderId"
+            element={
+              <PrivateAuthRoute roles={[3]}>
+                <OrderDetails/>
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/edit-order/:orderId"
+            element={
+              <PrivateAuthRoute roles={[3]}>
+                <EditOrderForm/>
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/services"
+            element={
+              <PrivateAuthRoute roles={[3, 1]}>
+                <Services />
               </PrivateAuthRoute>
             }
           />

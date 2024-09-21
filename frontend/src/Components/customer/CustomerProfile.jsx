@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import customerService from "../../Components/services/customer.service";
 import { Button, Row, Col, Card, Modal, Form } from "react-bootstrap";
@@ -13,7 +13,7 @@ const CustomerProfile = () => {
   const [orders, setOrders] = useState([]);
   const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState(null); // Vehicle being edited
+  const [editingVehicle, setEditingVehicle] = useState(null); 
 
   const [formData, setFormData] = useState({
     vehicle_make: "",
@@ -87,8 +87,8 @@ const CustomerProfile = () => {
 
   const handleEditVehicleClick = (vehicle) => {
     setEditingVehicle(vehicle);
-    setFormData(vehicle); // Populate form with current vehicle data
-    setShowEditModal(true); // Show the modal
+    setFormData(vehicle); 
+    setShowEditModal(true); 
   };
 
   const handleUpdateVehicle = async () => {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Table, Modal, Button } from "react-bootstrap";
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import employeeService from "../../services/employee.service";
 import UpdateEmployeeForm from "./UpdateEmployeeForm"; // Import the UpdateEmployeeForm
 
@@ -13,6 +14,7 @@ const EmployeesList = () => {
   const [showModal, setShowModal] = useState(false);
   const { employee } = useAuth();
   const token = employee?.employee_token || null;
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -69,6 +71,10 @@ const EmployeesList = () => {
     setShowModal(true);
   };
 
+  const handleNavigateToProfile = (employeeId) => {
+    navigate(`/admin/employee-profile/${employeeId}`);
+  };
+
   return (
     <div className="employees-list">
       {apiError ? (
@@ -84,19 +90,27 @@ const EmployeesList = () => {
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
+                  <th>ID</th> {/* Add the employee_id column header */}
                   <th>Active</th>
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Email</th>
                   <th>Phone</th>
                   <th>Added Date</th>
-                  {/* <th>Role</th> */}
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {employees.map((employee) => (
                   <tr key={employee.employee_id}>
+                    <td>
+                      <button
+                        className="btn btn-link"
+                        onClick={() => handleNavigateToProfile(employee.employee_id)}
+                      >
+                        {employee.employee_id}
+                      </button>
+                    </td>
                     <td>{employee.active_employee ? "Yes" : "No"}</td>
                     <td>{employee.employee_first_name}</td>
                     <td>{employee.employee_last_name}</td>
@@ -108,7 +122,6 @@ const EmployeesList = () => {
                         "MM/dd/yyyy | HH:mm"
                       )}
                     </td>
-                    {/* <td>{employee.company_role_name}</td> */}
                     <td>
                       <div className="action-buttons">
                         <button

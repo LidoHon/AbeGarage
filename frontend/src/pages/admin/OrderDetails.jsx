@@ -1,6 +1,6 @@
 
 // Import the AddCustomerorm component 
-import OrderList from "../../Components/Admin/OrderList/OrderList"
+import OrderDetails from "../../Components/Admin/OrderDetails/OrderDetails"
 // Import the AdminMenu component 
 import AdminMenu from '../../Components/Admin/AdminMenu/AdminMenu';
 
@@ -13,7 +13,7 @@ function AddCustomer(props) {
                 <AdminMenu />
             </div>
             <div className="col-md-9 admin-right-side">
-                <OrderList />
+                <OrderDetails />
             </div>
             </div>
         </div>

@@ -1,10 +1,10 @@
 
 // Import the AddCustomerorm component 
-import OrderList from "../../Components/Admin/OrderList/OrderList"
+import EmployeeInfo from "../Components/Employee/EmployeeProfile";
 // Import the AdminMenu component 
-import AdminMenu from '../../Components/Admin/AdminMenu/AdminMenu';
+import AdminMenu from '../Components/Admin/AdminMenu/AdminMenu';
 
-function AddCustomer(props) {
+function CustomerProfile(props) {
     return (
         <div>
         <div className="container-fluid admin-pages">
@@ -13,7 +13,7 @@ function AddCustomer(props) {
                 <AdminMenu />
             </div>
             <div className="col-md-9 admin-right-side">
-                <OrderList />
+                <EmployeeInfo/>
             </div>
             </div>
         </div>
@@ -21,4 +21,4 @@ function AddCustomer(props) {
     );
 }
 
-export default AddCustomer;
+export default CustomerProfile;
