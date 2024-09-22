@@ -13,6 +13,7 @@ import EmployeeProfile from "./pages/EmployeeProfile"
 import Customers from './pages/admin/Customers';
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
+import HomeService from "./pages/Services"
 import AdminLanding from "./pages/admin/AdminLanding";
 import AddCustomer from "./pages/admin/AddCustomer";
 import CustomerProfile from "./pages/CustomerProfile";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/services" element={<HomeService />} />
           <Route
             path="/admin/admin-landing"
             element={

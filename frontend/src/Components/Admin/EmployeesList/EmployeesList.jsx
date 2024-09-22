@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Table, Modal, Button } from "react-bootstrap";
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+import { useNavigate } from "react-router-dom"; 
 import employeeService from "../../services/employee.service";
-import UpdateEmployeeForm from "./UpdateEmployeeForm"; // Import the UpdateEmployeeForm
+import UpdateEmployeeForm from "./UpdateEmployeeForm"; 
 
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
@@ -153,6 +153,7 @@ const EmployeesList = () => {
               onClose={() => setShowModal(false)}
               onSuccess={() => {
                 setShowModal(false);
+                window.location.reload();
                 // Refresh employee list or handle success
               }}
             />

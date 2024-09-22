@@ -186,6 +186,7 @@ const CustomersList = () => {
                             onClose={() => setShowModal(false)}
                             onSuccess={() => {
                                 setShowModal(false);
+                                window.location.reload();
                                 // Refresh customer list or handle success
                             }}
                         />
