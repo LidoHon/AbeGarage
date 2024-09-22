@@ -21,23 +21,42 @@ const getAllCustomersForOrder = async (req, res) => {
     }
 };
 
+
+// Create a new order
 // Create a new order
 const createOrder = async (req, res) => {
   try {
     const { orderData, orderInfoData, orderServiceData } = req.body;
 
-    console.log("Received order, info, and service data:", { orderData, orderInfoData, orderServiceData });
+    // Validate the request payload
+    if (!orderData || !orderInfoData || !orderServiceData) {
+      return res.status(400).json({
+        message: 'Missing required data: orderData, orderInfoData, or orderServiceData',
+      });
+    }
 
-    // Call the service function to handle everything
+    console.log("Received order data:", orderData);
+    console.log("Received order info data:", orderInfoData);
+    console.log("Received order service data:", orderServiceData);
+
+    // Call the service function to handle the order creation
     const result = await orderService.createOrder(orderData, orderInfoData, orderServiceData);
 
+    console.log("Order creation result:", result);
+
+    // Respond with success
     res.status(201).json(result);
 
   } catch (error) {
-    console.error('Error creating order:', error);
-    res.status(500).json({ message: 'Error creating order' });
+    // Log the error for debugging purposes
+    console.error('Error creating order:', error.message);
+    console.error('Stack trace:', error.stack);
+
+    // Return a 500 Internal Server Error with more details in production environment
+    res.status(500).json({ message: 'Error creating order', error: error.message });
   }
 };
+
 
 
 // Controller to fetch all orders

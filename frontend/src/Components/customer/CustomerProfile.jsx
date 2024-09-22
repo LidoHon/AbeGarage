@@ -1,5 +1,5 @@
-import  { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import customerService from "../../Components/services/customer.service";
 import { Button, Row, Col, Card, Modal, Form } from "react-bootstrap";
 import AddVehicleForm from "../../Components/Admin/AddVehicleForm/AddVehicleForm";
@@ -13,7 +13,7 @@ const CustomerProfile = () => {
   const [orders, setOrders] = useState([]);
   const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState(null); 
+  const [editingVehicle, setEditingVehicle] = useState(null);
 
   const [formData, setFormData] = useState({
     vehicle_make: "",
@@ -59,6 +59,25 @@ const CustomerProfile = () => {
     fetchCustomerVehicles();
   }, [customer_id]);
 
+  useEffect(() => {
+    const fetchCustomerOrders = async () => {
+      try {
+        const res = await customerService.getCustomerOrders(customer_id); 
+        const data = await res.json();
+        console.log("Orders data response:", data);
+        if (data.status === "success") {
+          setOrders(data.data);
+        } else {
+          setOrders([]);
+        }
+      } catch (error) {
+        console.error("Error fetching customer orders", error);
+      }
+    };
+
+    fetchCustomerOrders();
+  }, [customer_id]);
+
   const handleAddVehicleClick = () => {
     setShowAddVehicleForm(true);
   };
@@ -87,8 +106,8 @@ const CustomerProfile = () => {
 
   const handleEditVehicleClick = (vehicle) => {
     setEditingVehicle(vehicle);
-    setFormData(vehicle); 
-    setShowEditModal(true); 
+    setFormData(vehicle);
+    setShowEditModal(true);
   };
 
   const handleUpdateVehicle = async () => {
@@ -172,18 +191,20 @@ const CustomerProfile = () => {
                 <strong>Active Customer:</strong>{" "}
                 {customerData.active_customer ? "Yes" : "No"}
               </p>
-              <Button
+              {/* <Button
                 variant="link"
-                href={`/admin/edit-customer/${customer_id}`}
+                href={/admin/edit-customer/${customer_id}}
               >
                 <i className="fa fa-edit"></i> Edit customer info
-              </Button>
+              </Button> */}
             </Card.Body>
           </Card>
 
           <Card className="mb-4">
             <Card.Body>
-              <h3>Vehicles of {customerData.customer_first_name}</h3>
+              <h3 className="text-xl font-bold mb-2">
+                Vehicles of {customerData.customer_first_name}
+              </h3>
               {vehicles.length > 0 ? (
                 <ul>
                   {vehicles.map((vehicle) => (
@@ -236,12 +257,26 @@ const CustomerProfile = () => {
 
           <Card>
             <Card.Body>
-              <h3>Orders of {customerData.customer_first_name}</h3>
+              <h3 className="text-xl font-bold mb-2">
+                Orders of {customerData.customer_first_name}
+              </h3>
               {orders.length > 0 ? (
                 <ul>
                   {orders.map((order) => (
-                    <li key={order.id}>
-                      Order #{order.id} - {order.status}
+                    <li key={order.order_id} className="mb-2">
+                      <div className="flex flex-row gap-4 ">
+                        <p className="text-lg font-bold mt-1">
+                          Order #{order.order_id}{" "}
+                        </p>
+                        <Link to={`/admin/order/${order.order_id}`}>
+                          <button
+                            // variant="danger"
+                            className="bg-gray-700 text-white px-2  py-1 hover:bg-gray-500 hover:translate-x-2  "
+                          >
+                            View Order Details
+                          </button>
+                        </Link>
+                      </div>
                     </li>
                   ))}
                 </ul>

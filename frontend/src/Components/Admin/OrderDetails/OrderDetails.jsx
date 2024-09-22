@@ -3,121 +3,212 @@ import { useParams } from "react-router-dom";
 import Service from "../../services/order.service";
 
 const OrderDetails = () => {
-    const { orderId } = useParams(); 
-    console.log("Order ID from useParams:", orderId);
+  const { orderId } = useParams();
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const [orderDetails, setOrderDetails] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await Service.getOrderDetails(orderId);
+        if (response && response.data) {
+          setOrderDetails(response.data);
+        } else {
+          setError("No order details found.");
+        }
+      } catch (err) {
+        setError("Error fetching order details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    useEffect(() => {
-        const fetchOrderDetails = async () => {
-            try {
-                setLoading(true);
-                const response = await Service.getOrderDetails(orderId);
-                console.log("Order Details Response:", response);
-                
-                if (response && response.data) {
-                    setOrderDetails(response.data);
-                } else {
-                    setError("No order details found.");
-                }
-            } catch (err) {
-                setError("Error fetching order details. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchOrderDetails();
-    }, [orderId]);
+    fetchOrderDetails();
+  }, [orderId]);
 
-    if (loading) {
-        return <p>Loading order details...</p>;
-    }
+  if (loading) {
+    return <p>Loading order details...</p>;
+  }
 
-    if (error) {
-        return <p className="text-danger">{error}</p>;
-    }
+  if (error) {
+    return <p className="text-red-600">{error}</p>;
+  }
 
-    if (!orderDetails) {
-        return <p>No order details found.</p>;
-    }
+  if (!orderDetails) {
+    return <p>No order details found.</p>;
+  }
 
-    // Extract the vehicle mileage and services from the order details
-    const services = orderDetails.services || []; // Extract services
-    const vehicleMileage = orderDetails.vehicle_mileage || 'N/A'; // Extract vehicle mileage
+  const statusMap = {
+    1: "Received",
+    2: "In progress",
+    3: "Completed",
+  };
 
-    return (
-        <div className="container mt-5">
-            <div className="row mb-4">
-                <div className="col d-flex justify-content-between align-items-center">
-                    <h2 className="text-primary">
-                        {orderDetails.customer_first_name} {orderDetails.customer_last_name}
-                    </h2>
-                    <span className="badge bg-warning text-dark fs-5">In progress</span>
-                </div>
-            </div>
+  const orderStatusText =
+    statusMap[orderDetails.order_status] || "Unknown status";
 
-            <p className="text-muted mb-4">
-                You can track the progress of your order using this page. We will constantly update this page to let you know how we are progressing. As soon as we are done with the order, the status will turn green. That means, your car is ready for pickup.
-            </p>
+  const services = orderDetails.service_name
+    ? orderDetails.service_name.split(", ")
+    : [];
+  const serviceDescriptions = orderDetails.service_descriptions
+    ? orderDetails.service_descriptions.split("; ")
+    : [];
+  const vehicleMileage = orderDetails.vehicle_mileage || "N/A";
 
-            <div className="row">
-                {/* Customer Information */}
-                <div className="col-md-6">
-                    <div className="card mb-4 p-3">
-                        <h5>Customer</h5>
-                        <hr />
-                        <p><strong>{orderDetails.customer_first_name} {orderDetails.customer_last_name}</strong></p>
-                        <p>Email: {orderDetails.customer_email}</p>
-                        <p>Phone Number: {orderDetails.customer_phone}</p>
-                        <p>Active Customer: <span className={orderDetails.active_customer ? "text-success" : "text-danger"}>{orderDetails.active_customer ? "Yes" : "No"}</span></p>
-                    </div>
-                </div>
-
-                {/* Car Information */}
-                <div className="col-md-6">
-                    <div className="card mb-4 p-3">
-                        <h5>Car in Service</h5>
-                        <hr />
-                        <p><strong>{orderDetails.vehicle_make} {orderDetails.vehicle_model}</strong></p>
-                        <p>Vehicle tag: {orderDetails.vehicle_tag}</p>
-                        <p>Vehicle year: {orderDetails.vehicle_year}</p>
-                        <p>Vehicle mileage: {vehicleMileage}</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Requested Services */}
-            <div className="card p-3 mb-4">
-                <h5 className="mb-3">Requested Services</h5>
-                {services.length > 0 ? (
-                    services.map((service, index) => (
-                        <div key={index} className="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                            <div>
-                                <h6>{service.service_name}</h6>
-                                <p className="text-muted">{service.service_description}</p>
-                            </div>
-                            <span className="badge bg-warning text-dark">In progress</span>
-                        </div>
-                    ))
-                ) : (
-                    <p>No services requested.</p>
-                )}
-
-                {/* Additional Request */}
-                {orderDetails.additional_request && (
-                    <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6>Additional request</h6>
-                            <p className="text-muted">{orderDetails.additional_request}</p>
-                        </div>
-                        <span className="badge bg-warning text-dark">In progress</span>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-4">
+          <h2 className="text-blue-900 text-3xl font-bold">
+            {orderDetails.customer_first_name} {orderDetails.customer_last_name}
+          </h2>
+          <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>{" "}
         </div>
-    );
+        <span
+          className={`text-lg font-bold px-4 py-2 rounded-full ${
+            orderDetails.order_status === 3
+              ? "bg-green-500 text-white"
+              : orderDetails.order_status === 2
+              ? "bg-yellow-300 text-black"
+              : "bg-gray-500 text-white"
+          }`}
+        >
+          {orderStatusText}
+        </span>
+      </div>
+
+      <p className="text-gray-600 mb-6">
+        You can track the progress of your order using this page. We will
+        constantly update this page to let you know how we are progressing. As
+        soon as we are done with the order, the status will turn green. That
+        means your car is ready for pickup.
+      </p>
+
+      <div className="flex flex-col md:flex-row gap-4 mx-20 service-block-one">
+        {/* Customer Info */}
+        <div className="inner-box hvr-float-shadow w-full md:w-1/2">
+          {" "}
+          {/* Full width on small, 50% on medium and up */}
+          <h5 className="font-semibold">Customer</h5>
+          <p className="font-bold">
+            {orderDetails.customer_first_name} {orderDetails.customer_last_name}
+          </p>
+          <p>Email: {orderDetails.customer_email}</p>
+          <p>Phone Number: {orderDetails.customer_phone}</p>
+          <p>
+            Active Customer:{" "}
+            <span
+              className={
+                orderDetails.active_customer ? "text-green-500" : "text-red-500"
+              }
+            >
+              {orderDetails.active_customer ? "Yes" : "No"}
+            </span>
+          </p>
+        </div>
+
+        {/* Car in Service Info */}
+        <div className="inner-box hvr-float-shadow w-full md:w-1/2">
+          {" "}
+          {/* Full width on small, 50% on medium and up */}
+          <h5 className="font-semibold">Car in Service</h5>
+          <p className="font-bold">
+            {orderDetails.vehicle_make} {orderDetails.vehicle_model}
+          </p>
+          <p>Vehicle tag: {orderDetails.vehicle_tag}</p>
+          <p>Vehicle year: {orderDetails.vehicle_year}</p>
+          <p>Vehicle mileage: {vehicleMileage}</p>
+        </div>
+      </div>
+
+      <div className="service-block-one mx-20">
+        <div className="inner-box hvr-float-shadow">
+          <h5 className="font-bold text-4xl mb-4">Requested Services</h5>{" "}
+          {/* Main title size */}
+          {services.length > 0 ? (
+            services.map((service, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-3"
+              >
+                <div>
+                  <h6 className="font-semibold text-xl">{service}</h6>{" "}
+                  {/* Service title size */}
+                  <p className="text-gray-600 text-sm">
+                    {serviceDescriptions[index]}
+                  </p>{" "}
+                  {/* Description size */}
+                </div>
+                <span
+                  className={`text-lg font-bold px-4 py-2 rounded-full ${
+                    orderDetails.order_status === 3
+                      ? "bg-green-500 text-white"
+                      : orderDetails.order_status === 2
+                      ? "bg-yellow-300 text-black"
+                      : "bg-gray-500 text-white"
+                  }`}
+                >
+                  {orderStatusText}
+                </span>
+              </div>
+            ))
+          ) : (
+            <h1 className="text-xl font-bold text-center text-gray-600 p-4 bg-gray-200 rounded-lg">
+              No services requested.
+            </h1>
+          )}
+          {orderDetails.additional_request && (
+            <div className="flex justify-between items-center mt-4">
+              <div>
+                <h6 className="font-semibold text-xl">Additional request</h6>{" "}
+                {/* Additional request title size */}
+                <p className="text-gray-600 text-sm">
+                  {orderDetails.additional_request}
+                </p>{" "}
+                {/* Additional request description size */}
+              </div>
+              <span
+                className={`text-lg font-bold px-4 py-2 rounded-full ${
+                  orderDetails.order_status === 3
+                    ? "bg-green-500 text-white"
+                    : orderDetails.order_status === 2
+                    ? "bg-yellow-300 text-black"
+                    : "bg-gray-500 text-white"
+                }`}
+              >
+                {orderStatusText}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="service-block-one mx-20">
+        <div className="inner-box hvr-float-shadow">
+          <h5 className="font-bold text-3xl mb-2">Order Information</h5>
+
+          <p className="text-blue-900">
+            Total Price:
+            <span className="text-black">
+              {" "}
+              ${orderDetails.order_total_price}
+            </span>
+          </p>
+          <p className="text-blue-900">
+            {" "}
+            Estimated Completion Date:{" "}
+            <span className="text-black">
+              {new Date(
+                orderDetails.estimated_completion_date
+              ).toLocaleString()}
+            </span>
+          </p>
+          {/* <hr className="border-red-700 border-4 my-2" /> */}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default OrderDetails;

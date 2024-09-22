@@ -132,6 +132,16 @@ CREATE TABLE IF NOT EXISTS `order_services` (
   FOREIGN KEY (service_id) REFERENCES common_services(service_id)
 ) ENGINE=InnoDB;
 
+-- order_service_employee` to track service assignments to employees
+CREATE TABLE IF NOT EXISTS `order_service_employee` (
+  `order_service_employee_id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_service_id` int(11) NOT NULL,
+  `employee_id` int(11) NOT NULL,
+  PRIMARY KEY (`order_service_employee_id`),
+  FOREIGN KEY (`order_service_id`) REFERENCES `order_services`(`order_service_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`employee_id`) REFERENCES `employee`(`employee_id`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS `order_status` (
   `order_status_id` int(11) NOT NULL AUTO_INCREMENT,
   `order_id` int(11) NOT NULL,

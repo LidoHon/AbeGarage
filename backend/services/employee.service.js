@@ -68,6 +68,7 @@ async function getEmployeeByEmail(employee_email) {
   return rows;
 }
 
+//get
 async function getAllEmployees() {
   const query = `SELECT * 
                  FROM employee 
@@ -82,6 +83,49 @@ async function getAllEmployees() {
     throw err;
   }
 }
+
+// Service function to get an employee by ID
+async function getEmployeeById(employeeId) {
+  const query = `
+    SELECT e.*, ei.employee_first_name, ei.employee_last_name, ei.employee_phone, er.company_role_id 
+    FROM employee e
+    INNER JOIN employee_info ei ON e.employee_id = ei.employee_id
+    INNER JOIN employee_role er ON e.employee_id = er.employee_id
+    WHERE e.employee_id = ?`;
+
+  try {
+    const rows = await conn.query(query, [employeeId]);
+    if (rows.length === 0) {
+      return null;
+    }
+    return rows[0]; 
+  } catch (err) {
+    console.log("Error fetching employee by ID:", err);
+    throw err;
+  }
+}
+
+// Service function to fetch employees by role
+async function getEmployeesByRole(roleId) {
+  console.log(`[Service] Database query: Fetching employees for roleId: ${roleId}`);
+
+  const query = `
+    SELECT e.employee_id, e.employee_email, ei.employee_first_name, ei.employee_last_name
+    FROM employee e
+    JOIN employee_info ei ON e.employee_id = ei.employee_id
+    JOIN employee_role er ON e.employee_id = er.employee_id
+    WHERE er.company_role_id = ?`;
+
+  try {
+    const rows = await conn.query(query, [roleId]);
+    console.log(`[Service] Database response for roleId ${roleId}:`, rows);
+    return rows;
+  } catch (error) {
+    console.error(`[Service] Database query error for roleId ${roleId}:`, error);
+    throw error;
+  }
+}
+
 
 // Function to update an employee's details
 async function updateEmployee(employee_id, employeeData) {
@@ -149,7 +193,6 @@ async function deleteEmployee(employeeId) {
     const query = "DELETE FROM employee WHERE employee_id = ?";
     const result = await conn.query(query, [employeeId]);
 
-    // Example of potential issue if you are destructuring or expecting iterable
     if (result.affectedRows === 0) {
       throw new Error("Employee not found");
     }
@@ -157,16 +200,105 @@ async function deleteEmployee(employeeId) {
     return result;
   } catch (error) {
     console.error("Error deleting employee:", error);
-    throw error; // Rethrow the error to be handled elsewhere
+    throw error; 
   }
 }
+
+// Fetch tasks assigned to the employee, including customer and vehicle details
+const getEmployeeTasks = async (employee_id) => {
+  const query = `
+    SELECT
+      ose.order_service_employee_id,
+      os.service_id,
+      cs.service_name,
+      cs.service_description,
+      os.service_completed,
+      o.order_id,
+      os.order_service_id,
+      os.service_completed,
+      ords.order_status,
+      c.customer_id,
+      c.customer_email,  -- Fetching email from the customer table
+      ci.customer_first_name,
+      ci.customer_last_name,
+      ci.customer_phone,
+      v.vehicle_id,
+      v.vehicle_make,
+      v.vehicle_model,
+      v.vehicle_year,
+      v.vehicle_mileage,
+      v.vehicle_tag
+    FROM order_service_employee ose
+    INNER JOIN order_services os ON ose.order_service_id = os.order_service_id
+    INNER JOIN common_services cs ON os.service_id = cs.service_id
+    INNER JOIN orders o ON os.order_id = o.order_id
+    INNER JOIN order_status ords ON ords.order_id = o.order_id
+    INNER JOIN customer c ON o.customer_id = c.customer_id  -- Fetching from the customer table
+    INNER JOIN customer_info ci ON c.customer_id = ci.customer_id  -- Fetching from customer_info table
+    INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id  -- Fetching vehicle details
+    WHERE ose.employee_id = ?
+  `;
+
+  try {
+    console.log(`Executing query for employee_id: ${employee_id}`);
+
+    const rows = await conn.query(query, [employee_id]);
+    console.log(`Rows fetched for employee_id: ${employee_id}`, rows);
+
+    if (rows.length === 0) {
+      console.warn(`No tasks found for employee_id: ${employee_id}`);
+      throw new Error('No tasks found for the given employee');
+    }
+
+    return rows;  // Return the result set
+  } catch (error) {
+    console.error("Error fetching employee tasks:", error);
+    throw error;
+  }
+};
+
+// Function to update task (order service) status
+// Function to update task (order service) status
+// Function to update task (order service) status
+async function updateTaskStatus(order_service_id, status) {
+  console.log(`[Service] Updating task (order_service_id: ${order_service_id}) with status: ${status}`);
+
+  const query = `
+    UPDATE order_services
+    SET service_completed = ?
+    WHERE order_service_id = ?
+  `;
+
+  try {
+    // Execute the query to update the task status
+    const [result] = await conn.query(query, [status, order_service_id]);
+    
+    if (result.affectedRows === 0) {
+      console.warn(`[Service] No rows were updated for order_service_id: ${order_service_id}`);
+      return { success: false, message: "No task found to update." };
+    }
+
+    console.log(`[Service] Successfully updated task (order_service_id: ${order_service_id}) to status: ${status}`);
+    return { success: true, message: "Task status updated successfully" };
+  } catch (error) {
+    console.error(`[Service] Error occurred while updating task (order_service_id: ${order_service_id}) status:`, error);
+    return { success: false, message: "Error updating task status" };  
+  }
+}
+
+
+
 
 // Export the functions for use in the controller
 module.exports = {
   checkIfEmployeeExists,
   createEmployee,
   getEmployeeByEmail,
+  getEmployeeById,
   getAllEmployees,
+  getEmployeesByRole,
   updateEmployee,
   deleteEmployee,
+  getEmployeeTasks,
+  updateTaskStatus
 };

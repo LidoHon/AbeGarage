@@ -90,19 +90,51 @@ const getVehicles = async (customerId) => {
     }
 };
 
-// Create an order (for the customer and vehicle)
+// get employees by their role
+async function getEmployeesByRole(roleId) {
+  console.log(`[Frontend] Fetching employees for role: ${roleId}`);
+  
+  try {
+    const response = await fetch(`${api_url}/api/employees/role/${roleId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem('employee_token')}`, 
+      },
+    });
+
+    console.log(`[Frontend] Response status for role ${roleId}:`, response.status);
+
+    if (!response.ok) {
+      throw new Error(`[Frontend] Error fetching employees for role ${roleId}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(`[Frontend] Data received from API (employees for role ${roleId}):`, data);
+
+    return data.data;
+  } catch (error) {
+    console.error(`[Frontend] Error fetching employees for role ${roleId}:`, error);
+    throw error;
+  }
+}
+
+// Create an order (for the customer with vehicle, services, and employee assignments)
 const createOrder = async (OrderData) => {
   try {
+    // Log the entire order data including employee-service assignments
     console.log("Outgoing OrderData:", JSON.stringify(OrderData));
+
     const response = await fetch(`${api_url}/api/order/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('employee_token')}`, 
       },
       body: JSON.stringify({
-        orderData: OrderData.orderData,
-        orderInfoData: OrderData.orderInfoData,
-        orderServiceData: OrderData.orderServiceData,
+        orderData: OrderData.orderData,         
+        orderInfoData: OrderData.orderInfoData, 
+        orderServiceData: OrderData.orderServiceData, 
       }),
     });
 
@@ -117,6 +149,7 @@ const createOrder = async (OrderData) => {
     throw error;
   }
 };
+
 
 // Fetch all orders
 const getOrders = async () => {
@@ -224,6 +257,7 @@ export default {
   getCustomers,
   getVehicles,
   getServices,
+  getEmployeesByRole,
   createOrder,
   getOrders,
   getOrderDetails,

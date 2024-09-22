@@ -24,6 +24,22 @@ router.get(
   employeeController.getAllEmployees
 );
 
+// Create a route to handle getting an employee by ID
+router.get(
+  "/api/employees/:id", 
+  // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+  employeeController.getEmployeeById
+);
+
+// Create a route to handle getting an employee by role
+router.get("/api/employees/role/:roleId", employeeController.getEmployeesByRole);
+
+// Fetch tasks assigned to the employee 
+router.get("/api/employees/:employee_id/tasks", employeeController.getEmployeeTasks);
+
+// Update task status
+router.put("/api/employees/tasks/:task_id/status", employeeController.updateTaskStatus);
+
 router.put(
   "/api/employees/:id",
   // [authMiddleware.verifyToken, authMiddleware.isAdmin],

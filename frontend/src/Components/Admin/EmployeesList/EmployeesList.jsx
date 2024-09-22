@@ -57,7 +57,6 @@ const EmployeesList = () => {
           setApiErrorMessage(getErrorMessage(res.status));
           return;
         }
-        // Refresh the employee list after deletion
         setEmployees(employees.filter((emp) => emp.employee_id !== employeeId));
       } catch (err) {
         setApiError(true);
@@ -90,7 +89,7 @@ const EmployeesList = () => {
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
-                  <th>ID</th> {/* Add the employee_id column header */}
+                  <th>ID</th> 
                   <th>Active</th>
                   <th>First Name</th>
                   <th>Last Name</th>
@@ -104,38 +103,34 @@ const EmployeesList = () => {
                 {employees.map((employee) => (
                   <tr key={employee.employee_id}>
                     <td>
-                      <button
-                        className="btn btn-link"
+                      <Button
+                        variant="link"
+                        className="p-0"
                         onClick={() => handleNavigateToProfile(employee.employee_id)}
                       >
                         {employee.employee_id}
-                      </button>
+                      </Button>
                     </td>
                     <td>{employee.active_employee ? "Yes" : "No"}</td>
                     <td>{employee.employee_first_name}</td>
                     <td>{employee.employee_last_name}</td>
                     <td>{employee.employee_email}</td>
                     <td>{employee.employee_phone}</td>
-                    <td>
-                      {format(
-                        new Date(employee.added_date),
-                        "MM/dd/yyyy | HH:mm"
-                      )}
-                    </td>
+                    <td>{format(new Date(employee.added_date), "MM/dd/yyyy | HH:mm")}</td>
                     <td>
                       <div className="action-buttons">
-                        <button
-                          className="btn btn-primary"
+                        <Button
+                          className="btn btn-primary me-2"
                           onClick={() => handleEdit(employee)}
                         >
                           Edit
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="btn btn-danger"
                           onClick={() => handleDelete(employee.employee_id)}
                         >
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>

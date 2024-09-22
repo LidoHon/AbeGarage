@@ -6,7 +6,7 @@ import customerService from "../../services/customer.service";
 import UpdateCustomerForm from "./UpdateCustomer";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom"; 
 
 const CustomersList = () => {
     const [customers, setCustomers] = useState([]);
@@ -14,12 +14,12 @@ const CustomersList = () => {
     const [apiErrorMessage, setApiErrorMessage] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const { customer } = useAuth();
+    const { employee } = useAuth();
 
     // Try to fetch token from AuthContext or fallback to localStorage
-    const token = customer?.customer_token || localStorage.getItem("customer_token");
+    const token = employee?.employee_token || localStorage.getItem("employee_token");
 
-    console.log("Token in customerList.jsx:", token); // Debug log for token
+    console.log("Token in customerList.jsx:", token); 
 
     const [searchQuery, setSearchQuery] = useState(''); 
 

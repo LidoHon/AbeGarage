@@ -17,16 +17,14 @@ async function createOrder(orderData, orderInfoData, orderServiceData) {
             orderData.order_hash    
         ]);
 
-        // Log the entire result1 to check its structure
+        // Log the result of the order creation
         console.log("Result from DB query (order creation):", result1);
 
         // Access insertId from the correct index
         const order_id = result1.insertId || result1[0]?.insertId;
-        
         if (!order_id) {
             throw new Error('Failed to retrieve order ID after inserting order');
         }
-        
         console.log("Order created with ID:", order_id);
 
         // Step 2: Add the order details in 'order_info'
@@ -45,6 +43,7 @@ async function createOrder(orderData, orderInfoData, orderServiceData) {
 
         // Step 3: Add services related to the order
         console.log("Adding services for order:", orderServiceData);
+        const orderServiceIds = [];
         if (Array.isArray(orderServiceData) && orderServiceData.length > 0) {
             for (const service of orderServiceData) {
                 if (service.service_id) {
@@ -52,7 +51,9 @@ async function createOrder(orderData, orderInfoData, orderServiceData) {
                         INSERT INTO order_services (order_id, service_id, service_completed)
                         VALUES (?, ?, ?)
                     `;
-                    await db.query(query3, [order_id, service.service_id, service.service_completed]);
+                    const result3 = await db.query(query3, [order_id, service.service_id, service.service_completed]);
+                    const order_service_id = result3.insertId;
+                    orderServiceIds.push({ order_service_id, employee_id: service.employee_id });
                 } else {
                     console.log("Skipping service with missing service_id");
                 }
@@ -61,13 +62,27 @@ async function createOrder(orderData, orderInfoData, orderServiceData) {
             console.log("No services selected for this order.");
         }
 
-        // Step 4: Add default order status
+        // Step 4: Add employee assignments to 'order_service_employee'
+        if (orderServiceIds.length > 0) {
+            console.log("Assigning employees to services");
+            for (const assignment of orderServiceIds) {
+                const query4 = `
+                    INSERT INTO order_service_employee (order_service_id, employee_id)
+                    VALUES (?, ?)
+                `;
+                await db.query(query4, [assignment.order_service_id, assignment.employee_id]);
+            }
+        } else {
+            console.log("No employee assignments found.");
+        }
+
+        // Step 5: Add default order status
         console.log("Adding default order status");
-        const query4 = `
+        const query5 = `
             INSERT INTO order_status (order_id, order_status)
             VALUES (?, ?)
         `;
-        await db.query(query4, [order_id, 1]);  
+        await db.query(query5, [order_id, 1]);  
 
         console.log("Order, details, services, and status created successfully");
         return { 
@@ -81,66 +96,102 @@ async function createOrder(orderData, orderInfoData, orderServiceData) {
     }
 }
 
-
-// Service to fetch all orders
+// get all orders 
 const getAllOrders = async () => {
     try {
-        const query = `
-            SELECT o.order_id, o.order_date, 
-                    ci.customer_first_name, ci.customer_last_name, 
-                    c.customer_email, ci.customer_phone, 
-                    v.vehicle_make, v.vehicle_model, v.vehicle_year, v.vehicle_tag,
-                    e.employee_first_name, e.employee_last_name,
-                    os.order_status
+      const query = `
+            SELECT o.order_id, o.order_date,
+                   ci.customer_first_name, ci.customer_last_name,
+                   c.customer_email, ci.customer_phone,
+                   v.vehicle_make, v.vehicle_model, v.vehicle_year, v.vehicle_tag,v.vehicle_mileage,
+                   e.employee_first_name, e.employee_last_name,
+                   os.order_status,
+                   oi.order_total_price,  -- Add total price
+                   oi.estimated_completion_date,  -- Add estimated completion date
+                   GROUP_CONCAT(cs.service_name SEPARATOR ', ') AS service_name,
+                   GROUP_CONCAT(cs.service_description SEPARATOR '; ') AS service_descriptions,
+                   oi.additional_request  -- Add additional requests
             FROM orders o
             JOIN customer_info ci ON o.customer_id = ci.customer_id
             JOIN customer c ON ci.customer_id = c.customer_id
             JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
             JOIN employee_info e ON o.employee_id = e.employee_id
             JOIN order_status os ON o.order_id = os.order_id
-        `;
-        const rows = await db.query(query);
-        console.log("Orders fetched from DB:", rows);
-        return rows; 
+            LEFT JOIN order_services os2 ON o.order_id = os2.order_id
+            LEFT JOIN common_services cs ON os2.service_id = cs.service_id
+            LEFT JOIN order_info oi ON o.order_id = oi.order_id  -- Join order_info
+            GROUP BY o.order_id, o.order_date,
+                     ci.customer_first_name, ci.customer_last_name,
+                     c.customer_email, ci.customer_phone,
+                     v.vehicle_make, v.vehicle_model, v.vehicle_year, v.vehicle_tag,v.vehicle_mileage,
+                     e.employee_first_name, e.employee_last_name,
+                     os.order_status,
+                     oi.order_total_price,  -- Include in GROUP BY
+                     oi.estimated_completion_date,  -- Include in GROUP BY
+                     oi.additional_request  -- Include additional request in GROUP BY
+          `;
+  
+      const rows = await db.query(query);
+      console.log("Orders fetched from DB:", rows);
+      return rows;
     } catch (error) {
-        console.error("Error fetching orders from DB:", error);
-        throw error;
+      console.error("Error fetching orders from DB:", error);
+      throw error;
     }
-};
+  };
+  
 
-
-// Get single order by ID
-async function getOrderById(orderId) {
+// get order by Id 
+const getOrderById = async (orderId) => {
     try {
-        const query = `
-        SELECT o.order_id, o.order_date, ci.customer_first_name, ci.customer_last_name, 
-                c.customer_email, ci.customer_phone, v.vehicle_make, v.vehicle_model, v.vehicle_year, v.vehicle_tag,
-                oi.order_total_price, oi.additional_request, e.employee_first_name, e.employee_last_name
-        FROM orders o
-        JOIN customer_info ci ON o.customer_id = ci.customer_id
-        JOIN customer c ON o.customer_id = c.customer_id
-        JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
-        JOIN order_info oi ON o.order_id = oi.order_id
-        JOIN employee_info e ON o.employee_id = e.employee_id
-        WHERE o.order_id = ?
-        `;
-        
-        // Fetch the order by order ID
-        const order = await db.query(query, [orderId]); 
-        
-        // Log the result to debug the output from the database
-        console.log("Order from DB:", order);
-
-        if (!order || order.length === 0) {
-            throw new Error(`No order found with ID: ${orderId}`);
-        }
-
-        return order[0]; 
+      const query = `
+              SELECT o.order_id, o.order_date, 
+                     ci.customer_first_name, ci.customer_last_name, 
+                     c.customer_email, ci.customer_phone, 
+                     v.vehicle_make, v.vehicle_model, v.vehicle_year, v.vehicle_tag, v.vehicle_mileage,
+                     e.employee_first_name, e.employee_last_name,
+                     os.order_status AS order_status,
+                     oi.order_total_price,  -- Add total price
+                     oi.estimated_completion_date,  -- Add estimated completion date
+                     oi.additional_request,  -- Add additional request
+                     c.active_customer,  -- Add active customer status
+                     GROUP_CONCAT(cs.service_name SEPARATOR ', ') AS service_name,
+                     GROUP_CONCAT(cs.service_description SEPARATOR '; ') AS service_descriptions
+              FROM orders o
+              JOIN customer_info ci ON o.customer_id = ci.customer_id
+              JOIN customer c ON ci.customer_id = c.customer_id
+              JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
+              JOIN employee_info e ON o.employee_id = e.employee_id
+              JOIN order_status os ON o.order_id = os.order_id
+              LEFT JOIN order_services os2 ON o.order_id = os2.order_id
+              LEFT JOIN common_services cs ON os2.service_id = cs.service_id
+              LEFT JOIN order_info oi ON o.order_id = oi.order_id  -- Join order_info
+              WHERE o.order_id = ?
+              GROUP BY o.order_id, o.order_date, 
+                       ci.customer_first_name, ci.customer_last_name, 
+                       c.customer_email, ci.customer_phone, 
+                       v.vehicle_make, v.vehicle_model, v.vehicle_year, v.vehicle_tag, v.vehicle_mileage,
+                       e.employee_first_name, e.employee_last_name,
+                       os.order_status,
+                       oi.order_total_price,  -- Include in GROUP BY
+                       oi.estimated_completion_date,  -- Include in GROUP BY
+                       oi.additional_request,  -- Include additional request in GROUP BY
+                       c.active_customer  -- Include active_customer in GROUP BY
+            `;
+  
+      const rows = await db.query(query, [orderId]);
+  
+      if (rows.length === 0) {
+        throw new Error("Order not found");
+      }
+  
+      return rows[0]; // Return the first (and only) order
     } catch (error) {
-        console.error("Error fetching order by ID from DB:", error);
-        throw error;
+      console.error("Error fetching order by ID:", error);
+      throw error;
     }
-}
+  };
+  
 
 // Update an order
 async function updateOrder(id, updateData) {

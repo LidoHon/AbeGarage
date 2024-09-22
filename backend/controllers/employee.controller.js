@@ -51,6 +51,73 @@ async function getAllEmployees(req, res, next) {
   }
 }
 
+// Controller to get employee by ID
+async function getEmployeeById(req, res, next) {
+  const employeeId = req.params.id;
+  
+  try {
+    const employee = await employeeService.getEmployeeById(employeeId);
+
+    if (!employee) {
+      return res.status(404).json({
+        status: "fail",
+        message: `Employee with ID ${employeeId} not found`,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: employee,
+    });
+  } catch (error) {
+    console.error("Error fetching employee by ID:", error);
+    res.status(500).json({
+      status: "error",
+      message: "An error occurred while fetching the employee",
+    });
+  }
+}
+
+// Controller to get employees by their role
+async function getEmployeesByRole(req, res) {
+  const { roleId } = req.params;
+  console.log(`[Controller] Received request to fetch employees with roleId: ${roleId}`);
+
+  if (!roleId) {
+    console.log(`[Controller] Missing roleId in request.`);
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Role ID is required',
+    });
+  }
+
+  try {
+    const employees = await employeeService.getEmployeesByRole(roleId);
+    console.log(`[Controller] Employees fetched:`, employees);
+
+    if (employees.length === 0) {
+      console.log(`[Controller] No employees found for roleId: ${roleId}`);
+      return res.status(404).json({
+        status: 'fail',
+        message: 'No employees found for this role',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: employees,
+    });
+    console.log(`[Controller] Response sent successfully for roleId: ${roleId}`);
+  } catch (error) {
+    console.error(`[Controller] Error fetching employees by roleId: ${roleId}. Error:`, error);
+    res.status(500).json({
+      status: "fail",
+      message: "Failed to get employees by role",
+    });
+  }
+}
+
+
 // Controller to update an employee
 async function updateEmployee(req, res, next) {
   const employee_id = req.params.id;
@@ -107,10 +174,63 @@ async function deleteEmployee(req, res) {
   }
 }
 
+// Get tasks assigned to a specific employee
+const getEmployeeTasks = async (req, res) => {
+  try {
+    const { employee_id } = req.params;
+    console.log(`Fetching tasks for employee_id: ${employee_id}`);
+
+    const tasks = await employeeService.getEmployeeTasks(employee_id);
+    console.log(`Tasks fetched for employee_id: ${employee_id}`, tasks);
+
+    res.status(200).json({ tasks });
+  } catch (error) {
+    console.error("Error fetching employee tasks:", error);
+    res.status(500).json({ message: "Error fetching employee tasks" });
+  }
+};
+
+// Controller function to handle updating task status
+// Controller function to handle updating task status
+const updateTaskStatus = async (req, res) => {
+  try {
+    const { task_id } = req.params; 
+    const { status } = req.body;    
+
+    // Ensure status is valid
+    if (![1, 2, 3].includes(status)) {
+      console.warn(`[Controller] Invalid status value: ${status}`);
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    console.log(`[Controller] Received request to update task ID: ${task_id} to status: ${status}`);
+
+    // Call the service to update the task status
+    const result = await employeeService.updateTaskStatus(task_id, status);
+
+    if (!result.success) {
+      console.warn(`[Controller] Task status update failed for Task ID: ${task_id}. Reason: ${result.message}`);
+      return res.status(400).json({ message: result.message });
+    }
+
+    console.log(`[Controller] Task status updated successfully for Task ID: ${task_id}`);
+    return res.status(200).json({ message: "Task status updated successfully" });
+  } catch (error) {
+    console.error(`[Controller] Error updating task status for Task ID: ${req.params.task_id}`, error);
+    return res.status(500).json({ message: "Error updating task status" });
+  }
+};
+
+
+
 // Export the createEmployee controller
 module.exports = {
   createEmployee,
   getAllEmployees,
+  getEmployeeById,
+  getEmployeesByRole,
   updateEmployee,
   deleteEmployee,
+  updateTaskStatus,
+  getEmployeeTasks,
 };

@@ -36,7 +36,7 @@ const ServiceSelection = ({ onSelectServices }) => {
   };
 
   return (
-    <div className="service-selection mt-4">
+    <div className="service-selection mt-4 container-width">
       <h4>Choose Service</h4>
       {loading && <p>Loading services...</p>}
       {error && <p className="text-danger">{error}</p>}

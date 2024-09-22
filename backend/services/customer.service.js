@@ -89,7 +89,7 @@ async function getCustomerByEmail(customer_email) {
 
 
 // Modified backend code to handle both listing and searching of customers
-async function getAllCustomers(searchQuery = null) { // Default searchQuery to null for normal list fetching
+async function getAllCustomers(searchQuery = null) { 
   let query = `
   SELECT * 
   FROM customer 
@@ -122,8 +122,6 @@ async function getAllCustomers(searchQuery = null) { // Default searchQuery to n
   }
 }
 
-
-
 // A function to get a specific customer by ID
 async function getCustomer(customerId) {
   const query = `
@@ -140,7 +138,7 @@ async function getCustomer(customerId) {
         return null;
         }
 
-        return rows[0]; // Return the customer info
+        return rows[0];
     } catch (error) {
         console.error("Error fetching customer by ID:", error);
         throw error;
@@ -161,8 +159,7 @@ async function getVehiclesByCustomerId(customerId) {
         console.log("No vehicles found for this customer:", customerId);
         return [];
         }
-
-        return rows; // Return the list of vehicles
+        return rows;
     } catch (error) {
         console.error("Error fetching vehicles by customer ID:", error);
         throw error;
@@ -184,7 +181,7 @@ async function getOrdersByCustomerId(customerId) {
             return [];
         }
 
-        return rows; // Return the list of orders
+        return rows; 
     } catch (error) {
         console.error("Error fetching orders by customer ID:", error);
         throw error;
