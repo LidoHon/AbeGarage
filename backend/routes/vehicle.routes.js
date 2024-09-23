@@ -18,24 +18,14 @@ router.get(
   vehicleController.getVehicleById
 );
 
-// Update a vehicle
-// router.put(
-//   "/api/vehicles/:id",
-//   authMiddleware.verifyToken,
-//   vehicleController.updateVehicle
-// );
+
 router.put(
   "/api/vehicles/:id",
 
   vehicleController.updateVehicle
 );
 
-// Delete a vehicle
-// router.delete(
-//   "/api/vehicles/:id",
-//   authMiddleware.verifyToken,
-//   vehicleController.deleteVehicle
-// );
+
 router.delete(
   "/api/vehicles/:id",
 

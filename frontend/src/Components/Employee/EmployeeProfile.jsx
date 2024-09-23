@@ -4,11 +4,11 @@ import employeeService from "../../Components/services/employee.service";
 import Service from "../../Components/services/order.service";
 import { useAuth } from "../../Contexts/AuthContext";
 import { Spinner, Container, Row, Col, Card, Form, Button } from "react-bootstrap";
-import { FaEllipsisV} from "react-icons/fa"; 
+import { FaEllipsisV } from "react-icons/fa"; 
 
 const EmployeeProfile = () => {
-  const { employee_id } = useParams();
-  const { isLogged, isAdmin, isEmployee } = useAuth(); 
+  const { employee_id: paramEmployeeId } = useParams(); 
+  const { isLogged, isAdmin, isEmployee, employee: authEmployee } = useAuth(); 
   const [employee, setEmployee] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,15 +17,13 @@ const EmployeeProfile = () => {
   const [selectedStatus, setSelectedStatus] = useState({});
   const [isEditingStatus, setIsEditingStatus] = useState({});
 
-  useEffect(() => {
-    console.log("isEmployee:", isEmployee);
-    console.log("isAdmin:", isAdmin);
-    console.log("isLogged:", isLogged);
+  const employee_id = paramEmployeeId || (isEmployee ? authEmployee.employee_id : null);
 
+  useEffect(() => {
     const fetchEmployeeDetails = async () => {
       try {
         setLoading(true);
-        const employees = await Service.getEmployeesByRole(1);
+        const employees = await Service.getEmployeesByRole(1); 
         const employee = employees.find(emp => emp.employee_id === parseInt(employee_id));
 
         if (!employee) {
@@ -43,67 +41,60 @@ const EmployeeProfile = () => {
     const fetchAssignedTasks = async () => {
       try {
         const tasksResponse = await employeeService.getEmployeeTasks(employee_id, token);
-        console.log("Employee Token:", token);
-        if (tasksResponse.ok) {
-          const tasksData = await tasksResponse.json();
-          setTasks(tasksData.tasks);
-        } else {
-          const errorMsg = await tasksResponse.text();
-          setError("Failed to load assigned tasks.");
-        }
+        setTasks(tasksResponse); 
       } catch (err) {
-        setError("An error occurred fetching tasks.");
+        console.error("An error occurred fetching tasks:", err);
+        setError("Failed to load assigned tasks.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEmployeeDetails();
-    fetchAssignedTasks();
+    if (employee_id) {
+      fetchAssignedTasks();
+      fetchEmployeeDetails();
+    } else {
+      setError("No employee ID found.");
+      setLoading(false);
+    }
   }, [employee_id, token, isEmployee]);
 
   const handleStatusChange = (orderServiceId, newStatus) => {
-    // Ensure the status is mapped to an integer
-    const statusMap = {
-      "Received": 1,
-      "In progress": 2,
-      "Completed": 3
-    };
-  
-    const mappedStatus = statusMap[newStatus] || newStatus; // Ensure newStatus is properly mapped
-  
     setSelectedStatus((prevStatus) => ({
       ...prevStatus,
-      [orderServiceId]: parseInt(mappedStatus), 
+      [orderServiceId]: newStatus, 
     }));
     setIsEditingStatus((prev) => ({
       ...prev,
-      [orderServiceId]: true,
+      [orderServiceId]: true, 
     }));
   };
-  
+
   const handleSaveStatus = async (orderServiceId) => {
     const updatedStatus = selectedStatus[orderServiceId];
   
     try {
-      console.log(`[Frontend] Saving status for OrderService ID: ${orderServiceId} with status: ${updatedStatus}`);
-      // Call the backend service to update the status of the task
       const response = await employeeService.updateTaskStatus(orderServiceId, updatedStatus, token);
   
       if (response.ok) {
-        console.log(`Order Service ID: ${orderServiceId} successfully updated to status ${updatedStatus}`);
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.order_service_id === orderServiceId
+              ? { ...task, order_status: updatedStatus }
+              : task
+          )
+        );
         setIsEditingStatus((prev) => ({
           ...prev,
           [orderServiceId]: false,
         }));
       } else {
-        console.error(`Failed to update status for Order Service ID: ${orderServiceId}`, response.statusText);
+        console.error(`[Frontend] Failed to update status for Order Service ID: ${orderServiceId}`, response.statusText);
       }
     } catch (err) {
-      console.error(`Failed to update status for Order Service ID: ${orderServiceId}`, err);
+      console.error(`[Frontend] Failed to update status for Order Service ID: ${orderServiceId}`, err);
     }
   };
-  
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -142,28 +133,25 @@ const EmployeeProfile = () => {
     );
   }
 
-  // Group tasks by order
   const orders = tasks.reduce((acc, task) => {
-    const {
-      order_id,
-      customer_first_name,
-      customer_last_name,
-      customer_email,
-      customer_phone,
-      vehicle_make,
-      vehicle_model,
-      vehicle_year,
-      vehicle_mileage,
-      vehicle_tag,
-      estimated_completion_date,
-    } = task;
+    const { order_id } = task;
 
     if (!acc[order_id]) {
       acc[order_id] = {
-        customer: { customer_first_name, customer_last_name, customer_email, customer_phone },
-        vehicle: { vehicle_make, vehicle_model, vehicle_year, vehicle_mileage, vehicle_tag },
+        customer: {
+          customer_first_name: task.customer_first_name,
+          customer_last_name: task.customer_last_name,
+          customer_email: task.customer_email,
+          customer_phone: task.customer_phone,
+        },
+        vehicle: {
+          vehicle_make: task.vehicle_make,
+          vehicle_model: task.vehicle_model,
+          vehicle_year: task.vehicle_year,
+          vehicle_mileage: task.vehicle_mileage,
+          vehicle_tag: task.vehicle_tag,
+        },
         services: [],
-        estimated_completion_date,
       };
     }
 
@@ -185,65 +173,53 @@ const EmployeeProfile = () => {
               <p><strong>Active Employee:</strong> {employee.active_employee ? "Yes" : "No"}</p>
               <p><strong>Added Date:</strong> {new Date(employee.added_date).toLocaleString()}</p>
             </Card.Body>
-            <div className="border-bottom border-danger"></div>
           </Card>
         </Col>
       </Row>
-
-      {Object.keys(orders).map(order_id => (
-        <Card key={order_id} className="mt-4 shadow-sm">
-          <Card.Body>
-            <Row>
-              <Col md={6}>
-                <Card className="mb-3 shadow-sm">
-                  <Card.Body>
+      <h2>Your Tasks</h2>
+      <Row>
+        {Object.keys(orders).map(order_id => (
+          <Col key={order_id} md={6} className="mb-4">
+            <Card className="shadow-sm w-100">
+              <Card.Body>
+                <h5 className="text-uppercase mb-3">Order ID: #{order_id}</h5> {/* Order ID added here */}
+                <div className="text-sm flex gap-20">
+                  <div>
                     <h6 className="text-uppercase">Customer</h6>
                     <p><strong>{orders[order_id].customer.customer_first_name} {orders[order_id].customer.customer_last_name}</strong></p>
                     <p><strong>Email:</strong> {orders[order_id].customer.customer_email}</p>
                     <p><strong>Phone:</strong> {orders[order_id].customer.customer_phone}</p>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={6}>
-                <Card className="mb-3 shadow-sm">
-                  <Card.Body>
+                  </div>
+                  <div className="mr-8">
                     <h6 className="text-uppercase">Vehicle</h6>
                     <p><strong>{orders[order_id].vehicle.vehicle_make} {orders[order_id].vehicle.vehicle_model}</strong></p>
                     <p><strong>Year:</strong> {orders[order_id].vehicle.vehicle_year}</p>
                     <p><strong>Mileage:</strong> {orders[order_id].vehicle.vehicle_mileage}</p>
                     <p><strong>Tag:</strong> {orders[order_id].vehicle.vehicle_tag}</p>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col md={12}>
+                  </div>
+                </div>
                 <h5 className="mt-3">Requested Services</h5>
                 {orders[order_id].services.map((service) => (
-                  <Card key={service.order_service_id} className="mb-2 shadow-sm">  {/* Use order_service_id */}
+                  <Card key={`${order_id}-${service.order_service_id}`} className="mb-2 shadow-sm">
                     <Card.Body className="d-flex justify-content-between align-items-center">
                       <div>
                         <h6 className="mb-0">{service.service_name}</h6>
                       </div>
                       <div className="d-flex align-items-center">
+                        <span className="me-1">{getStatusBadge(service.order_status)}</span>
                         {isLogged && isEmployee && service.order_status !== 3 && (
                           <>
-                            {!isEditingStatus[service.order_service_id] ? (  // Use order_service_id
+                            {!isEditingStatus[service.order_service_id] ? (
                               <div
                                 className="d-inline-flex align-items-center"
-                                onClick={() => setIsEditingStatus((prev) => ({ ...prev, [service.order_service_id]: true }))}  // Use order_service_id
-                              >
-                                <span className="me-1">
-                                  {getStatusBadge(service.order_status)}
-                                </span>
+                                onClick={() => setIsEditingStatus((prev) => ({ ...prev, [service.order_service_id]: true }))}>
                                 <FaEllipsisV />
                               </div>
                             ) : (
                               <>
                                 <Form.Select
-                                  value={selectedStatus[service.order_service_id] || service.order_status}  // Use order_service_id
-                                  onChange={(e) => handleStatusChange(service.order_service_id, e.target.value)}  // Use order_service_id
+                                  value={selectedStatus[service.order_service_id] || service.order_status}
+                                  onChange={(e) => handleStatusChange(service.order_service_id, e.target.value)}
                                   className="form-select-sm ms-2"
                                 >
                                   <option value={1}>Received</option>
@@ -254,7 +230,7 @@ const EmployeeProfile = () => {
                                   variant="success"
                                   size="sm"
                                   className="ms-2"
-                                  onClick={() => handleSaveStatus(service.order_service_id)}  // Use order_service_id
+                                  onClick={() => handleSaveStatus(service.order_service_id)}
                                 >
                                   Save
                                 </Button>
@@ -266,17 +242,11 @@ const EmployeeProfile = () => {
                     </Card.Body>
                   </Card>
                 ))}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>
-                <p><strong>Due Date:</strong> {orders[order_id].estimated_completion_date ? new Date(orders[order_id].estimated_completion_date).toLocaleDateString() : "Not set"}</p>
-              </Col>
-            </Row>
-          </Card.Body>
-        </Card>
-      ))}
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 };

@@ -152,7 +152,7 @@ const createOrder = async (OrderData) => {
 
 
 // Fetch all orders
-const getOrders = async () => {
+const getAllOrders = async () => {
   try {
     console.log("Sending request to API:", `${api_url}/api/orders`);
     
@@ -182,52 +182,107 @@ const getOrders = async () => {
   }
 };
 
-// get a single order by its id
-const getOrderDetails = async (orderId) => {
+const getOrderDetails = async (orderId) => { 
   try {
-      const response = await fetch(`${api_url}/api/order/${orderId}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('employee_token')}`,
-          },
-      });
+    const response = await fetch(`${api_url}/api/order/${orderId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('employee_token')}`,
+      },
+    });
 
-      if (!response.ok) {
-          const errorMessage = await response.text(); 
-          throw new Error(`Failed to fetch order details: ${response.status} - ${errorMessage}`);
-      }
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to fetch order details: ${response.status} - ${errorMessage}`);
+    }
 
-      const data = await response.json();
-      if (data.status === "success" && data.data) {
-          return data; 
-      } else {
-          throw new Error("Order details not found");
-      }
+    const data = await response.json();
+    if (data && data.status === 'success') {
+      // Correct data is received, return it
+      return data.data; 
+    } else {
+      throw new Error("Order details not found or improperly formatted.");
+    }
+    
   } catch (error) {
-      console.error('Error fetching order details from API:', error);
-      throw error;
+    console.error('Error fetching order details from API:', error);
+    throw error;
   }
 };
+
+
+
+
+// get order id from the task
+const getOrderIdFromTask = async (orderServiceId) => {
+  try {
+    const response = await fetch(`${api_url}/api/order/task/${orderServiceId}/order-id`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching order ID for task ${orderServiceId}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.order_id;
+  } catch (error) {
+    console.error("Error in getOrderIdFromTask:", error);
+    throw error;
+  }
+};
+
+//get all services for a specific order
+const getAllServicesForOrder = async (orderId) => {
+  try {
+    const response = await fetch(`${api_url}/api/order/${orderId}/services`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching services for order ${orderId}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in getAllServicesForOrder:", error);
+    throw error;
+  }
+};
+
 
 // Update the status of an order
-const updateOrderStatus = async (orderId, newStatus) => {
-  const response = await fetch(`${api_url}/api/order/${orderId}/status`, {
-      method: 'PUT',
+const updateOrderStatus = async (orderId, status) => {
+  try {
+    const response = await fetch(`${api_url}/api/order/${orderId}/status`, {
+      method: "PUT",
       headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('employee_token')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem('employee_token')}`,
       },
-      body: JSON.stringify({ order_status: newStatus }),
-  });
+      body: JSON.stringify({ status }),
+    });
 
-  if (!response.ok) {
-      throw new Error('Failed to update order status');
+    if (!response.ok) {
+      throw new Error(`Error updating order status for order ${orderId}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in updateOrderStatus:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data;
 };
+
 
 // delete order
 const deleteOrder = async (orderId) => {
@@ -259,8 +314,10 @@ export default {
   getServices,
   getEmployeesByRole,
   createOrder,
-  getOrders,
+  getAllOrders,
   getOrderDetails,
+  getOrderIdFromTask,
+  getAllServicesForOrder,
   deleteOrder,
   updateOrderStatus,
 };

@@ -190,36 +190,37 @@ const getEmployeeTasks = async (req, res) => {
   }
 };
 
-// Controller function to handle updating task status
-// Controller function to handle updating task status
+
+// Update task status with detailed logging
 const updateTaskStatus = async (req, res) => {
   try {
-    const { task_id } = req.params; 
-    const { status } = req.body;    
+    const { task_id } = req.params;
+    const { status } = req.body;
 
-    // Ensure status is valid
-    if (![1, 2, 3].includes(status)) {
-      console.warn(`[Controller] Invalid status value: ${status}`);
+    // Log incoming request values
+    console.log(`[UpdateTaskStatus Controller] Received request with Task ID: ${task_id}, Status: ${status}`);
+
+    // Ensure status is parsed as a number
+    const parsedStatus = Number(status);  // Convert status to a number
+
+    // Ensure status is between 1 and 3
+    if (![1, 2, 3].includes(parsedStatus)) {
+      console.warn(`[UpdateTaskStatus Controller] Invalid status value provided: ${parsedStatus}`);
       return res.status(400).json({ message: "Invalid status value" });
     }
 
-    console.log(`[Controller] Received request to update task ID: ${task_id} to status: ${status}`);
+    // Proceed with updating the task status
+    const result = await employeeService.updateTaskStatus(task_id, parsedStatus);
+    console.log(`[UpdateTaskStatus Controller] Task ID: ${task_id} status updated successfully to ${parsedStatus}`);
+    res.status(200).json({ message: "Task status updated successfully" });
 
-    // Call the service to update the task status
-    const result = await employeeService.updateTaskStatus(task_id, status);
-
-    if (!result.success) {
-      console.warn(`[Controller] Task status update failed for Task ID: ${task_id}. Reason: ${result.message}`);
-      return res.status(400).json({ message: result.message });
-    }
-
-    console.log(`[Controller] Task status updated successfully for Task ID: ${task_id}`);
-    return res.status(200).json({ message: "Task status updated successfully" });
   } catch (error) {
-    console.error(`[Controller] Error updating task status for Task ID: ${req.params.task_id}`, error);
-    return res.status(500).json({ message: "Error updating task status" });
+    console.error(`[UpdateTaskStatus Controller] Error occurred while updating task status for Task ID: ${task_id}`, error);
+    res.status(500).json({ message: "Error updating task status" });
   }
 };
+
+
 
 
 

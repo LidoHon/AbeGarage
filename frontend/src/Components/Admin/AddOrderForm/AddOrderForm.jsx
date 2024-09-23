@@ -130,24 +130,16 @@ const AddOrderForm = () => {
         serviceAssignments.length === 0
       ) {
         alert("Please fill in all required fields.");
-        console.log("Validation failed. Missing required fields.");
-        console.log("Selected customer:", selectedCustomer);
-        console.log("Selected vehicle:", selectedVehicle);
-        console.log("Order price:", orderPrice);
-        console.log("Estimated completion date:", estimatedCompletionDate);
-        console.log("Additional request:", additionalRequest);
-        console.log("Selected services:", selectedServices);
-        console.log("Service assignments:", serviceAssignments);
         return;
       }
-  
+    
       try {
         const employee = await getAuth();
-  
+    
         if (!employee || !employee.employee_id) {
           throw new Error("Employee not found or not authenticated.");
         }
-  
+    
         // Log data for order creation
         const orderData = {
           customer_id: selectedCustomer.customer_id,
@@ -155,45 +147,38 @@ const AddOrderForm = () => {
           employee_id: employee.employee_id,
           active_order: 1,
           order_hash: generateOrderHash(),
-          customer_first_name: selectedCustomer.customer_first_name,
-          customer_last_name: selectedCustomer.customer_last_name,
-          customer_email: selectedCustomer.customer_email,
-          vehicle_tag: selectedVehicle.vehicle_tag,
-          vehicle_mileage: selectedVehicle.vehicle_mileage,
-          employee_name: `${employee.employee_first_name} ${employee.employee_last_name}`,
           order_status: 1,
         };
-        console.log("Order data:", orderData);
-  
+    
         const orderInfoData = {
           order_total_price: orderPrice,
           additional_request: additionalRequest,
           estimated_completion_date: estimatedCompletionDate,
           additional_requests_completed: 0,
         };
-        console.log("Order info data:", orderInfoData);
-  
-        // Log service assignments with employee IDs
+    
+        
         const orderServiceData = serviceAssignments.map((assignment) => ({
           service_id: assignment.service_id,
           employee_id: assignment.employee_id,
-          service_completed: 0,
+          service_completed: 0, 
         }));
-        console.log("Order service data (service assignments):", orderServiceData);
-  
+    
+        // Send the order creation request to the backend
         await Service.createOrder({
           orderData,
           orderInfoData,
           orderServiceData,
         });
-  
+    
         alert("Order created successfully.");
         navigate("/admin/orders");
       } catch (err) {
         setError("Error creating the order. Please try again.");
         console.error("Error in handleCreateOrder:", err);
       }
-  };
+    };
+    
   
 
   const generateOrderHash = () => {

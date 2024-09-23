@@ -207,7 +207,7 @@ async function deleteEmployee(employeeId) {
 // Fetch tasks assigned to the employee, including customer and vehicle details
 const getEmployeeTasks = async (employee_id) => {
   const query = `
-    SELECT
+        SELECT
       ose.order_service_employee_id,
       os.service_id,
       cs.service_name,
@@ -215,10 +215,9 @@ const getEmployeeTasks = async (employee_id) => {
       os.service_completed,
       o.order_id,
       os.order_service_id,
-      os.service_completed,
       ords.order_status,
       c.customer_id,
-      c.customer_email,  -- Fetching email from the customer table
+      c.customer_email,  
       ci.customer_first_name,
       ci.customer_last_name,
       ci.customer_phone,
@@ -228,16 +227,20 @@ const getEmployeeTasks = async (employee_id) => {
       v.vehicle_year,
       v.vehicle_mileage,
       v.vehicle_tag
-    FROM order_service_employee ose
-    INNER JOIN order_services os ON ose.order_service_id = os.order_service_id
-    INNER JOIN common_services cs ON os.service_id = cs.service_id
-    INNER JOIN orders o ON os.order_id = o.order_id
-    INNER JOIN order_status ords ON ords.order_id = o.order_id
-    INNER JOIN customer c ON o.customer_id = c.customer_id  -- Fetching from the customer table
-    INNER JOIN customer_info ci ON c.customer_id = ci.customer_id  -- Fetching from customer_info table
-    INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id  -- Fetching vehicle details
-    WHERE ose.employee_id = ?
-  `;
+  FROM order_service_employee ose
+  INNER JOIN order_services os ON ose.order_service_id = os.order_service_id
+  INNER JOIN common_services cs ON os.service_id = cs.service_id
+  INNER JOIN orders o ON os.order_id = o.order_id
+  LEFT JOIN (
+      SELECT order_service_id, MAX(order_status) as order_status 
+      FROM order_status
+      GROUP BY order_service_id
+  ) ords ON ords.order_service_id = os.order_service_id
+  INNER JOIN customer c ON o.customer_id = c.customer_id  
+  INNER JOIN customer_info ci ON c.customer_id = ci.customer_id  
+  INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id  
+  WHERE ose.employee_id = ?;
+`;
 
   try {
     console.log(`Executing query for employee_id: ${employee_id}`);
@@ -257,35 +260,82 @@ const getEmployeeTasks = async (employee_id) => {
   }
 };
 
+// Update task status
 // Function to update task (order service) status
-// Function to update task (order service) status
-// Function to update task (order service) status
-async function updateTaskStatus(order_service_id, status) {
-  console.log(`[Service] Updating task (order_service_id: ${order_service_id}) with status: ${status}`);
-
-  const query = `
-    UPDATE order_services
-    SET service_completed = ?
-    WHERE order_service_id = ?
-  `;
-
+const updateTaskStatus = async (task_id, status) => {
   try {
-    // Execute the query to update the task status
-    const [result] = await conn.query(query, [status, order_service_id]);
-    
-    if (result.affectedRows === 0) {
-      console.warn(`[Service] No rows were updated for order_service_id: ${order_service_id}`);
-      return { success: false, message: "No task found to update." };
+    console.log(`[Service] Updating task (order_service_id: ${task_id}) to status: ${status}`);
+
+    // Ensure status is valid (1 = Received, 2 = In Progress, 3 = Completed)
+    if (![1, 2, 3].includes(status)) {
+      throw new Error(`Invalid status value: ${status}`);
     }
 
-    console.log(`[Service] Successfully updated task (order_service_id: ${order_service_id}) to status: ${status}`);
-    return { success: true, message: "Task status updated successfully" };
-  } catch (error) {
-    console.error(`[Service] Error occurred while updating task (order_service_id: ${order_service_id}) status:`, error);
-    return { success: false, message: "Error updating task status" };  
-  }
-}
+    // Update the service (task) status in `order_services`
+    const updateServiceQuery = `
+      UPDATE order_services
+      SET service_completed = ?
+      WHERE order_service_id = ?
+    `;
+    const serviceCompletedValue = status === 3 ? 1 : 0; // Mark service as completed if status is 3 (Completed)
+    const result = await conn.query(updateServiceQuery, [serviceCompletedValue, task_id]);
 
+    if (result.affectedRows === 0) {
+      throw new Error(`No task found with ID: ${task_id}`);
+    }
+
+    // Update the status in `order_status` for this specific service
+    const updateStatusQuery = `
+      UPDATE order_status
+      SET order_status = ?
+      WHERE order_service_id = ?
+    `;
+    await conn.query(updateStatusQuery, [status, task_id]);
+
+    // Fetch the order ID associated with this service
+    const getOrderQuery = `
+      SELECT order_id FROM order_services WHERE order_service_id = ?
+    `;
+    const orderRow = await conn.query(getOrderQuery, [task_id]);
+    const orderId = orderRow[0]?.order_id;
+
+    if (!orderId) {
+      throw new Error(`No order found for task ID: ${task_id}`);
+    }
+
+    // Check if all services in the order are completed
+    const checkCompletionQuery = `
+      SELECT service_completed
+      FROM order_services
+      WHERE order_id = ?
+    `;
+    const services = await conn.query(checkCompletionQuery, [orderId]);
+
+    const allCompleted = services.every((service) => service.service_completed === 1);
+    const anyInProgress = services.some((service) => service.service_completed === 0 && status === 2);
+
+    // Update the overall order status based on services' completion status
+    let overallOrderStatus = 1; // Default to "Received" if no updates
+    if (allCompleted) {
+      overallOrderStatus = 3; // Completed
+    } else if (anyInProgress) {
+      overallOrderStatus = 2; // In Progress
+    }
+
+    const updateOrderStatusQuery = `
+      UPDATE order_status
+      SET order_status = ?
+      WHERE order_id = ? AND order_service_id IS NULL
+    `;
+    await conn.query(updateOrderStatusQuery, [overallOrderStatus, orderId]);
+
+    return { success: true, message: 'Task status updated successfully' };
+
+  } catch (error) {
+    console.error(`[Service] Error updating task status for task ID: ${task_id}`, error);
+    throw error;
+  }
+};
 
 
 

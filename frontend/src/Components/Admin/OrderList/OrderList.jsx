@@ -18,7 +18,7 @@ const OrderList = () => {
         const fetchOrders = async () => {
             try {
                 setLoading(true);
-                const response = await Service.getOrders();
+                const response = await Service.getAllOrders();
                 console.log("Full API Response:", response.data);
 
                 if (response.data && response.data.orders) {

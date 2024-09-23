@@ -12,9 +12,9 @@ const OrderDetails = () => {
     const fetchOrderDetails = async () => {
       try {
         setLoading(true);
-        const response = await Service.getOrderDetails(orderId);
-        if (response && response.data) {
-          setOrderDetails(response.data);
+        const data = await Service.getOrderDetails(orderId);
+        if (data) {
+          setOrderDetails(data);
         } else {
           setError("No order details found.");
         }
@@ -24,9 +24,10 @@ const OrderDetails = () => {
         setLoading(false);
       }
     };
-
+  
     fetchOrderDetails();
   }, [orderId]);
+  
 
   if (loading) {
     return <p>Loading order details...</p>;
@@ -36,6 +37,7 @@ const OrderDetails = () => {
     return <p className="text-red-600">{error}</p>;
   }
 
+  console.log("Order Details in OrderDetails Component:", orderDetails);
   if (!orderDetails) {
     return <p>No order details found.</p>;
   }
@@ -46,16 +48,18 @@ const OrderDetails = () => {
     3: "Completed",
   };
 
-  const orderStatusText =
-    statusMap[orderDetails.order_status] || "Unknown status";
+  const orderStatusText = statusMap[orderDetails.overall_order_status] || "Unknown status";
 
-  const services = orderDetails.service_name
+    const services = orderDetails.service_name
     ? orderDetails.service_name.split(", ")
     : [];
   const serviceDescriptions = orderDetails.service_descriptions
     ? orderDetails.service_descriptions.split("; ")
     : [];
-  const vehicleMileage = orderDetails.vehicle_mileage || "N/A";
+  const serviceStatuses = orderDetails.service_statuses
+    ? orderDetails.service_statuses.split(", ")
+    : [];
+    const vehicleMileage = orderDetails.vehicle_mileage || "N/A";
 
   return (
     <div className="container mx-auto p-6">
@@ -64,13 +68,13 @@ const OrderDetails = () => {
           <h2 className="text-blue-900 text-3xl font-bold">
             {orderDetails.customer_first_name} {orderDetails.customer_last_name}
           </h2>
-          <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>{" "}
+          <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
         </div>
         <span
           className={`text-lg font-bold px-4 py-2 rounded-full ${
-            orderDetails.order_status === 3
+            orderDetails.overall_order_status === 3
               ? "bg-green-500 text-white"
-              : orderDetails.order_status === 2
+              : orderDetails.overall_order_status === 2
               ? "bg-yellow-300 text-black"
               : "bg-gray-500 text-white"
           }`}
@@ -89,8 +93,6 @@ const OrderDetails = () => {
       <div className="flex flex-col md:flex-row gap-4 mx-20 service-block-one">
         {/* Customer Info */}
         <div className="inner-box hvr-float-shadow w-full md:w-1/2">
-          {" "}
-          {/* Full width on small, 50% on medium and up */}
           <h5 className="font-semibold">Customer</h5>
           <p className="font-bold">
             {orderDetails.customer_first_name} {orderDetails.customer_last_name}
@@ -111,8 +113,6 @@ const OrderDetails = () => {
 
         {/* Car in Service Info */}
         <div className="inner-box hvr-float-shadow w-full md:w-1/2">
-          {" "}
-          {/* Full width on small, 50% on medium and up */}
           <h5 className="font-semibold">Car in Service</h5>
           <p className="font-bold">
             {orderDetails.vehicle_make} {orderDetails.vehicle_model}
@@ -125,8 +125,7 @@ const OrderDetails = () => {
 
       <div className="service-block-one mx-20">
         <div className="inner-box hvr-float-shadow">
-          <h5 className="font-bold text-4xl mb-4">Requested Services</h5>{" "}
-          {/* Main title size */}
+          <h5 className="font-bold text-4xl mb-4">Requested Services</h5>
           {services.length > 0 ? (
             services.map((service, index) => (
               <div
@@ -134,23 +133,21 @@ const OrderDetails = () => {
                 className="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-3"
               >
                 <div>
-                  <h6 className="font-semibold text-xl">{service}</h6>{" "}
-                  {/* Service title size */}
+                  <h6 className="font-semibold text-xl">{service}</h6>
                   <p className="text-gray-600 text-sm">
                     {serviceDescriptions[index]}
-                  </p>{" "}
-                  {/* Description size */}
+                  </p>
                 </div>
                 <span
-                  className={`text-lg font-bold px-4 py-2 rounded-full ${
-                    orderDetails.order_status === 3
+                  className={`text-md font-semibold px-4 py-2 rounded-full ${
+                    serviceStatuses[index] === "3"
                       ? "bg-green-500 text-white"
-                      : orderDetails.order_status === 2
+                      : serviceStatuses[index] === "2"
                       ? "bg-yellow-300 text-black"
                       : "bg-gray-500 text-white"
                   }`}
                 >
-                  {orderStatusText}
+                  {statusMap[serviceStatuses[index]] || "Unknown status"}
                 </span>
               </div>
             ))
@@ -159,44 +156,17 @@ const OrderDetails = () => {
               No services requested.
             </h1>
           )}
-          {orderDetails.additional_request && (
-            <div className="flex justify-between items-center mt-4">
-              <div>
-                <h6 className="font-semibold text-xl">Additional request</h6>{" "}
-                {/* Additional request title size */}
-                <p className="text-gray-600 text-sm">
-                  {orderDetails.additional_request}
-                </p>{" "}
-                {/* Additional request description size */}
-              </div>
-              <span
-                className={`text-lg font-bold px-4 py-2 rounded-full ${
-                  orderDetails.order_status === 3
-                    ? "bg-green-500 text-white"
-                    : orderDetails.order_status === 2
-                    ? "bg-yellow-300 text-black"
-                    : "bg-gray-500 text-white"
-                }`}
-              >
-                {orderStatusText}
-              </span>
-            </div>
-          )}
         </div>
       </div>
+
       <div className="service-block-one mx-20">
         <div className="inner-box hvr-float-shadow">
           <h5 className="font-bold text-3xl mb-2">Order Information</h5>
-
           <p className="text-blue-900">
-            Total Price:
-            <span className="text-black">
-              {" "}
-              ${orderDetails.order_total_price}
-            </span>
+            Total Price:{" "}
+            <span className="text-black">${orderDetails.order_total_price}</span>
           </p>
           <p className="text-blue-900">
-            {" "}
             Estimated Completion Date:{" "}
             <span className="text-black">
               {new Date(
@@ -204,7 +174,6 @@ const OrderDetails = () => {
               ).toLocaleString()}
             </span>
           </p>
-          {/* <hr className="border-red-700 border-4 my-2" /> */}
         </div>
       </div>
     </div>

@@ -104,74 +104,55 @@ const getEmployee = async (employeeId, token) => {
 
 
 // Fetch tasks assigned to the employee
-const getEmployeeTasks = async (employee_id, token) => {
+const getEmployeeTasks = async (employee_id) => {
   try {
     const response = await fetch(`${api_url}/api/employees/${employee_id}/tasks`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
     });
-    return response;
+
+    if (!response.ok) {
+      throw new Error(`Error fetching tasks: ${response.statusText}`);
+    }
+
+    const data = await response.json(); // Ensure you're converting to JSON
+    return data.tasks || []; // Return the tasks array or an empty array
   } catch (error) {
     console.error("Error fetching employee tasks:", error);
     throw error;
   }
 };
 
-// Function to update task status 
 
+// Function to update task status with detailed logging
 const updateTaskStatus = async (task_id, status, token) => {
-  // Map string status to corresponding integer values
-  const statusMap = {
-    "Received": 1,
-    "In Progress": 2,
-    "Completed": 3,
-  };
-
-  // Log the status received from the UI
-  console.log(`[UpdateTaskStatus] Status received from UI: ${status}`);
-
-  // Map the string status to its corresponding integer value
-  const mappedStatus = statusMap[status];
-  
-  // Ensure that the mapped status is valid before sending the request
-  if (mappedStatus === undefined) {
-    console.error(`[UpdateTaskStatus] Invalid status value: ${status}`);
-    throw new Error("Invalid status value");
-  }
-
   try {
-    console.log(`[UpdateTaskStatus] Sending PUT request to: ${api_url}/employees/tasks/${task_id}/status`);
+    console.log(`[UpdateTaskStatus] New status to send: ${status}`);
     
-    const response = await fetch(`${api_url}/employees/tasks/${task_id}/status`, {
+
+    const response = await fetch(`${api_url}/api/employees/tasks/${task_id}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ status: mappedStatus }), // Send the mapped integer status here
+      body: JSON.stringify({ status: Number(status) }),  // Ensure it's a number
     });
-
-    console.log(`[UpdateTaskStatus] Response status: ${response.status}`);
-
+   
     if (!response.ok) {
       const errorMsg = `Failed to update task status. Status: ${response.status}, StatusText: ${response.statusText}`;
       console.error(`[UpdateTaskStatus] ${errorMsg}`);
       throw new Error(errorMsg);
     }
 
-    const data = await response.json();
-    console.log(`[UpdateTaskStatus] Task status updated successfully. Response data:`, data);
-
-    return data;
+    return await response.json();
   } catch (error) {
     console.error(`[UpdateTaskStatus] Error occurred while updating task status:`, error);
     throw error;
   }
 };
-
 
 
 
@@ -183,6 +164,7 @@ const employeeService = {
   deleteEmployee,
   updateEmployee,
   getEmployee,
+  // getEmployeesByRole,
   getEmployeeTasks,
   updateTaskStatus
 };

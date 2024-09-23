@@ -21,23 +21,32 @@ const getAllCustomersForOrder = async (req, res) => {
     }
 };
 
-
-// Create a new order
 // Create a new order
 const createOrder = async (req, res) => {
   try {
     const { orderData, orderInfoData, orderServiceData } = req.body;
+    // Log the entire request body for debugging
+    console.log("Received order data in the request body:", req.body);
 
     // Validate the request payload
-    if (!orderData || !orderInfoData || !orderServiceData) {
+    if (!orderData || !orderInfoData || !orderServiceData || orderServiceData.length === 0) {
       return res.status(400).json({
         message: 'Missing required data: orderData, orderInfoData, or orderServiceData',
       });
     }
 
+    // Log incoming request details for debugging
     console.log("Received order data:", orderData);
     console.log("Received order info data:", orderInfoData);
     console.log("Received order service data:", orderServiceData);
+
+    // Ensure all services have an employee assigned
+    const unassignedServices = orderServiceData.filter(service => !service.employee_id);
+    if (unassignedServices.length > 0) {
+      return res.status(400).json({
+        message: 'All services must have an employee assigned',
+      });
+    }
 
     // Call the service function to handle the order creation
     const result = await orderService.createOrder(orderData, orderInfoData, orderServiceData);
@@ -48,15 +57,12 @@ const createOrder = async (req, res) => {
     res.status(201).json(result);
 
   } catch (error) {
-    // Log the error for debugging purposes
+    
     console.error('Error creating order:', error.message);
     console.error('Stack trace:', error.stack);
-
-    // Return a 500 Internal Server Error with more details in production environment
     res.status(500).json({ message: 'Error creating order', error: error.message });
   }
 };
-
 
 
 // Controller to fetch all orders
@@ -103,6 +109,63 @@ const getOrderById = async (req, res) => {
   }
 };
 
+// get the order i from the task
+const getOrderIdFromTask = async (req, res) => {
+  try {
+    const { orderServiceId } = req.params;
+    const orderId = await orderService.getOrderIdFromTask(orderServiceId);
+
+    if (!orderId) {
+      return res.status(404).json({ message: "Order ID not found" });
+    }
+
+    res.status(200).json({ order_id: orderId });
+  } catch (error) {
+    console.error("Error fetching order ID:", error);
+    res.status(500).json({ message: "Error fetching order ID" });
+  }
+};
+
+// controller for get all the services for a single order
+const getAllServicesForOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const services = await orderService.getAllServicesForOrder(orderId);
+
+    if (!services || services.length === 0) {
+      return res.status(404).json({ message: "No services found for the order" });
+    }
+
+    res.status(200).json(services);
+  } catch (error) {
+    console.error("Error fetching services:", error);
+    res.status(500).json({ message: "Error fetching services for the order" });
+  }
+};
+
+// the entire order status not only the services
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (![1, 2, 3].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const result = await orderService.updateOrderStatus(orderId, status);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Order not found or status not updated" });
+    }
+
+    res.status(200).json({ message: "Order status updated successfully" });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    res.status(500).json({ message: "Error updating order status" });
+  }
+};
+
 // Update an existing order
 const updateOrder = async (req, res) => {
   try {
@@ -115,7 +178,6 @@ const updateOrder = async (req, res) => {
       order_services
     } = req.body;
 
-    // Log the update data
     console.log("Updating order with id:", id, req.body);
 
     // Call service to update order
@@ -160,31 +222,6 @@ const deleteOrderById = async (req, res) => {
   }
 };
 
-// Controller to update the order status
-const updateOrderStatus = async (req, res) => {
-  try {
-      const { id: orderId } = req.params;
-      const { order_status } = req.body;
-
-      // Validate if the status is provided and correct
-      if (![1, 2, 3].includes(order_status)) {
-          return res.status(400).json({ message: "Invalid order status. Must be 1 (Received), 2 (In Progress), or 3 (Completed)." });
-      }
-
-      // Call the service to update the order status
-      const result = await orderService.updateOrderStatus(orderId, order_status);
-
-      res.status(200).json({
-          message: 'Order status updated successfully',
-          data: result,
-      });
-  } catch (error) {
-      console.error('Error updating order status:', error);
-      res.status(500).json({
-          message: 'Error updating order status',
-      });
-  }
-};
 
 
 // Export all at the end
@@ -193,7 +230,9 @@ module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
+  getOrderIdFromTask,
   updateOrder,
+  getAllServicesForOrder,
   updateOrderStatus,
   deleteOrderById,
 };

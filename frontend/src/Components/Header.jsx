@@ -37,27 +37,7 @@ function Header(props) {
 
     fetchUserData();
   }, [setEmployee, setCustomer]);
-  // useEffect(() => {
-  //   const fetchCustomerData = () => {
-  //     const customerToken = localStorage.getItem("customer_token");
-  //     if (customerToken) {
-  //       try {
-  //         const decodedToken = jwtDecode(customerToken);
-          
-  //         setCustomer({
-  //           customer_first_name: decodedToken.customer_first_name,
-  //           customer_id: decodedToken.customer_id,
-  //           profile_image: decodedToken.profile_image, // if available in the token
-  //         });
-  //         console.log("Decoded Customer Data:", decodedToken);
-  //       } catch (error) {
-  //         console.error("Invalid token", error);
-  //       }
-  //     }
-  //   };
-
-  //   fetchCustomerData();
-  // }, [setCustomer]);
+  
   const logOut = () => {
     loginService.logOut();
     setIsLogged(false);

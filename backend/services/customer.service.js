@@ -20,7 +20,6 @@ async function createCustomer(customer) {
     const salt = await bcrypt.genSalt(10);
     // Hash the password
     const hashedPassword = await bcrypt.hash(customer.customer_password, salt);
-    // Insert the email into the customer table
     const query =
         "INSERT INTO customer (customer_email, active_customer) VALUES (?, ?)";
     const rows = await conn.query(query, [
