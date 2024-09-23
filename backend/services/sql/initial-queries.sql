@@ -145,10 +145,13 @@ CREATE TABLE IF NOT EXISTS `order_service_employee` (
 CREATE TABLE IF NOT EXISTS `order_status` (
   `order_status_id` int(11) NOT NULL AUTO_INCREMENT,
   `order_id` int(11) NOT NULL,
+  `order_service_id` int(11) DEFAULT NULL,
   `order_status` int(11) NOT NULL,
-  PRIMARY KEY (order_status_id),
-  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+  PRIMARY KEY (`order_status_id`),
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`order_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`order_service_id`) REFERENCES `order_services`(`order_service_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
 
 -- Add the roles to the database 
 INSERT INTO company_roles (company_role_name)
