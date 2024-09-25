@@ -1,10 +1,7 @@
-import React from 'react';
+
 import { Link } from "react-router-dom";
 import bg1 from "../assets/images/banner/bg-1.jpg";
-import vban1 from "../assets/images/banner/vban1.jpg";
-import vban2 from "../assets/images/banner/vban2.jpg";
 import image4 from "../assets/images/banner/image-4.jpg";
-import image5 from "../assets/images/banner/bg-3.jpg";
 import image6 from "../assets/images/banner/bg-4.jpg";
 
 // Defining an array of features with their titles and icons

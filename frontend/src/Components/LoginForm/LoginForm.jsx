@@ -1,85 +1,95 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { loginService } from "../services/login.service";
+import { useAuth } from "../../Contexts/AuthContext"; // Import the AuthContext
 
 function LoginForm() {
+  const { setIsLogged, setEmployee, setCustomer } = useAuth(); // Use context to set login state
   const navigate = useNavigate();
   const location = useLocation();
-  const [employee_email, setEmail] = useState("");
-  const [employee_password, setPassword] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [serverError, setServerError] = useState("");
-
+  // Toggle between employee and customer
+  const [isEmployeeLogin, setIsEmployeeLogin] = useState(true); 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle client side validations here
-    let valid = true; // Flag
-    // Email validation
-    if (!employee_email) {
-      setEmailError("Please enter your email address first");
+
+    // Client-side validations
+    let valid = true;
+    if (!email) {
+      setEmailError("Please enter your email address");
       valid = false;
-    } else if (!employee_email.includes("@")) {
+    } else if (!email.includes("@")) {
       setEmailError("Invalid email format");
+      valid = false;
     } else {
       const regex = /^\S+@\S+\.\S+$/;
-      if (!regex.test(employee_email)) {
+      if (!regex.test(email)) {
         setEmailError("Invalid email format");
         valid = false;
       } else {
         setEmailError("");
       }
     }
-    // Password has to be at least 6 characters long
-    if (!employee_password || employee_password.length < 6) {
+
+    if (!password || password.length < 6) {
       setPasswordError("Password must be at least 6 characters long");
       valid = false;
     } else {
       setPasswordError("");
     }
-    if (!valid) {
-      return;
-    }
-    // Handle form submission here
-    const formData = {
-      employee_email,
-      employee_password,
-    };
-    console.log(formData);
-    // Call the service
-    const loginEmployee = loginService.logIn(formData);
-    console.log(loginEmployee);
-    loginEmployee
-      .then((response) => response.json())
-      .then((response) => {
-        console.log(response);
-        if (response.status === "success") {
-          // Save the user in the local storage
-          if (response.data.employee_token) {
-            console.log(response.data);
-            localStorage.setItem("employee", JSON.stringify(response.data));
-          }
-          // Redirect the user to the dashboard
-          // navigate('/admin');
-          console.log(location);
-          if (location.pathname === "/login") {
-            // navigate('/admin');
-            // window.location.replace('/admin');
-            // To home for now
-            // window.location.replace("/");
-            navigate("/")
-          } else {
-            window.location.reload();
-          }
+
+    if (!valid) return;
+
+    const formData = { email, password };
+    console.log("Form Data Submitted:", formData);
+
+    try {
+      // Call the appropriate service based on login type
+      const loginResponse = isEmployeeLogin
+        ? await loginService.logInEmployee(formData)
+        : await loginService.logInCustomer(formData);
+
+      const response = await loginResponse.json();
+      console.log("Response from Server:", response);
+
+      if (response.status === "success") {
+        if (isEmployeeLogin) {
+          // Clear previous customer data and store new employee data
+          localStorage.removeItem("customer"); // Clear customer data if logging in as employee
+          const employeeData = {
+            employee_token: response.data.employee_token,
+            employee_role: response.data.employee_role,
+            employee_first_name: response.data.employee_first_name,
+          };
+          localStorage.setItem("employee", JSON.stringify(employeeData));
+          setEmployee(employeeData);
         } else {
-          // Show an error message
-          setServerError(response.message);
+          // Clear previous employee data and store new customer data
+          localStorage.removeItem("employee"); 
+          const customerData = {
+            customer_token: response.data.customer_token,
+            customer_first_name: response.data.customer_first_name,
+          };
+          localStorage.setItem("customer", JSON.stringify(customerData));
+          setCustomer(customerData);
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        setServerError("An error has occurred. Please try again later." + err);
-      });
+
+        setIsLogged(true);
+
+        // Redirect based on user type
+        navigate(isEmployeeLogin ? "/" : "/");
+      } else {
+        setServerError(response.message);
+      }
+    } catch (err) {
+      console.log("Error:", err);
+      setServerError("An error has occurred. Please try again later.");
+    }
   };
 
   return (
@@ -88,6 +98,29 @@ function LoginForm() {
         <div className="contact-title">
           <h2>Login to your account</h2>
         </div>
+
+        {/* Toggle between Employee and Customer */}
+        <div className="login-toggle">
+          <label>
+            <input
+              type="radio"
+              name="loginType"
+              checked={isEmployeeLogin}
+              onChange={() => setIsEmployeeLogin(true)}
+            />
+            Employee Login
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="loginType"
+              checked={!isEmployeeLogin}
+              onChange={() => setIsEmployeeLogin(false)}
+            />
+            Customer Login
+          </label>
+        </div>
+
         <div className="row clearfix">
           <div className="form-column col-lg-7">
             <div className="inner-column">
@@ -102,8 +135,8 @@ function LoginForm() {
                       )}
                       <input
                         type="email"
-                        name="employee_email"
-                        value={employee_email}
+                        name="email"
+                        value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         placeholder="Email"
                       />
@@ -117,8 +150,8 @@ function LoginForm() {
                     <div className="form-group col-md-12">
                       <input
                         type="password"
-                        name="employee_password"
-                        value={employee_password}
+                        name="password"
+                        value={password}
                         onChange={(event) => setPassword(event.target.value)}
                         placeholder="Password"
                       />
