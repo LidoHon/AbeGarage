@@ -4,7 +4,6 @@
 
 Abe Garage is a full-stack web application designed to manage garage services. The platform allows administrators to register both **customers** and **employees**. After registration, customers and employees can log in to the system. Customers can:
 - Order services,
-- Assign employees to handle their orders,
 - Track the status of their orders.
 
 Administrators have full control over user management, including assigning roles and managing service orders.
