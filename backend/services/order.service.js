@@ -104,10 +104,13 @@ const getAllOrders = async () => {
 
             -- Determine overall order status:
             CASE
-                WHEN SUM(os_service.order_status = 2) > 0 THEN 2  -- If any service is "In Progress"
-                WHEN SUM(os_service.order_status = 3) = COUNT(os_service.order_service_id) THEN 3  -- If all services are "Completed"
-                ELSE 1  -- If all services are still "Received"
-            END AS order_status,  -- Dynamically calculate the overall status
+                -- If all services are completed, set overall status to "Completed" (status = 3)
+                WHEN SUM(os_service.order_status = 3) = COUNT(os_service.order_service_id) THEN 3
+                -- If any service is either "In Progress" (status = 2) or "Completed" (status = 3), set overall status to "In Progress" (status = 2)
+                WHEN SUM(os_service.order_status = 2) > 0 OR SUM(os_service.order_status = 3) > 0 THEN 2
+                -- Otherwise, if all services are "Received" (status = 1), set overall status to "Received" (status = 1)
+                ELSE 1
+            END AS order_status,
 
             oi.order_total_price,  
             oi.estimated_completion_date,  

@@ -28,18 +28,14 @@ function AddCustomerForm(props) {
     }
 
     const handleSubmit = (e) => {
-        // Prevent the default behavior of the form
         e.preventDefault();
-        // Handle client side validations
-        let valid = true; // Flag
-        // First name is required
+        let valid = true; 
         if (!customer_first_name) {
         setFirstNameRequired("First name is required");
         valid = false;
         } else {
         setFirstNameRequired("");
         }
-        // Email is required
         if (!customer_email) {
         setEmailError("Email is required");
         valid = false;
@@ -92,8 +88,7 @@ function AddCustomerForm(props) {
             // Redirect to the employees page after 2 seconds
             // For now, just redirect to the home page
             setTimeout(() => {
-                window.location.href = "/admin/customers";
-                // window.location.href = "/admin/dashboard";
+                window.location.href = "/admin/customers";;
             }, 2000);
             }
         })
@@ -112,9 +107,10 @@ function AddCustomerForm(props) {
     return (
         <section className="contact-section">
         <div className="auto-container">
-            <div className="contact-title">
-            <h2>Add a new customer</h2>
-            </div>
+        <div className="flex items-center gap-3 mb-4">
+            <h2 className="page-titles text-3xl font-bold mb-4">Add a new customer</h2>
+            <div className="h-1 w-16 bg-red-500 mr-2 mt-2"></div>
+        </div>
             <div className="row clearfix">
             <div className="form-column col-lg-7">
                 <div className="inner-column">
@@ -194,7 +190,7 @@ function AddCustomerForm(props) {
 
                         <div className="form-group col-md-12">
                         <button
-                            className="theme-btn btn-style-one"
+                            className="buttonStyle"
                             type="submit"
                             data-loading-text="Please wait..."
                         >

@@ -22,21 +22,21 @@ function Header(props) {
   useEffect(() => {
     const fetchUserData = async () => {
       const loggedInUser = await getAuth();
+      console.log("Logged in User:", loggedInUser); 
       if (loggedInUser) {
         if (loggedInUser.employee_id) {
           setEmployee(loggedInUser);
+          console.log("Employee Data:", loggedInUser); 
         } else {
           setCustomer(loggedInUser);
-          console.log("Customer Data:", {
-            firstName: loggedInUser.customer_first_name,
-            id: loggedInUser.customer_id,
-          });
+          console.log("Customer Data:", loggedInUser); 
         }
       }
     };
-
+  
     fetchUserData();
   }, [setEmployee, setCustomer]);
+  
   
   const logOut = () => {
     loginService.logOut();
@@ -196,22 +196,12 @@ function Header(props) {
                 isMobileMenuOpen ? "block" : "hidden"
               } lg:flex`}
             >
-              <ul className="navigation flex flex-col lg:flex-row lg:space-x-4">
+              <ul className="navigation flex flex-col lg:flex-row lg:space-x-2">
                 <li className="dropdown">
                   <Link to="/" className="hover:text-blue-500">
                     Home
                   </Link>
                 </li>
-                {/* {isAdmin && (
-                  <li className="dropdown">
-                    <Link
-                      to="/admin/admin-landing"
-                      className="hover:text-blue-500"
-                    >
-                      Dashboard
-                    </Link>
-                  </li>
-                )} */}
                 <li className="dropdown">
                   <Link to="/about" className="hover:text-blue-500">
                     About Us
@@ -247,16 +237,7 @@ function Header(props) {
                   Home
                 </Link>
               </li>
-              {/* {isAdmin && (
-                <li className="dropdown">
-                  <Link
-                    to="/admin/admin-landing"
-                    className="hover:text-blue-500"
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-              )} */}
+              
               <li className="dropdown">
                 <Link to="/about" className="hover:text-blue-500">
                   About Us

@@ -46,7 +46,7 @@ ServiceBlock.propTypes = {
     subtitle: PropTypes.string.isRequired,
     linkText: PropTypes.string.isRequired,
     icon: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired, // Added prop for the navigation link
+    link: PropTypes.string.isRequired, 
 };
 
 // AdminDashboard component
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
                         subtitle={service.subtitle}
                         linkText={service.linkText}
                         icon={service.icon}
-                        link={service.link} // Pass the link for navigation
+                        link={service.link} 
                     />
                 ))}
             </div>

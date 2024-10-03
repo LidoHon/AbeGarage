@@ -12,7 +12,7 @@ function AddEmployee(props) {
           <div className="col-md-3 admin-left-side">
             <AdminMenu />
           </div>
-          <div className="col-md-9 admin-right-side">
+          <div className="col-md-9 px-14">
             <AddEmployeeForm />
           </div>
         </div>

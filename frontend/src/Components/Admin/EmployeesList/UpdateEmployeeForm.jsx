@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import employeeService from "../../services/employee.service";
 import { Button, Form, Alert } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css"; 
+import employeeService from "../../services/employee.service";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
   const [employee_email, setEmail] = useState("");
@@ -100,7 +100,11 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} className="p-4 border rounded bg-light">
+    <Form
+      onSubmit={handleSubmit}
+      className="p-4 border rounded bg-light"
+      style={{ maxWidth: "400px", margin: "0 auto" }} // Set max width for the form
+    >
       <Form.Group controlId="formEmail">
         <Form.Label>Email</Form.Label>
         <Form.Control
@@ -183,8 +187,8 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
           onChange={(event) => setCompany_role_id(Number(event.target.value))}
         >
           <option value={1}>Employee</option>
-          <option value={1}>Manager</option>
-          <option value={1}>Admin</option>
+          <option value={2}>Manager</option>
+          <option value={3}>Admin</option>
         </Form.Control>
       </Form.Group>
 

@@ -50,7 +50,6 @@ async function createEmployee(employee) {
       employee_id,
       employee.company_role_id,
     ]);
-    // construct to the employee object to return
     createdEmployee = {
       employee_id: employee_id,
     };
@@ -208,39 +207,39 @@ async function deleteEmployee(employeeId) {
 const getEmployeeTasks = async (employee_id) => {
   const query = `
         SELECT
-      ose.order_service_employee_id,
-      os.service_id,
-      cs.service_name,
-      cs.service_description,
-      os.service_completed,
-      o.order_id,
-      os.order_service_id,
-      ords.order_status,
-      c.customer_id,
-      c.customer_email,  
-      ci.customer_first_name,
-      ci.customer_last_name,
-      ci.customer_phone,
-      v.vehicle_id,
-      v.vehicle_make,
-      v.vehicle_model,
-      v.vehicle_year,
-      v.vehicle_mileage,
-      v.vehicle_tag
-  FROM order_service_employee ose
-  INNER JOIN order_services os ON ose.order_service_id = os.order_service_id
-  INNER JOIN common_services cs ON os.service_id = cs.service_id
-  INNER JOIN orders o ON os.order_id = o.order_id
-  LEFT JOIN (
-      SELECT order_service_id, MAX(order_status) as order_status 
-      FROM order_status
-      GROUP BY order_service_id
-  ) ords ON ords.order_service_id = os.order_service_id
-  INNER JOIN customer c ON o.customer_id = c.customer_id  
-  INNER JOIN customer_info ci ON c.customer_id = ci.customer_id  
-  INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id  
-  WHERE ose.employee_id = ?;
-`;
+        ose.order_service_employee_id,
+        os.service_id,
+        cs.service_name,
+        cs.service_description,
+        os.service_completed,
+        o.order_id,
+        os.order_service_id,
+        ords.order_status,
+        c.customer_id,
+        c.customer_email,  
+        ci.customer_first_name,
+        ci.customer_last_name,
+        ci.customer_phone,
+        v.vehicle_id,
+        v.vehicle_make,
+        v.vehicle_model,
+        v.vehicle_year,
+        v.vehicle_mileage,
+        v.vehicle_tag
+    FROM order_service_employee ose
+    INNER JOIN order_services os ON ose.order_service_id = os.order_service_id
+    INNER JOIN common_services cs ON os.service_id = cs.service_id
+    INNER JOIN orders o ON os.order_id = o.order_id
+    LEFT JOIN (
+        SELECT order_service_id, MAX(order_status) as order_status 
+        FROM order_status
+        GROUP BY order_service_id
+    ) ords ON ords.order_service_id = os.order_service_id
+    INNER JOIN customer c ON o.customer_id = c.customer_id  
+    INNER JOIN customer_info ci ON c.customer_id = ci.customer_id  
+    INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id  
+    WHERE ose.employee_id = ?;
+  `;
 
   try {
     console.log(`Executing query for employee_id: ${employee_id}`);
@@ -277,7 +276,7 @@ const updateTaskStatus = async (task_id, status) => {
       SET service_completed = ?
       WHERE order_service_id = ?
     `;
-    const serviceCompletedValue = status === 3 ? 1 : 0; // Mark service as completed if status is 3 (Completed)
+    const serviceCompletedValue = status === 3 ? 1 : 0; 
     const result = await conn.query(updateServiceQuery, [serviceCompletedValue, task_id]);
 
     if (result.affectedRows === 0) {
@@ -315,11 +314,11 @@ const updateTaskStatus = async (task_id, status) => {
     const anyInProgress = services.some((service) => service.service_completed === 0 && status === 2);
 
     // Update the overall order status based on services' completion status
-    let overallOrderStatus = 1; // Default to "Received" if no updates
+    let overallOrderStatus = 1; 
     if (allCompleted) {
-      overallOrderStatus = 3; // Completed
+      overallOrderStatus = 3; 
     } else if (anyInProgress) {
-      overallOrderStatus = 2; // In Progress
+      overallOrderStatus = 2; 
     }
 
     const updateOrderStatusQuery = `

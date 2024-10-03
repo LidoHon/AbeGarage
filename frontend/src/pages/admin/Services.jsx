@@ -49,7 +49,7 @@ const Services = () => {
     };
 
     const handleServiceUpdated = (updatedService) => {
-        // Update the UI immediately after editing or adding a service
+        // Update the UI immediately after editing 
         if (editingService) {
             setServices((prevServices) =>
                 prevServices.map(service =>
@@ -64,14 +64,20 @@ const Services = () => {
     };
 
     return (
-        <div>
+        <div className="px-2">
             <div className="container-fluid admin-pages">
                 <div className="row">
                     <div className="col-md-3 admin-left-side">
                         <AdminMenu />
                     </div>
-                    <div className="col-md-9 admin-right-side">
-                        <h2 className="mb-4">Services we provide</h2>
+                    <div className="services-section col-md-9 px-4">
+                        <div className="flex items-center gap-4 mb-2">
+                            <h2 className="page-titles text-3xl font-bold mb-4">Services we provide </h2>
+                            <div className="h-1 w-16 bg-red-500 mr-2 mt-2"></div>
+                        </div>
+                        <p className="text-gray-600 mb-6">
+                        Our skilled team provides comprehensive garage services, ensuring every vehicle receives expert care and attention. From routine inspections to advanced mechanical repairs, we guarantee efficient and high-quality service delivery for all jobs.
+                        </p>
                         {loading ? (
                             <p>Loading services...</p>
                         ) : error ? (
@@ -81,20 +87,20 @@ const Services = () => {
                         ) : (
                             <ul className="list-group mb-4">
                                 {services.map((service) => (
-                                    <li key={service.service_id} className="list-group-item d-flex justify-content-between align-items-center">
+                                    <li key={service.service_id} className="list-group-item d-flex justify-content-between align-items-center mb-1 ">
                                         <div>
-                                            <h5>{service.service_name}</h5>
-                                            <p>{service.service_description}</p>
+                                            <h4 className="font-bold page-titles">{service.service_name}</h4>
+                                            <p className="text-sm">{service.service_description}</p>
                                         </div>
                                         <div>
                                             <button
-                                                className="btn btn-sm btn-primary me-2"
+                                                className="btn btn-sm text-red-500 "
                                                 onClick={() => handleEditService(service)}
                                             >
                                                 <i className="fa fa-edit"></i>
                                             </button>
                                             <button
-                                                className="btn btn-sm btn-danger"
+                                                className="btn btn-sm ml-2"
                                                 onClick={() => handleDeleteService(service.service_id)}
                                             >
                                                 <i className="fa fa-trash"></i>
@@ -104,11 +110,16 @@ const Services = () => {
                                 ))}
                             </ul>
                         )}
-                        <h4>{editingService ? 'Edit' : 'Add'} Service</h4>
-                        <AddServiceForm
-                            editingService={editingService}
-                            onServiceUpdated={handleServiceUpdated}
-                        />
+                        <div className="bg-white p-4">
+                        <div className="flex items-center gap-3 mb-2">
+                            <h4 className="page-titles font-bold text-xl">{editingService ? 'Edit' : 'Add a new'} Service</h4>
+                                <div className="h-1 w-14 bg-red-500 mr-2 mt-2"></div>
+                        </div>
+                            <AddServiceForm
+                                editingService={editingService}
+                                onServiceUpdated={handleServiceUpdated}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

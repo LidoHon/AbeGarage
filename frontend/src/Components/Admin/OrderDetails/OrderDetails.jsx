@@ -65,7 +65,7 @@ const OrderDetails = () => {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-4">
-          <h2 className="text-blue-900 text-3xl font-bold">
+          <h2 className="page-titles text-3xl font-bold">
             {orderDetails.customer_first_name} {orderDetails.customer_last_name}
           </h2>
           <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
