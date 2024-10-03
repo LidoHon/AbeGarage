@@ -22,22 +22,22 @@ function Header(props) {
   useEffect(() => {
     const fetchUserData = async () => {
       const loggedInUser = await getAuth();
-      console.log("Logged in User:", loggedInUser); 
       if (loggedInUser) {
         if (loggedInUser.employee_id) {
           setEmployee(loggedInUser);
-          console.log("Employee Data:", loggedInUser); 
         } else {
           setCustomer(loggedInUser);
-          console.log("Customer Data:", loggedInUser); 
+          console.log("Customer Data:", {
+            firstName: loggedInUser.customer_first_name,
+            id: loggedInUser.customer_id,
+          });
         }
       }
     };
-  
+
     fetchUserData();
   }, [setEmployee, setCustomer]);
-  
-  
+
   const logOut = () => {
     loginService.logOut();
     setIsLogged(false);
@@ -63,24 +63,26 @@ function Header(props) {
   return (
     <header className="main-header bg-white shadow-md">
       {/* Top Header */}
-      <div className="header-top bg-gray-800 text-white py-2">
-        <div className="auto-container flex justify-between">
+      <div className="header-top bg-gray-800 text-white py-0">
+        <div className="flex justify-between pr-10">
           <div className="left-column">
             <div className="text">Enjoy the Best while we fix your car</div>
-            <div className="office-hour">Monday - Saturday 7:00AM - 6:00PM</div>
+            <div className="office-hour hidden md:block">
+              Monday - Saturday 7:00AM - 6:00PM
+            </div>
           </div>
           <div className="right-column flex items-center">
             {isLogged ? (
               <div className="link-btn flex items-center">
                 <div className="phone-number flex items-center gap-2">
-                  <strong>
+                  <strong onClick={toggleDropdown} className="cursor-pointer">
                     Welcome{" "}
                     {employee
                       ? employee.employee_first_name
                       : customer?.customer_first_name}
                   </strong>
                   <div className="relative">
-                    <div onClick={toggleDropdown} className="cursor-pointer">
+                    {/* <div onClick={toggleDropdown} className="cursor-pointer">
                       <Avatar
                         name={
                           employee
@@ -91,7 +93,7 @@ function Header(props) {
                         round={true}
                         src={employee?.profile_image || customer?.profile_image}
                       />
-                    </div>
+                    </div> */}
                     {isDropdownOpen && (
                       <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded shadow-lg z-10">
                         {!isAdmin && employee && (
@@ -118,15 +120,9 @@ function Header(props) {
                             className="block px-4 py-2 hover:bg-gray-100"
                             onClick={closeDropdown}
                           >
-                            Dashboard
+                            Profile
                           </Link>
                         )}
-                        <Link
-                          onClick={logOut}
-                          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                        >
-                          Logout
-                        </Link>
                       </div>
                     )}
                   </div>
@@ -145,11 +141,11 @@ function Header(props) {
 
       {/* Upper Header */}
       <div className="header-upper py-0">
-        <div className="auto-container flex items-center justify-between">
+        <div className=" flex items-center justify-between pl-4 pr-10">
           <div className="logo-box">
             <div className="logo">
               <Link to="/">
-                <img src={logo} alt="Logo" className="w-32 h-auto" />
+                <img src={logo} alt="Logo" className="w-40 h-10" />
               </Link>
             </div>
           </div>
@@ -196,12 +192,22 @@ function Header(props) {
                 isMobileMenuOpen ? "block" : "hidden"
               } lg:flex`}
             >
-              <ul className="navigation flex flex-col lg:flex-row lg:space-x-2">
+              <ul className="navigation flex flex-col lg:flex-row lg:space-x-4">
                 <li className="dropdown">
                   <Link to="/" className="hover:text-blue-500">
                     Home
                   </Link>
                 </li>
+                {/* {isAdmin && (
+                  <li className="dropdown">
+                    <Link
+                      to="/admin/admin-landing"
+                      className="hover:text-blue-500"
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                )} */}
                 <li className="dropdown">
                   <Link to="/about" className="hover:text-blue-500">
                     About Us
@@ -217,6 +223,37 @@ function Header(props) {
                     Contact Us
                   </Link>
                 </li>
+                {isAdmin && (
+                  <li>
+                    <Link
+                      to="/admin/admin-landing"
+                      className="hover:text-blue-500"
+                    >
+                      Admin
+                    </Link>
+                  </li>
+                )}
+                <li></li>
+                {isLogged && (
+                  <>
+                    <div
+                      style={{
+                        width: "2px", 
+                        backgroundColor: "gray", 
+                        height: "30px", 
+                        margin: "0 8px", 
+                      }}
+                    ></div>
+                    <li>
+                      <button
+                        onClick={logOut}
+                        className="hover:text-blue-500 bg-blue-950 text-white hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium  text-sm px-4 py-2.5 text-center dark:bg-blue-950 dark:hover:bg-blue-950 dark:focus:ring-blue-800"
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </>
+                )}
               </ul>
             </nav>
           </div>
@@ -237,7 +274,16 @@ function Header(props) {
                   Home
                 </Link>
               </li>
-              
+              {/* {isAdmin && (
+                <li className="dropdown">
+                  <Link
+                    to="/admin/admin-landing"
+                    className="hover:text-blue-500"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              )} */}
               <li className="dropdown">
                 <Link to="/about" className="hover:text-blue-500">
                   About Us
@@ -253,6 +299,26 @@ function Header(props) {
                   Contact Us
                 </Link>
               </li>
+              {isAdmin && (
+                <li>
+                  <Link
+                    to="/admin/admin-landing"
+                    className="hover:text-blue-500"
+                  >
+                    Admin
+                  </Link>
+                </li>
+              )}
+              {isLogged && (
+                <li>
+                  <button
+                    onClick={logOut}
+                    className="hover:text-blue-500 bg-black text-white hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    Logout
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         </nav>
