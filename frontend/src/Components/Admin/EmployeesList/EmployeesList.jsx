@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Table, Modal, Button } from "react-bootstrap";
+import { Table, Modal, Button, Pagination } from "react-bootstrap"; 
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import employeeService from "../../services/employee.service";
-import UpdateEmployeeForm from "./UpdateEmployeeForm"; 
+import UpdateEmployeeForm from "./UpdateEmployeeForm";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
@@ -14,18 +15,26 @@ const EmployeesList = () => {
   const [showModal, setShowModal] = useState(false);
   const { employee } = useAuth();
   const token = employee?.employee_token || null;
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState(1); 
+  const itemsPerPage = 4; 
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const res = await employeeService.getAllEmployees(token);
+        console.log("Employee response:", res);
+
         if (!res.ok) {
           setApiError(true);
           setApiErrorMessage(getErrorMessage(res.status));
           return;
         }
+
         const data = await res.json();
+        console.log("Parsed Employee Data:", data);
+
         if (data.data.length !== 0) {
           setEmployees(data.data);
         }
@@ -34,6 +43,7 @@ const EmployeesList = () => {
         setApiErrorMessage("An error occurred. Please try again later.");
       }
     };
+
     fetchEmployees();
   }, [token]);
 
@@ -74,8 +84,31 @@ const EmployeesList = () => {
     navigate(`/admin/employee-profile/${employeeId}`);
   };
 
+  // Add a utility function to map role IDs to role names
+  const getRoleName = (roleId) => {
+    switch (roleId) {
+      case 1:
+        return "Employee";
+      case 2:
+        return "Manager";
+      case 3:
+        return "Admin";
+      default:
+        return "Unknown";
+    }
+  };
+
+  // Pagination Logic
+  const indexOfLastEmployee = currentPage * itemsPerPage;
+  const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
+  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+
+  const totalPages = Math.ceil(employees.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
-    <div className="employees-list">
+    <div className="employees-list px-8 text-sm min-h-[500px]">
       {apiError ? (
         <section className="error-section">
           <div className="container">
@@ -85,27 +118,33 @@ const EmployeesList = () => {
       ) : (
         <section className="table-section">
           <div className="container">
-            <h2>Employees</h2>
+            <div className="">
+            <div className="flex items-center gap-4">
+                <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Employees </h2>
+                <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+            </div>
+            </div>
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
-                  <th>ID</th> 
+                  <th>ID</th>
                   <th>Active</th>
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Email</th>
                   <th>Phone</th>
                   <th>Added Date</th>
-                  <th>Actions</th>
+                  <th>Role</th>
+                  <th>Edit/Delete</th>
                 </tr>
               </thead>
               <tbody>
-                {employees.map((employee) => (
+                {currentEmployees.map((employee) => (
                   <tr key={employee.employee_id}>
                     <td>
                       <Button
                         variant="link"
-                        className="p-0"
+                        className="p-0 text-gray-800 no-underline"
                         onClick={() => handleNavigateToProfile(employee.employee_id)}
                       >
                         {employee.employee_id}
@@ -117,32 +156,63 @@ const EmployeesList = () => {
                     <td>{employee.employee_email}</td>
                     <td>{employee.employee_phone}</td>
                     <td>{format(new Date(employee.added_date), "MM/dd/yyyy | HH:mm")}</td>
+                    <td>{employee.company_role_id ? getRoleName(employee.company_role_id) : "Unknown"}</td>
                     <td>
-                      <div className="action-buttons">
-                        <Button
-                          className="btn btn-primary me-2"
+                      <div className="d-flex align-items-center">
+                        <FaEdit
+                          className="me-2 text-gray-800"
+                          style={{ cursor: "pointer" }}
                           onClick={() => handleEdit(employee)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          className="btn btn-danger"
+                        />
+                        <FaTrashAlt
+                          className="text-gray-800"
+                          style={{ cursor: "pointer" }}
                           onClick={() => handleDelete(employee.employee_id)}
-                        >
-                          Delete
-                        </Button>
+                        />
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </Table>
+
+            {/* Pagination */}
+            {employees.length > itemsPerPage && (
+              <Pagination className="custom-pagination justify-content-center">
+                <Pagination.First
+                  onClick={() => paginate(1)}
+                  disabled={currentPage === 1}
+                >
+                  « First
+                </Pagination.First>
+                <Pagination.Prev
+                  onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+                  disabled={currentPage === 1}
+                >
+                  ‹ Previous
+                </Pagination.Prev>
+                <Pagination.Next
+                  onClick={() =>
+                    paginate(currentPage < totalPages ? currentPage + 1 : currentPage)
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  Next ›
+                </Pagination.Next>
+                <Pagination.Last
+                  onClick={() => paginate(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  Last »
+                </Pagination.Last>
+              </Pagination>
+            )}
           </div>
         </section>
       )}
 
       {/* Bootstrap Modal for Editing Employee */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="sm">
         <Modal.Header closeButton>
           <Modal.Title>Edit Employee</Modal.Title>
         </Modal.Header>
@@ -154,12 +224,12 @@ const EmployeesList = () => {
               onSuccess={() => {
                 setShowModal(false);
                 window.location.reload();
-                // Refresh employee list or handle success
               }}
             />
           )}
         </Modal.Body>
       </Modal>
+
     </div>
   );
 };

@@ -178,77 +178,80 @@ const EmployeeProfile = () => {
       </Row>
       <h2>Your Tasks</h2>
       <Row>
-        {Object.keys(orders).map(order_id => (
-          <Col key={order_id} md={6} className="mb-4">
-            <Card className="shadow-sm w-100">
-              <Card.Body>
-                <h5 className="text-uppercase mb-3">Order ID: #{order_id}</h5> {/* Order ID added here */}
-                <div className="text-sm flex gap-20">
-                  <div>
-                    <h6 className="text-uppercase">Customer</h6>
-                    <p><strong>{orders[order_id].customer.customer_first_name} {orders[order_id].customer.customer_last_name}</strong></p>
-                    <p><strong>Email:</strong> {orders[order_id].customer.customer_email}</p>
-                    <p><strong>Phone:</strong> {orders[order_id].customer.customer_phone}</p>
+        {Object.keys(orders)
+          .sort((a, b) => b - a) // Sort order_id keys in descending order
+          .map(order_id => (
+            <Col key={order_id} md={12} className="mb-4">
+              <Card className="shadow-sm w-100">
+                <Card.Body>
+                  <h5 className="text-uppercase mb-3">Order ID: #{order_id}</h5> 
+                  <div className="text-sm flex gap-20">
+                    <div>
+                      <h6 className="text-uppercase">Customer</h6>
+                      <p><strong>{orders[order_id].customer.customer_first_name} {orders[order_id].customer.customer_last_name}</strong></p>
+                      <p><strong>Email:</strong> {orders[order_id].customer.customer_email}</p>
+                      <p><strong>Phone:</strong> {orders[order_id].customer.customer_phone}</p>
+                    </div>
+                    <div className="mr-8">
+                      <h6 className="text-uppercase">Vehicle</h6>
+                      <p><strong>{orders[order_id].vehicle.vehicle_make} {orders[order_id].vehicle.vehicle_model}</strong></p>
+                      <p><strong>Year:</strong> {orders[order_id].vehicle.vehicle_year}</p>
+                      <p><strong>Mileage:</strong> {orders[order_id].vehicle.vehicle_mileage}</p>
+                      <p><strong>Tag:</strong> {orders[order_id].vehicle.vehicle_tag}</p>
+                    </div>
                   </div>
-                  <div className="mr-8">
-                    <h6 className="text-uppercase">Vehicle</h6>
-                    <p><strong>{orders[order_id].vehicle.vehicle_make} {orders[order_id].vehicle.vehicle_model}</strong></p>
-                    <p><strong>Year:</strong> {orders[order_id].vehicle.vehicle_year}</p>
-                    <p><strong>Mileage:</strong> {orders[order_id].vehicle.vehicle_mileage}</p>
-                    <p><strong>Tag:</strong> {orders[order_id].vehicle.vehicle_tag}</p>
-                  </div>
-                </div>
-                <h5 className="mt-3">Requested Services</h5>
-                {orders[order_id].services.map((service) => (
-                  <Card key={`${order_id}-${service.order_service_id}`} className="mb-2 shadow-sm">
-                    <Card.Body className="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 className="mb-0">{service.service_name}</h6>
-                      </div>
-                      <div className="d-flex align-items-center">
-                        <span className="me-1">{getStatusBadge(service.order_status)}</span>
-                        {isLogged && isEmployee && service.order_status !== 3 && (
-                          <>
-                            {!isEditingStatus[service.order_service_id] ? (
-                              <div
-                                className="d-inline-flex align-items-center"
-                                onClick={() => setIsEditingStatus((prev) => ({ ...prev, [service.order_service_id]: true }))}>
-                                <FaEllipsisV />
-                              </div>
-                            ) : (
-                              <>
-                                <Form.Select
-                                  value={selectedStatus[service.order_service_id] || service.order_status}
-                                  onChange={(e) => handleStatusChange(service.order_service_id, e.target.value)}
-                                  className="form-select-sm ms-2"
-                                >
-                                  <option value={1}>Received</option>
-                                  <option value={2}>In progress</option>
-                                  <option value={3}>Completed</option>
-                                </Form.Select>
-                                <Button
-                                  variant="success"
-                                  size="sm"
-                                  className="ms-2"
-                                  onClick={() => handleSaveStatus(service.order_service_id)}
-                                >
-                                  Save
-                                </Button>
-                              </>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </Card.Body>
-                  </Card>
-                ))}
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+                  <h5 className="mt-3">Requested Services</h5>
+                  {orders[order_id].services.map((service) => (
+                    <Card key={`${order_id}-${service.order_service_id}`} className="mb-2 shadow-sm">
+                      <Card.Body className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 className="mb-0">{service.service_name}</h6>
+                        </div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-1">{getStatusBadge(service.order_status)}</span>
+                          {isLogged && isEmployee && service.order_status !== 3 && (
+                            <>
+                              {!isEditingStatus[service.order_service_id] ? (
+                                <div
+                                  className="d-inline-flex align-items-center"
+                                  onClick={() => setIsEditingStatus((prev) => ({ ...prev, [service.order_service_id]: true }))}>
+                                  <FaEllipsisV />
+                                </div>
+                              ) : (
+                                <>
+                                  <Form.Select
+                                    value={selectedStatus[service.order_service_id] || service.order_status}
+                                    onChange={(e) => handleStatusChange(service.order_service_id, e.target.value)}
+                                    className="form-select-sm ms-2"
+                                  >
+                                    <option value={1}>Received</option>
+                                    <option value={2}>In progress</option>
+                                    <option value={3}>Completed</option>
+                                  </Form.Select>
+                                  <Button
+                                    variant="success"
+                                    size="sm"
+                                    className="ms-2"
+                                    onClick={() => handleSaveStatus(service.order_service_id)}
+                                  >
+                                    Save
+                                  </Button>
+                                </>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  ))}
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
       </Row>
     </Container>
   );
+
 };
 
 export default EmployeeProfile;

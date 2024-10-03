@@ -82,19 +82,17 @@ function AddEmployeeForm(props) {
     newEmployee
       .then((response) => response.json())
       .then((data) => {
-        // console.log(data);
-        // If Error is returned from the API server, set the error message
+        
         if (data.error) {
           setServerError(data.error);
         } else {
-          // Handle successful response
+          
           setSuccess(true);
           setServerError("");
-          // Redirect to the employees page after 2 seconds
-          // For now, just redirect to the home page
+          
           setTimeout(() => {
             window.location.href = "/admin/employees";
-            // window.location.href = "/admin/dashboard";
+            
           }, 2000);
         }
       })
@@ -111,11 +109,12 @@ function AddEmployeeForm(props) {
   };
 
   return (
-    <section className="contact-section">
+    <section className="contact-section ">
       <div className="auto-container">
-        <div className="contact-title">
-          <h2>Add a new employee</h2>
-        </div>
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="page-titles text-3xl font-bold mb-4">Add a new employee</h2>
+        <div className="h-1 w-16 bg-red-500 mr-2 mt-2"></div>
+      </div>
         <div className="row clearfix">
           <div className="form-column col-lg-7">
             <div className="inner-column">
@@ -134,6 +133,7 @@ function AddEmployeeForm(props) {
                         value={employee_email}
                         onChange={(event) => setEmail(event.target.value)}
                         placeholder="Employee email"
+                        className="form-control form-control-sm py-2 rounded-none px-4"
                       />
                       {emailError && (
                         <div className="validation-error" role="alert">
@@ -148,6 +148,7 @@ function AddEmployeeForm(props) {
                         value={employee_first_name}
                         onChange={(event) => setFirstName(event.target.value)}
                         placeholder="Employee first name"
+                        className="form-control form-control-sm py-2 rounded-none px-4"
                       />
                       {firstNameRequired && (
                         <div className="validation-error" role="alert">
@@ -163,6 +164,7 @@ function AddEmployeeForm(props) {
                         value={employee_last_name}
                         onChange={(event) => setLastName(event.target.value)}
                         placeholder="Employee last name"
+                        className="form-control form-control-sm py-2 rounded-none px-4"
                         required
                       />
                     </div>
@@ -174,6 +176,7 @@ function AddEmployeeForm(props) {
                         value={employee_phone}
                         onChange={(event) => setPhoneNumber(event.target.value)}
                         placeholder="Employee phone (555-555-5555)"
+                        className="form-control form-control-sm py-2 rounded-none px-4"
                         required
                       />
                     </div>
@@ -200,6 +203,7 @@ function AddEmployeeForm(props) {
                         value={employee_password}
                         onChange={(event) => setPassword(event.target.value)}
                         placeholder="Employee password"
+                        className="form-control form-control-sm py-2 rounded-none px-4"
                       />
                       {passwordError && (
                         <div className="validation-error" role="alert">
@@ -210,7 +214,7 @@ function AddEmployeeForm(props) {
 
                     <div className="form-group col-md-12">
                       <button
-                        className="theme-btn btn-style-one"
+                        className="buttonStyle"
                         type="submit"
                         data-loading-text="Please wait..."
                       >

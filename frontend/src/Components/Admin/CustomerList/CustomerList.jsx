@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Table, Modal, Button, Form } from "react-bootstrap";
+import { Table, Modal, Button, Form, Pagination } from "react-bootstrap"; // Added Pagination
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
 import customerService from "../../services/customer.service";
 import UpdateCustomerForm from "./UpdateCustomer";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
+import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 
 const CustomersList = () => {
     const [customers, setCustomers] = useState([]);
@@ -15,13 +16,11 @@ const CustomersList = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const { employee } = useAuth();
-
-    // Try to fetch token from AuthContext or fallback to localStorage
-    const token = employee?.employee_token || localStorage.getItem("employee_token");
-
-    console.log("Token in customerList.jsx:", token); 
-
     const [searchQuery, setSearchQuery] = useState(''); 
+    const [currentPage, setCurrentPage] = useState(1); 
+    const itemsPerPage = 4; 
+
+    const token = employee?.employee_token || localStorage.getItem("employee_token");
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -99,6 +98,15 @@ const CustomersList = () => {
         setShowModal(true);
     };
 
+    // Pagination Logic
+    const indexOfLastCustomer = currentPage * itemsPerPage;
+    const indexOfFirstCustomer = indexOfLastCustomer - itemsPerPage;
+    const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage); 
+
     return (
         <div className="container">
             {apiError ? (
@@ -110,17 +118,25 @@ const CustomersList = () => {
             ) : (
                 <section className="table-section">
                     <div className="container">
-                        <h2>Customers</h2>
+                    <div className="flex items-center gap-4">
+                        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Customers</h2>
+                        <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+                    </div>
 
                         {/* Search Bar */}
                         <Form className="mb-4">
-                            <Form.Control
-                                type="text"
-                                placeholder="Search for a customer using first name, last name, email, or phone number"
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                className="form-control"
-                            />
+                            <div className="input-group">
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search for a customer using first name, last name, email, or phone number"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    className="form-control"
+                                />
+                                <span className="input-group-text bg-white text-gray-800">
+                                    <i className="fas fa-search"></i> {/* Search Icon */}
+                                </span>
+                            </div>
                         </Form>
 
                         {/* Customers Table */}
@@ -134,20 +150,19 @@ const CustomersList = () => {
                                     <th>Phone</th>
                                     <th>Added Date</th>
                                     <th>Active</th>
-                                    <th>Actions</th>
+                                    <th>Edit</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredCustomers.map((customer) => (
+                                {currentCustomers.map((customer) => (
                                     <tr key={customer.customer_id}>
-                                        {/* Only make specific columns clickable */}
                                         <td>
                                             <Link to={`/admin/customer-profile/${customer.customer_id}`}>
                                                 {customer.customer_id}
                                             </Link>
                                         </td>
-                                        <td>{customer.customer_first_name}</td>
-                                        <td>{customer.customer_last_name}</td>
+                                        <td><strong>{customer.customer_first_name}</strong></td>
+                                        <td><strong>{customer.customer_last_name}</strong></td>
                                         <td>{customer.customer_email}</td>
                                         <td>{customer.customer_phone}</td>
                                         <td>
@@ -157,19 +172,53 @@ const CustomersList = () => {
                                         </td>
                                         <td>{customer.active_customer ? "Yes" : "No"}</td>
                                         <td>
-                                            <div className="action-buttons">
-                                                <Button variant="primary" onClick={() => handleEdit(customer)}>
-                                                    Edit
-                                                </Button>
-                                                <Button variant="danger" onClick={() => handleDelete(customer.customer_id)}>
-                                                    Delete
-                                                </Button>
+                                            <div className="d-flex">
+                                                <FaEdit
+                                                    className="me-3 text-gray-800"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handleEdit(customer)}
+                                                />
+                                                <FaTrashAlt
+                                                    className="text-gray-800"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handleDelete(customer.customer_id)}
+                                                />
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </Table>
+
+                        {/* Pagination */}
+                        {filteredCustomers.length > itemsPerPage && ( 
+                            <Pagination className="custom-pagination justify-content-center">
+                            <Pagination.First 
+                                onClick={() => paginate(1)} 
+                                disabled={currentPage === 1}
+                            >
+                                « First
+                            </Pagination.First>
+                            <Pagination.Prev 
+                                onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)} 
+                                disabled={currentPage === 1}
+                            >
+                                ‹ Previous
+                            </Pagination.Prev>
+                            <Pagination.Next 
+                                onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : currentPage)} 
+                                disabled={currentPage === totalPages}
+                            >
+                                Next ›
+                            </Pagination.Next>
+                            <Pagination.Last 
+                                onClick={() => paginate(totalPages)} 
+                                disabled={currentPage === totalPages}
+                            >
+                                Last »
+                            </Pagination.Last>
+                        </Pagination>
+                        )}
                     </div>
                 </section>
             )}
@@ -187,7 +236,6 @@ const CustomersList = () => {
                             onSuccess={() => {
                                 setShowModal(false);
                                 window.location.reload();
-                                // Refresh customer list or handle success
                             }}
                         />
                     )}

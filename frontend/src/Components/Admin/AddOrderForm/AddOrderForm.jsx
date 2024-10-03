@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Service from "../../services/order.service";
 import ServiceSelection from "../AddServiceForm/SelectService";
 import getAuth from "../../util/auth";
+import {Table, Form} from 'react-bootstrap';
 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -190,8 +191,10 @@ const AddOrderForm = () => {
 
   return (
     <div className="container pb-5">
-      <h2 className="mb-4">Create a new order</h2>
-
+      <div className="flex items-center gap-4 mt-4 mb-4">
+        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Create a new order</h2>
+        <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+      </div>
       {selectedCustomer ? (
         <div className="selected-customer-details card p-3">
           <div className="row">
@@ -349,18 +352,25 @@ const AddOrderForm = () => {
       ) : (
         <>
           <div className="search-bar">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search for a customer"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <Form className="">
+              <div className="input-group">
+                <Form.Control
+                  type="text"
+                  placeholder="Search for a customer using first name, last name, email, or phone number"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="form-control-sm py-2"
+                />
+                <span className="input-group-text bg-white text-gray-800">
+                  <i className="fas fa-search"></i>
+                </span>
+              </div>
+            </Form>
             <button
-              className="btn btn-danger mt-3"
+              className="buttonStyle mt-3 text-sm"
               onClick={() => (window.location.href = "/admin/add-customer")}
             >
-              Add New Customer
+              ADD NEW CUSTOMER
             </button>
           </div>
 
@@ -368,7 +378,7 @@ const AddOrderForm = () => {
           {error && <p className="text-danger">{error}</p>}
 
           {!loading && !error && searchQuery && (
-            <table className="table table-hover mt-4">
+            <Table striped bordered hover responsive className="mt-4">
               <thead>
                 <tr>
                   <th>First Name</th>
@@ -388,10 +398,10 @@ const AddOrderForm = () => {
                       <td>{customer.customer_phone}</td>
                       <td>
                         <button
-                          className="btn btn-sm btn-primary"
+                          className="btn btn-sm "
                           onClick={() => handleSelectCustomer(customer)}
                         >
-                          Select
+                          <i className="fas fa-hand-pointer"></i>
                         </button>
                       </td>
                     </tr>
@@ -404,7 +414,7 @@ const AddOrderForm = () => {
                   </tr>
                 )}
               </tbody>
-            </table>
+            </Table>
           )}
         </>
       )}

@@ -317,3 +317,65 @@ input:disabled {
 .container-width{
   max-width:40vw;
 }
+
+/* update customer, employee modal styling*/
+.custom-modal-height .modal-dialog {
+  max-height: 80vh; /* Set the height limit (80% of the viewport height) */
+  margin: auto; /* Center the modal vertically */
+}
+
+.custom-modal-height .modal-body {
+  max-height: 60vh; /* Control the height of the modal body */
+  overflow-y: auto; /* Enable scrolling if content exceeds the height */
+}
+
+/* Add vehicle, add customer, submit order, add employee button styling */
+.buttonStyle{
+  background-color: #EE0D09;
+  color:white;
+  padding:0.5rem 0.7rem;
+}
+
+/* page titles styling */
+.page-titles{
+  color: #001659;
+}
+/* paginnation styling */
+.custom-pagination .page-link {
+  padding: 0.1rem 1.2rem;
+  font-size: 12px;
+  color: #1a1a1a; 
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+}
+
+.custom-pagination .page-link:hover {
+  background-color: #f1f1f1;
+}
+
+.custom-pagination .active .page-link {
+  background-color: #001f3f;
+  color: #fff;
+  border-color: #001f3f;
+}
+
+.custom-pagination .disabled .page-link {
+  color: #d9d9d9;
+  background-color: #f1f1f1;
+  border-color: #d9d9d9;
+}
+
+.custom-pagination .page-item {
+  margin: 0 ;
+}
+
+.custom-pagination .page-item:nth-child(3) .page-link, 
+.custom-pagination .page-item:nth-child(4) .page-link { 
+    background-color: #081336;
+    color: #fff;
+}
+
+.custom-pagination .page-item:nth-child(3) .page-link:hover,
+.custom-pagination .page-item:nth-child(4) .page-link:hover {
+    background-color: #0a1b4a;
+}

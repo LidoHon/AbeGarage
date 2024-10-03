@@ -41,7 +41,6 @@ const FeatureBlock = ({ title, icon }) => (
 const Services = () => {
 	return (
     <div>
-      
       <>
         <div
           className="page-title"

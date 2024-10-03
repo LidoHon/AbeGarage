@@ -54,26 +54,26 @@ const AddServiceForm = ({ editingService, onServiceUpdated }) => {
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       <div className="form-group mb-3">
-        <label htmlFor="serviceName">Service Name</label>
+        {/* <label htmlFor="serviceName">Service Name</label> */}
         <input
           type="text"
-          className="form-control"
+          className="form-control form-control-sm py-2 rounded-none px-4"
           id="serviceName"
           value={serviceName}
           onChange={(e) => setServiceName(e.target.value)}
-          placeholder="Enter service name"
+          placeholder="service name"
         />
       </div>
 
       <div className="form-group mb-3">
-        <label htmlFor="serviceDescription">Service Description</label>
+        {/* <label htmlFor="serviceDescription">Service Description</label> */}
         <textarea
-          className="form-control"
+          className="form-control form-control-sm py-2 rounded-none px-4"
           id="serviceDescription"
-          rows="4"
+          rows="8"
           value={serviceDescription}
           onChange={(e) => setServiceDescription(e.target.value)}
-          placeholder="Enter service description"
+          placeholder="service description"
         ></textarea>
       </div>
 
@@ -81,7 +81,7 @@ const AddServiceForm = ({ editingService, onServiceUpdated }) => {
 
       <button
         type="submit"
-        className="btn btn-danger"
+        className="buttonStyle"
         disabled={!serviceName || !serviceDescription || loading}
       >
         {loading

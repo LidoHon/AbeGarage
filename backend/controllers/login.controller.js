@@ -32,6 +32,7 @@ async function logInEmployee(req, res, next) {
         employee_token: token,
         employee_first_name: employee.data.employee_first_name,
         employee_role: employee.data.company_role_id, 
+        employee_id: employee.data.employee_id, 
       },
     });
   } catch (error) {
