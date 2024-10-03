@@ -1,0 +1,17 @@
+{
+  "name": "your-project",
+  "version": "1.0.0",
+  "description": "Your project description",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "react-bootstrap": "^2.10.4"
+  }
+}
