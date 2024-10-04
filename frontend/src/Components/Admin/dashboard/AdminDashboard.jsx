@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 // Defining an array of services with their titles, icons, descriptions, and routes
 const services = [
     { title: "All Orders", subtitle: "OPEN FOR ALL", linkText: "LIST OF ORDERS +", icon: "flaticon-power", link: "/admin/orders" },
-    { title: "New Orders", subtitle: "OPEN FOR LEADS", linkText: "ADD ORDER +", icon: "flaticon-gearbox", link: "/admin/order" },
+    { title: "New Orders", subtitle: "OPEN FOR LEADS", linkText: "ADD ORDER +", icon: "flaticon-gearbox", link: "/admin/add-order" },
     { title: "Add Order", subtitle: "OPEN FOR LEADS", linkText: "ADD ORDER +", icon: "flaticon-gearbox", link: "/admin/add-order" }, // Add Order Service
     { title: "Employees", subtitle: "OPEN FOR ADMINS", linkText: "LIST OF EMPLOYEES +", icon: "flaticon-brake-disc", link: "/admin/employees" },
     { title: "Add Employee", subtitle: "OPEN FOR ADMINS", linkText: "ADD EMPLOYEE +", icon: "flaticon-car-engine", link: "/admin/add-employee" },

@@ -114,7 +114,7 @@ function Header(props) {
                             Profile
                           </Link>
                         )}
-                        {isAdmin && (
+                        {/* {isAdmin && (
                           <Link
                             to="/admin/admin-landing"
                             className="block px-4 py-2 hover:bg-gray-100"
@@ -122,7 +122,7 @@ function Header(props) {
                           >
                             Profile
                           </Link>
-                        )}
+                        )} */}
                       </div>
                     )}
                   </div>
