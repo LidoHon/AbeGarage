@@ -235,6 +235,7 @@ function AddEmployeeForm(props) {
                         data-loading-text="Please wait..."
                       >
                         <span>Add employee</span>
+                        {/* comment */}
                       </button>
                     </div>
                   </div>
