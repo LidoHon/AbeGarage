@@ -3,6 +3,7 @@ import { useState } from "react";
 import employeeService from "../../services/employee.service";
 // Import the useAuth hook
 import { useAuth } from "../../../Contexts/AuthContext";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function AddEmployeeForm(props) {
   const [employee_email, setEmail] = useState("");
@@ -18,7 +19,7 @@ function AddEmployeeForm(props) {
   const [passwordError, setPasswordError] = useState("");
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
   // Create a variable to hold the user's token
   let loggedInEmployeeToken = "";
   // Destructure the auth hook and get the token
@@ -82,17 +83,14 @@ function AddEmployeeForm(props) {
     newEmployee
       .then((response) => response.json())
       .then((data) => {
-        
         if (data.error) {
           setServerError(data.error);
         } else {
-          
           setSuccess(true);
           setServerError("");
-          
+
           setTimeout(() => {
             window.location.href = "/admin/employees";
-            
           }, 2000);
         }
       })
@@ -111,10 +109,12 @@ function AddEmployeeForm(props) {
   return (
     <section className="contact-section ">
       <div className="auto-container">
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="page-titles text-3xl font-bold mb-4">Add a new employee</h2>
-        <div className="h-1 w-16 bg-red-500 mr-2 mt-2"></div>
-      </div>
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="page-titles text-3xl font-bold mb-4">
+            Add a new employee
+          </h2>
+          <div className="h-1 w-16 bg-red-500 mr-2 mt-2"></div>
+        </div>
         <div className="row clearfix">
           <div className="form-column col-lg-7">
             <div className="inner-column">
@@ -133,7 +133,8 @@ function AddEmployeeForm(props) {
                         value={employee_email}
                         onChange={(event) => setEmail(event.target.value)}
                         placeholder="Employee email"
-                        className="form-control form-control-sm py-2 rounded-none px-4"
+                        className="form-control form-control-sm text-sm rounded-none px-3"
+                        style={{ height: "40px", fontSize: "14px" }}
                       />
                       {emailError && (
                         <div className="validation-error" role="alert">
@@ -149,6 +150,7 @@ function AddEmployeeForm(props) {
                         onChange={(event) => setFirstName(event.target.value)}
                         placeholder="Employee first name"
                         className="form-control form-control-sm py-2 rounded-none px-4"
+                        style={{ height: "40px", fontSize: "14px" }}
                       />
                       {firstNameRequired && (
                         <div className="validation-error" role="alert">
@@ -164,8 +166,9 @@ function AddEmployeeForm(props) {
                         value={employee_last_name}
                         onChange={(event) => setLastName(event.target.value)}
                         placeholder="Employee last name"
-                        className="form-control form-control-sm py-2 rounded-none px-4"
+                        className="form-control form-control-sm  rounded-none px-4 "
                         required
+                        style={{ height: "40px", fontSize: "14px" }}
                       />
                     </div>
 
@@ -178,6 +181,7 @@ function AddEmployeeForm(props) {
                         placeholder="Employee phone (555-555-5555)"
                         className="form-control form-control-sm py-2 rounded-none px-4"
                         required
+                        style={{ height: "40px", fontSize: "14px" }}
                       />
                     </div>
 
@@ -189,6 +193,7 @@ function AddEmployeeForm(props) {
                           setCompany_role_id(event.target.value)
                         }
                         className="custom-select-box"
+                        style={{ height: "40px", fontSize: "14px" }}
                       >
                         <option value="1">Employee</option>
                         <option value="2">Manager</option>
@@ -196,15 +201,26 @@ function AddEmployeeForm(props) {
                       </select>
                     </div>
 
-                    <div className="form-group col-md-12">
+                    <div className="form-group col-md-12 relative">
+                      {" "}
+                      {/* Add relative positioning */}
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"} // Toggle input type
                         name="employee_password"
                         value={employee_password}
                         onChange={(event) => setPassword(event.target.value)}
                         placeholder="Employee password"
                         className="form-control form-control-sm py-2 rounded-none px-4"
+                        style={{ height: "40px", fontSize: "14px" }}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)} // Toggle show/hide password
+                        className="absolute right-6 top-1/2 transform -translate-y-1/2" // Position the icon
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}{" "}
+                        {/* Conditional rendering */}
+                      </button>
                       {passwordError && (
                         <div className="validation-error" role="alert">
                           {passwordError}

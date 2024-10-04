@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
 function AdminMenu(props) {
   return (
@@ -6,15 +7,31 @@ function AdminMenu(props) {
       <div className="admin-menu">
         <h2>Admin Menu</h2>
       </div>
-      <div className="list-group">
-        <a href="/admin/admin-landing" className="list-group-item">Dashboard</a>
-        <a href="/admin/orders" className="list-group-item">Orders</a>
-        <a href="/admin/add-order" className="list-group-item">New order</a>
-        <a href="/admin/add-employee" className="list-group-item">Add employee</a>
-        <a href="/admin/employees" className="list-group-item">Employees</a>
-        <a href="/admin/add-customer" className="list-group-item">Add customer</a>
-        <a href="/admin/customers" className="list-group-item">Customers</a>
-        <a href="/admin/services" className="list-group-item">Services</a>
+      <div className="items-center p-2 ">
+        <Link to="/admin/admin-landing" className="list-group-item p-2">
+          Dashboard
+        </Link>
+        <Link to="/admin/orders" className="list-group-item p-2">
+          Orders
+        </Link>
+        <Link to="/admin/add-order" className="list-group-item p-2">
+          New order
+        </Link>
+        <Link to="/admin/add-employee" className="list-group-item p-2">
+          Add employee
+        </Link>
+        <Link to="/admin/employees" className="list-group-item p-2">
+          Employees
+        </Link>
+        <Link to="/admin/add-customer" className="list-group-item p-2">
+          Add customer
+        </Link>
+        <Link to="/admin/customers" className="list-group-item p-2">
+          Customers
+        </Link>
+        <Link to="/admin/services" className="list-group-item p-2">
+          Services
+        </Link>
       </div>
     </div>
   );
