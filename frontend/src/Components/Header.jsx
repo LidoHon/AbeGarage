@@ -194,7 +194,7 @@ function Header(props) {
             >
               <ul className="navigation flex flex-col lg:flex-row lg:space-x-4">
                 <li className="dropdown">
-                  <Link to="/" className="hover:text-blue-500">
+                  <Link to="/" className="hover:text-blue-500 ">
                     Home
                   </Link>
                 </li>

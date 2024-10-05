@@ -198,17 +198,17 @@ const AddOrderForm = () => {
         <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
       </div>
       {selectedCustomer ? (
-        <div className="selected-customer-details card p-3">
-          <div className="row">
-            <div className="col-10">
-              <h3>
+        <div className="selected-customer-detail p-3">
+          <div className="flex container justify-between bg-slate-50 py-10 px-5 border rounded-lg ">
+            <div className=" ">
+              <h3 className="font-bold text-2xl text-blue-900 uppercase">
                 {selectedCustomer.customer_first_name}{" "}
                 {selectedCustomer.customer_last_name}
               </h3>
               <p>Email: {selectedCustomer.customer_email}</p>
               <p>Phone Number: {selectedCustomer.customer_phone}</p>
             </div>
-            <div className="col-2 text-right">
+            <div className="text-right mt-0">
               <button
                 className="btn btn-sm btn-danger"
                 onClick={() => {
@@ -294,13 +294,29 @@ const AddOrderForm = () => {
 
           {selectedVehicle && (
             <>
-              <div className="selected-vehicle-details card p-3 mt-4">
-                <h4>{selectedVehicle.vehicle_model}</h4>
-                <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
-                <p>Vehicle Type: {selectedVehicle.vehicle_type}</p>
-                <p>Vehicle Mileage: {selectedVehicle.vehicle_mileage}</p>
-                <p>Tag: {selectedVehicle.vehicle_tag}</p>
-                <p>Plate: {selectedVehicle.vehicle_serial}</p>
+              <div className="flex container justify-between bg-slate-50 py-6 px-5 border rounded-lg my-4">
+                <div className="selected-vehicle-details">
+                  <h4 className="font-bold text-2xl text-blue-900 uppercase">
+                    {selectedVehicle.vehicle_model}
+                  </h4>
+                  <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
+                  <p>Vehicle Type: {selectedVehicle.vehicle_type}</p>
+                  <p>Vehicle Mileage: {selectedVehicle.vehicle_mileage}</p>
+                  <p>Tag: {selectedVehicle.vehicle_tag}</p>
+                  <p>Plate: {selectedVehicle.vehicle_serial}</p>
+                </div>
+                <div className="text-right mt-0">
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => {
+                      setSelectedCustomer(null);
+                      setSelectedVehicle(null);
+                      setVehicles([]);
+                    }}
+                  >
+                    <i className="fa fa-times"></i>
+                  </button>
+                </div>
               </div>
 
               <div className="flex pb-10">
