@@ -237,7 +237,7 @@ const AddOrderForm = () => {
                 </>
               ) : (
                 <>
-                  <table className="table table-hover mt-3">
+                  <table className="table table-bordered table-hover mt-3">
                     <thead>
                       <tr>
                         <th>Make</th>
@@ -252,7 +252,10 @@ const AddOrderForm = () => {
                     </thead>
                     <tbody>
                       {vehicles.map((vehicle) => (
-                        <tr key={vehicle.vehicle_id}>
+                        <tr
+                          key={vehicle.vehicle_id}
+                          onClick={() => handleSelectVehicle(vehicle)}
+                        >
                           <td>{vehicle.vehicle_make}</td>
                           <td>{vehicle.vehicle_model}</td>
                           <td>{vehicle.vehicle_year}</td>
