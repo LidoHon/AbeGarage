@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Form, Alert } from "react-bootstrap";
+import { Button, Form, Alert, Row,Col } from "react-bootstrap";
 import employeeService from "../../services/employee.service";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -105,79 +105,85 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
       className="p-4 border rounded bg-light"
       style={{ maxWidth: "400px", margin: "0 auto" }} // Set max width for the form
     >
-      <Form.Group controlId="formEmail">
-        <Form.Label>Email</Form.Label>
-        <Form.Control
-          type="email"
-          value={employee_email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Enter email"
-          isInvalid={!!emailError}
-        />
-        <Form.Control.Feedback type="invalid">
-          {emailError}
-        </Form.Control.Feedback>
-      </Form.Group>
+      <Row>
+        <Col md={6}>
+          <Form.Group controlId="formEmail">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              value={employee_email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Enter email"
+              isInvalid={!!emailError}
+            />
+            <Form.Control.Feedback type="invalid">
+              {emailError}
+            </Form.Control.Feedback>
+          </Form.Group>
 
-      <Form.Group controlId="formFirstName">
-        <Form.Label>First Name</Form.Label>
-        <Form.Control
-          type="text"
-          value={employee_first_name}
-          onChange={(event) => setFirstName(event.target.value)}
-          placeholder="Enter first name"
-          isInvalid={!!firstNameRequired}
-        />
-        <Form.Control.Feedback type="invalid">
-          {firstNameRequired}
-        </Form.Control.Feedback>
-      </Form.Group>
+          <Form.Group controlId="formFirstName">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={employee_first_name}
+              onChange={(event) => setFirstName(event.target.value)}
+              placeholder="Enter first name"
+              isInvalid={!!firstNameRequired}
+            />
+            <Form.Control.Feedback type="invalid">
+              {firstNameRequired}
+            </Form.Control.Feedback>
+          </Form.Group>
 
-      <Form.Group controlId="formLastName">
-        <Form.Label>Last Name</Form.Label>
-        <Form.Control
-          type="text"
-          value={employee_last_name}
-          onChange={(event) => setLastName(event.target.value)}
-          placeholder="Enter last name"
-        />
-      </Form.Group>
-
-      <Form.Group controlId="formPhone">
-        <Form.Label>Phone Number</Form.Label>
-        <Form.Control
-          type="text"
-          value={employee_phone}
-          onChange={(event) => setPhoneNumber(event.target.value)}
-          placeholder="Enter phone number"
-        />
-      </Form.Group>
-
-      <Form.Group controlId="formPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          type="password"
-          value={employee_password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Enter password"
-          isInvalid={!!passwordError}
-        />
-        <Form.Control.Feedback type="invalid">
-          {passwordError}
-        </Form.Control.Feedback>
-      </Form.Group>
-
-      <Form.Group controlId="formActive">
-        <Form.Label>Active</Form.Label>
-        <Form.Control
-          as="select"
-          value={active_employee}
-          onChange={(event) => setActive_employee(Number(event.target.value))}
-        >
-          <option value={1}>Yes</option>
-          <option value={0}>No</option>
-        </Form.Control>
-      </Form.Group>
+          <Form.Group controlId="formLastName">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={employee_last_name}
+              onChange={(event) => setLastName(event.target.value)}
+              placeholder="Enter last name"
+            />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          {" "}
+          <Form.Group controlId="formPhone">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control
+              type="text"
+              value={employee_phone}
+              onChange={(event) => setPhoneNumber(event.target.value)}
+              placeholder="Enter phone number"
+            />
+          </Form.Group>
+          <Form.Group controlId="formPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={employee_password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter password"
+              isInvalid={!!passwordError}
+            />
+            <Form.Control.Feedback type="invalid">
+              {passwordError}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group controlId="formActive">
+            <Form.Label>Active</Form.Label>
+            <Form.Control
+              as="select"
+              value={active_employee}
+              onChange={(event) =>
+                setActive_employee(Number(event.target.value))
+              }
+            >
+              <option value={1}>Yes</option>
+              <option value={0}>No</option>
+            </Form.Control>
+          </Form.Group>
+        </Col>
+      </Row>
 
       <Form.Group controlId="formRole">
         <Form.Label>Role</Form.Label>
@@ -192,7 +198,7 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
         </Form.Control>
       </Form.Group>
 
-      <Button variant="primary" type="submit">
+      <Button variant="primary" type="submit" className="mt-3">
         Update Employee
       </Button>
 
