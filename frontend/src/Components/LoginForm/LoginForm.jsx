@@ -93,22 +93,25 @@ function LoginForm() {
   };
 
   return (
-    <section className="contact-section">
-      <div className="auto-container">
-        <div className="contact-title">
-          <h2>Login to your account</h2>
+    <section className="min-h-fit flex items-center justify-center my-10">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
+        <div className="style-two ">
+          <h2 className={`text-2xl font-semibold text-gray-900 text-center mb-4`}>
+            Login to your account
+          </h2>
         </div>
 
         {/* Toggle between Employee and Customer */}
-        <div className="login-toggle">
-          <label>
+        <div className="flex justify-center mb-6">
+          <label className="mr-4">
             <input
               type="radio"
               name="loginType"
               checked={isEmployeeLogin}
               onChange={() => setIsEmployeeLogin(true)}
+              className="mr-1"
             />
-            Employee Login
+            <span className="text-gray-600">Employee Login</span>
           </label>
           <label>
             <input
@@ -116,67 +119,62 @@ function LoginForm() {
               name="loginType"
               checked={!isEmployeeLogin}
               onChange={() => setIsEmployeeLogin(false)}
+              className="mr-1"
             />
-            Customer Login
+            <span className="text-gray-600">Customer Login</span>
           </label>
         </div>
 
-        <div className="row clearfix">
-          <div className="form-column col-lg-7">
-            <div className="inner-column">
-              <div className="contact-form">
-                <form onSubmit={handleSubmit}>
-                  <div className="row clearfix">
-                    <div className="form-group col-md-12">
-                      {serverError && (
-                        <div className="validation-error" role="alert">
-                          {serverError}
-                        </div>
-                      )}
-                      <input
-                        type="email"
-                        name="email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        placeholder="Email"
-                      />
-                      {emailError && (
-                        <div className="validation-error" role="alert">
-                          {emailError}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="form-group col-md-12">
-                      <input
-                        type="password"
-                        name="password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                        placeholder="Password"
-                      />
-                      {passwordError && (
-                        <div className="validation-error" role="alert">
-                          {passwordError}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="form-group col-md-12">
-                      <button
-                        className="theme-btn btn-style-one"
-                        type="submit"
-                        data-loading-text="Please wait..."
-                      >
-                        <span>Login</span>
-                      </button>
-                    </div>
-                  </div>
-                </form>
+        <form onSubmit={handleSubmit} className="space-y-2">
+          {/* Email Input */}
+          <div>
+            {serverError && (
+              <div
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-2"
+                role="alert"
+              >
+                {serverError}
               </div>
-            </div>
+            )}
+            <input
+              type="email"
+              name="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            {emailError && (
+              <div className="text-red-600 mt-2 text-sm">{emailError}</div>
+            )}
           </div>
-        </div>
+
+          {/* Password Input */}
+          <div>
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            {passwordError && (
+              <div className="text-red-600 mt-2 text-sm">{passwordError}</div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition duration-300"
+              data-loading-text="Please wait..."
+            >
+              Login
+            </button>
+          </div>
+        </form>
       </div>
     </section>
   );
