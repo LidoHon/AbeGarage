@@ -36,8 +36,9 @@ const ServiceSelection = ({ onSelectServices }) => {
   };
 
   return (
-    <div className="service-selection mt-4 container-width">
-      <h4>Choose Service & Assign Employee</h4>
+    <div className="service-selection mt-4 w-100 container bg-white border rounded-lg p-6">
+      
+      <h4 className="text-xl font-bold mb-4 text-blue-800">Choose Service & Assign Employee</h4>
       {loading && <p>Loading services...</p>}
       {error && <p className="text-danger">{error}</p>}
       {!loading && services.length > 0 && (
@@ -45,12 +46,13 @@ const ServiceSelection = ({ onSelectServices }) => {
           {services.map((service) => (
             <div key={service.service_id} className="list-group-item">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h5>{service.service_name}</h5>
-                  <p>{service.service_description}</p>
+                <div className="py-3">
+                  <h3 className="font-bold text-blue-800">{service.service_name}</h3>
+                  <p className="text-sm">{service.service_description}</p>
                 </div>
                 <input
                   type="checkbox"
+                  className="w-10 h-10"
                   checked={selectedServices.includes(service.service_id)}
                   onChange={() => handleServiceSelect(service.service_id)}
                 />

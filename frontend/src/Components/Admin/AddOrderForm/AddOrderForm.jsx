@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Service from "../../services/order.service";
 import ServiceSelection from "../AddServiceForm/SelectService";
 import getAuth from "../../util/auth";
-import {Table, Form} from 'react-bootstrap';
+import { Table, Form } from "react-bootstrap";
 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,12 +48,13 @@ const AddOrderForm = () => {
   // Fetch employees only after services have been selected
   useEffect(() => {
     if (selectedServices.length > 0) {
+console.log(first)
       const fetchEmployees = async () => {
         try {
           const response = await Service.getEmployeesByRole(1);
           setEmployees(response);
         } catch (error) {
-          console.error('Error fetching employees:', error);
+          console.error("Error fetching employees:", error);
         }
       };
       fetchEmployees();
@@ -65,9 +66,15 @@ const AddOrderForm = () => {
     if (searchQuery && Array.isArray(customers)) {
       const filtered = customers.filter(
         (customer) =>
-          customer.customer_first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          customer.customer_last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          customer.customer_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          customer.customer_first_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          customer.customer_last_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          customer.customer_email
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
           customer.customer_phone.includes(searchQuery)
       );
       setFilteredCustomers(filtered);
@@ -94,6 +101,7 @@ const AddOrderForm = () => {
   };
 
   const handleSelectServices = (services) => {
+
     const updatedServiceData = services.map((serviceId) => ({
       service_id: serviceId,
       service_completed: 0,
@@ -117,70 +125,68 @@ const AddOrderForm = () => {
     setServiceAssignments(updatedAssignments);
   };
 
-  const allEmployeesAssigned = selectedServices.length > 0 &&
+  const allEmployeesAssigned =
+    selectedServices.length > 0 &&
     serviceAssignments.every((assignment) => assignment.employee_id !== null);
 
-    const handleCreateOrder = async () => {
-      if (
-        !selectedCustomer ||
-        !selectedVehicle ||
-        !orderPrice ||
-        !estimatedCompletionDate ||
-        !additionalRequest ||
-        selectedServices.length === 0 ||
-        serviceAssignments.length === 0
-      ) {
-        alert("Please fill in all required fields.");
-        return;
+  const handleCreateOrder = async () => {
+    if (
+      !selectedCustomer ||
+      !selectedVehicle ||
+      !orderPrice ||
+      !estimatedCompletionDate ||
+      !additionalRequest ||
+      selectedServices.length === 0 ||
+      serviceAssignments.length === 0
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const employee = await getAuth();
+
+      if (!employee || !employee.employee_id) {
+        throw new Error("Employee not found or not authenticated.");
       }
-    
-      try {
-        const employee = await getAuth();
-    
-        if (!employee || !employee.employee_id) {
-          throw new Error("Employee not found or not authenticated.");
-        }
-    
-        // Log data for order creation
-        const orderData = {
-          customer_id: selectedCustomer.customer_id,
-          vehicle_id: selectedVehicle.vehicle_id,
-          employee_id: employee.employee_id,
-          active_order: 1,
-          order_hash: generateOrderHash(),
-          order_status: 1,
-        };
-    
-        const orderInfoData = {
-          order_total_price: orderPrice,
-          additional_request: additionalRequest,
-          estimated_completion_date: estimatedCompletionDate,
-          additional_requests_completed: 0,
-        };
-    
-        
-        const orderServiceData = serviceAssignments.map((assignment) => ({
-          service_id: assignment.service_id,
-          employee_id: assignment.employee_id,
-          service_completed: 0, 
-        }));
-    
-        // Send the order creation request to the backend
-        await Service.createOrder({
-          orderData,
-          orderInfoData,
-          orderServiceData,
-        });
-    
-        alert("Order created successfully.");
-        navigate("/admin/orders");
-      } catch (err) {
-        setError("Error creating the order. Please try again.");
-        console.error("Error in handleCreateOrder:", err);
-      }
-    };
-    
-  
+
+      // Log data for order creation
+      const orderData = {
+        customer_id: selectedCustomer.customer_id,
+        vehicle_id: selectedVehicle.vehicle_id,
+        employee_id: employee.employee_id,
+        active_order: 1,
+        order_hash: generateOrderHash(),
+        order_status: 1,
+      };
+
+      const orderInfoData = {
+        order_total_price: orderPrice,
+        additional_request: additionalRequest,
+        estimated_completion_date: estimatedCompletionDate,
+        additional_requests_completed: 0,
+      };
+
+      const orderServiceData = serviceAssignments.map((assignment) => ({
+        service_id: assignment.service_id,
+        employee_id: assignment.employee_id,
+        service_completed: 0,
+      }));
+
+      // Send the order creation request to the backend
+      await Service.createOrder({
+        orderData,
+        orderInfoData,
+        orderServiceData,
+      });
+
+      alert("Order created successfully.");
+      navigate("/admin/orders");
+    } catch (err) {
+      setError("Error creating the order. Please try again.");
+      console.error("Error in handleCreateOrder:", err);
+    }
+  };
 
   const generateOrderHash = () => {
     return (
@@ -319,16 +325,19 @@ const AddOrderForm = () => {
                 </div>
               </div>
 
-              <div className="flex pb-10">
+              <div className="pb-10">
                 <ServiceSelection onSelectServices={handleSelectServices} />
-                <div className="ml-20">
-                  <h4 className="mt-4">Assign Employees</h4>
+                <div className="container p-6 bg-white rounded-lg border my-4">
+                  <h4 className="text-xl font-bold my-4 text-blue-800">
+                    Assign Employees
+                  </h4>
                   <div className="form-group">
-                    {selectedServices.map((service) => (
+                    {
+                    selectedServices.map((service) => (
                       <div key={service.service_id} className="mt-3">
-                        <h5>{`Assign Employee to ${service.service_id}`}</h5>
+                        <h5 className="font-bold text-blue-800">{`Assign Employee to service: ${service.service_id}`}</h5>
                         <select
-                          className="form-control"
+                          className="form-control my-3"
                           onChange={(e) =>
                             handleAssignEmployeeToService(
                               service.service_id,

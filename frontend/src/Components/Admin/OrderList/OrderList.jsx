@@ -85,88 +85,132 @@ useEffect(() => {
     }
 
     return (
-        <div className="container my-4 px-10 text-sm">
-            <div className="flex items-center gap-4">
-                <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Orders</h2>
-                <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
-            </div>
+      <div className="container my-4 px-10 text-sm">
+        <div className="flex items-center gap-4">
+          <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Orders</h2>
+          <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+        </div>
         <Table striped bordered hover responsive>
-            <thead>
+          <thead>
             <tr>
-                <th>Order Id</th>
-                <th>Customer</th>
-                <th>Vehicle</th>
-                <th>Order Date</th>
-                <th>Received by</th>
-                <th>Order Status</th>
-                <th>View/Edit/Delete</th>
+              <th>Order Id</th>
+              <th>Customer</th>
+              <th>Vehicle</th>
+              <th>Order Date</th>
+              <th>Received by</th>
+              <th>Order Status</th>
+              <th>View/Edit/Delete</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             {currentOrders.length > 0 ? (
-                currentOrders.map((order) => (
-                <tr key={order.order_id}>
-                    <td>{order.order_id}</td>
-                    <td>
-                    <strong>{order.customer_first_name} {order.customer_last_name}</strong>
+              currentOrders.map((order) => (
+                <tr
+                  key={order.order_id}
+                  onClick={() => handleView(order.order_id)}
+                >
+                  <td>{order.order_id}</td>
+                  <td>
+                    <strong>
+                      {order.customer_first_name} {order.customer_last_name}
+                    </strong>
                     <br />
                     {order.customer_email}
                     <br />
                     {order.customer_phone}
-                    </td>
-                    <td>
-                    <strong>{order.vehicle_make} {order.vehicle_model}</strong>
+                  </td>
+                  <td>
+                    <strong>
+                      {order.vehicle_make} {order.vehicle_model}
+                    </strong>
                     <br />
                     {order.vehicle_year}
                     <br />
                     {order.vehicle_tag}
-                    </td>
-                    <td>{new Date(order.order_date).toLocaleDateString()}</td>
-                    <td>{order.employee_first_name} {order.employee_last_name}</td>
-                    <td>
-                    <span className={`badge ${order.order_status === 3 ? "bg-success" : order.order_status === 2 ? "bg-warning text-dark" : "bg-secondary"}`}>
-                        {statusMapping[order.order_status] || "Unknown"}
+                  </td>
+                  <td>{new Date(order.order_date).toLocaleDateString()}</td>
+                  <td>
+                    {order.employee_first_name} {order.employee_last_name}
+                  </td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        order.order_status === 3
+                          ? "bg-success"
+                          : order.order_status === 2
+                          ? "bg-warning text-dark"
+                          : "bg-secondary"
+                      }`}
+                    >
+                      {statusMapping[order.order_status] || "Unknown"}
                     </span>
-                    </td>
-                    <td>
-                        <button className="btn btn-sm" onClick={() => handleView(order.order_id)}>
-                            <i className="fas fa-external-link-alt"></i>
-                        </button>
-                        <button className="btn btn-sm "onClick={() => handleEditOrder(order)}>
-                            <i className="fas fa-pen"></i>
-                        </button>
-                        <button className="btn btn-sm" onClick={() => handleDelete(order.order_id)}>
-                            <i className="fas fa-trash"></i>
-                        </button>
-                    </td>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-sm hover:text-green-600"
+                      onClick={() => handleView(order.order_id)}
+                    >
+                      <i className="fas fa-external-link-alt"></i>
+                    </button>
+                    <button
+                      className="btn btn-sm hover:text-blue-800 "
+                      onClick={() => handleEditOrder(order)}
+                    >
+                      <i className="fas fa-pen"></i>
+                    </button>
+                    <button
+                      className="btn btn-sm hover:text-red-600"
+                      onClick={() => handleDelete(order.order_id)}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  </td>
                 </tr>
-                ))
+              ))
             ) : (
-                <tr>
-                <td colSpan="7" className="text-center">No orders found.</td>
-                </tr>
+              <tr>
+                <td colSpan="7" className="text-center">
+                  No orders found.
+                </td>
+              </tr>
             )}
-            </tbody>
+          </tbody>
         </Table>
 
         {/* Pagination */}
         {orders.length > itemsPerPage && (
-            <Pagination className="custom-pagination justify-content-center">
-            <Pagination.First onClick={() => paginate(1)} disabled={currentPage === 1}>
-                « First
+          <Pagination className="custom-pagination justify-content-center">
+            <Pagination.First
+              onClick={() => paginate(1)}
+              disabled={currentPage === 1}
+            >
+              « First
             </Pagination.First>
-            <Pagination.Prev onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)} disabled={currentPage === 1}>
-                ‹ Previous
+            <Pagination.Prev
+              onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+              disabled={currentPage === 1}
+            >
+              ‹ Previous
             </Pagination.Prev>
-            <Pagination.Next onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : currentPage)} disabled={currentPage === totalPages}>
-                Next ›
+            <Pagination.Next
+              onClick={() =>
+                paginate(
+                  currentPage < totalPages ? currentPage + 1 : currentPage
+                )
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next ›
             </Pagination.Next>
-            <Pagination.Last onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>
-                Last »
+            <Pagination.Last
+              onClick={() => paginate(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              Last »
             </Pagination.Last>
-            </Pagination>
+          </Pagination>
         )}
-        </div>
+      </div>
     );
 };
 
