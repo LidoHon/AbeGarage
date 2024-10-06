@@ -379,3 +379,13 @@ input:disabled {
 .custom-pagination .page-item:nth-child(4) .page-link:hover {
     background-color: #0a1b4a;
 }
+/* modal style */
+.modal-dialog-custom{
+  padding: 0;
+  height: 500px;
+  position: absolute;
+  top: 60%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}

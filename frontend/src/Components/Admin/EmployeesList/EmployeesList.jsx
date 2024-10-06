@@ -119,10 +119,12 @@ const EmployeesList = () => {
         <section className="table-section">
           <div className="container">
             <div className="">
-            <div className="flex items-center gap-4">
-                <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Employees </h2>
+              <div className="flex items-center gap-4">
+                <h2 className="page-titles text-3xl font-bold mb-4 mt-4">
+                  Employees{" "}
+                </h2>
                 <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
-            </div>
+              </div>
             </div>
             <Table striped bordered hover responsive>
               <thead>
@@ -140,12 +142,19 @@ const EmployeesList = () => {
               </thead>
               <tbody>
                 {currentEmployees.map((employee) => (
-                  <tr key={employee.employee_id}>
+                  <tr
+                    key={employee.employee_id}
+                    onClick={() =>
+                      handleNavigateToProfile(employee.employee_id)
+                    }
+                  >
                     <td>
                       <Button
                         variant="link"
                         className="p-0 text-gray-800 no-underline"
-                        onClick={() => handleNavigateToProfile(employee.employee_id)}
+                        onClick={() =>
+                          handleNavigateToProfile(employee.employee_id)
+                        }
                       >
                         {employee.employee_id}
                       </Button>
@@ -155,17 +164,26 @@ const EmployeesList = () => {
                     <td>{employee.employee_last_name}</td>
                     <td>{employee.employee_email}</td>
                     <td>{employee.employee_phone}</td>
-                    <td>{format(new Date(employee.added_date), "MM/dd/yyyy | HH:mm")}</td>
-                    <td>{employee.company_role_id ? getRoleName(employee.company_role_id) : "Unknown"}</td>
+                    <td>
+                      {format(
+                        new Date(employee.added_date),
+                        "MM/dd/yyyy | HH:mm"
+                      )}
+                    </td>
+                    <td>
+                      {employee.company_role_id
+                        ? getRoleName(employee.company_role_id)
+                        : "Unknown"}
+                    </td>
                     <td>
                       <div className="d-flex align-items-center">
                         <FaEdit
-                          className="me-2 text-gray-800"
+                          className="me-2 text-green-600"
                           style={{ cursor: "pointer" }}
                           onClick={() => handleEdit(employee)}
                         />
                         <FaTrashAlt
-                          className="text-gray-800"
+                          className="text-red-800"
                           style={{ cursor: "pointer" }}
                           onClick={() => handleDelete(employee.employee_id)}
                         />
@@ -186,14 +204,18 @@ const EmployeesList = () => {
                   « First
                 </Pagination.First>
                 <Pagination.Prev
-                  onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+                  onClick={() =>
+                    paginate(currentPage > 1 ? currentPage - 1 : 1)
+                  }
                   disabled={currentPage === 1}
                 >
                   ‹ Previous
                 </Pagination.Prev>
                 <Pagination.Next
                   onClick={() =>
-                    paginate(currentPage < totalPages ? currentPage + 1 : currentPage)
+                    paginate(
+                      currentPage < totalPages ? currentPage + 1 : currentPage
+                    )
                   }
                   disabled={currentPage === totalPages}
                 >
@@ -212,24 +234,30 @@ const EmployeesList = () => {
       )}
 
       {/* Bootstrap Modal for Editing Employee */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="sm">
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Employee</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedEmployee && (
-            <UpdateEmployeeForm
-              employee={selectedEmployee}
-              onClose={() => setShowModal(false)}
-              onSuccess={() => {
-                setShowModal(false);
-                window.location.reload();
-              }}
-            />
-          )}
-        </Modal.Body>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="md"
+        centered
+      >
+        <Modal.Dialog className="modal-dialog-custom ">
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Employee</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {selectedEmployee && (
+              <UpdateEmployeeForm
+                employee={selectedEmployee}
+                onClose={() => setShowModal(false)}
+                onSuccess={() => {
+                  setShowModal(false);
+                  window.location.reload();
+                }}
+              />
+            )}
+          </Modal.Body>
+        </Modal.Dialog>
       </Modal>
-
     </div>
   );
 };

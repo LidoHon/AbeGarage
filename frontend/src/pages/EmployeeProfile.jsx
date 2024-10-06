@@ -4,7 +4,7 @@ import EmployeeInfo from "../Components/Employee/EmployeeProfile";
 // Import the AdminMenu component 
 import AdminMenu from '../Components/Admin/AdminMenu/AdminMenu';
 
-function CustomerProfile(props) {
+function EmployeeProfile(props) {
     return (
         <div>
         <div className="container-fluid admin-pages">
@@ -21,4 +21,4 @@ function CustomerProfile(props) {
     );
 }
 
-export default CustomerProfile;
+export default EmployeeProfile;
