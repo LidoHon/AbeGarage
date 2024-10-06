@@ -104,9 +104,9 @@ const getEmployee = async (employeeId, token) => {
 
 
 // Fetch tasks assigned to the employee
-const getEmployeeTasks = async (employee_id) => {
+const getEmployeeTasks = async (employee_id,token) => {
   try {
-    const response = await fetch(`${api_url}/api/employees/${employee_id}/tasks`, {
+    const response = await fetch(`${api_url}/api/employees/${employee_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

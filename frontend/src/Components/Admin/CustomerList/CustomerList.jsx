@@ -159,7 +159,10 @@ const CustomersList = () => {
                   {currentCustomers.map((customer) => (
                     <tr
                       key={customer.customer_id}
-                      onClick={() => handleEdit(customer)}
+                      style={{ cursor: "pointer" }}
+                      onClick={() =>
+                        (window.location.href = `/admin/customer-profile/${customer.customer_id}`)
+                      }
                     >
                       <td>
                         <Link

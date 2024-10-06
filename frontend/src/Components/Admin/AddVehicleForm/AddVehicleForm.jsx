@@ -85,7 +85,7 @@ function AddVehicleForm({ customer_id, onVehicleAdded }) {
   };
 
   return (
-    <section className="contact-section mt-40">
+    <section className="contact-section">
       <div className="auto-container">
         <div className="contact-title">
           <h2>Add Customer's vehicle</h2>
