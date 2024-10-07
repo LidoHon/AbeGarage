@@ -18,7 +18,7 @@ function Header() {
   const [userType, setUserType] = useState(""); 
   const navigate = useNavigate();
 
-  // **Sync state with localStorage on mount and user changes**
+  // *Sync state with localStorage on mount and user changes*
   useEffect(() => {
     const updateUserState = () => {
       const storedEmployee = JSON.parse(localStorage.getItem("employee"));
@@ -62,7 +62,7 @@ function Header() {
     setUserType("");
     localStorage.removeItem("employee");
     localStorage.removeItem("customer");
-    navigate("/"); // Navigate to home after logout
+    navigate("/"); 
   };
 
   const toggleMobileMenu = () => {

@@ -204,7 +204,7 @@ function AddEmployeeForm(props) {
                       {" "}
                       {/* Add relative positioning */}
                       <input
-                        type={showPassword ? "text" : "password"} 
+                        type={showPassword ? "text" : "password"}
                         name="employee_password"
                         value={employee_password}
                         onChange={(event) => setPassword(event.target.value)}
