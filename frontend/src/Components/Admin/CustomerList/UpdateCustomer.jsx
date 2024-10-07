@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import customerService from "../../services/customer.service";
-import { Button, Form, Alert } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
+import { Button, Form, Spinner } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function UpdateCustomerForm({ customer, onClose, onSuccess }) {
+function UpdateCustomerForm() {
+    const { customer_id } = useParams(); // Fetch customer ID from route params
+    const navigate = useNavigate(); // Initialize useNavigate for redirection
     const [customer_email, setEmail] = useState("");
     const [customer_first_name, setFirstName] = useState("");
     const [customer_last_name, setLastName] = useState("");
@@ -13,18 +17,34 @@ function UpdateCustomerForm({ customer, onClose, onSuccess }) {
     const [emailError, setEmailError] = useState("");
     const [firstNameRequired, setFirstNameRequired] = useState("");
     const [passwordError, setPasswordError] = useState("");
-    const [success, setSuccess] = useState(false);
-    const [serverError, setServerError] = useState("");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (customer) {
-            setEmail(customer.customer_email);
-            setFirstName(customer.customer_first_name);
-            setLastName(customer.customer_last_name);
-            setPhoneNumber(customer.customer_phone);
-            setActive_customer(customer.active_customer);
-        }
-    }, [customer]);
+        const fetchCustomerDetails = async () => {
+            try {
+                const response = await customerService.getCustomer(customer_id);
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    const customerData = data.data;
+                    setEmail(customerData.customer_email);
+                    setFirstName(customerData.customer_first_name);
+                    setLastName(customerData.customer_last_name);
+                    setPhoneNumber(customerData.customer_phone);
+                    setActive_customer(customerData.active_customer);
+                } else {
+                    toast.error("Failed to fetch customer details");
+                }
+            } catch (error) {
+                toast.error("Error fetching customer details");
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCustomerDetails();
+    }, [customer_id]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -44,16 +64,10 @@ function UpdateCustomerForm({ customer, onClose, onSuccess }) {
             setEmailError("Invalid email format");
             valid = false;
         } else {
-            const regex = /^\S+@\S+\.\S+$/;
-            if (!regex.test(customer_email)) {
-                setEmailError("Invalid email format");
-                valid = false;
-            } else {
-                setEmailError("");
-            }
+            setEmailError("");
         }
 
-        if (!customer_password || customer_password.length < 6) {
+        if (customer_password && customer_password.length < 6) {
             setPasswordError("Password must be at least 6 characters long");
             valid = false;
         } else {
@@ -74,127 +88,120 @@ function UpdateCustomerForm({ customer, onClose, onSuccess }) {
         };
 
         customerService
-            .updateCustomer(customer.customer_id, formData, customer.customer_token)
+            .updateCustomer(customer_id, formData)
             .then((response) => response.json())
             .then((data) => {
                 if (data.error) {
-                    setServerError(data.error);
+                    toast.error(data.error);
                 } else {
-                    setSuccess(true);
-                    setServerError("");
-                    // Pass the updated customer data back to the parent component
-                    onSuccess({
-                        ...customer,
-                        customer_email,
-                        customer_first_name,
-                        customer_last_name,
-                        customer_phone,
-                        active_customer,
-                    });
+                    toast.success("Customer updated successfully");
+
+                    // Delay for 2 seconds before navigating to the customers page
+                    setTimeout(() => {
+                        navigate("/admin/customers");
+                    }, 2000); // Adjust the delay as necessary
                 }
             })
             .catch((error) => {
-                const resMessage =
-                    (error.response &&
-                        error.response.data &&
-                        error.response.data.message) ||
-                    error.message ||
-                    error.toString();
-                setServerError(resMessage);
+                const resMessage = error.message || "An error occurred.";
+                toast.error(resMessage);
             });
     };
 
+    if (loading) {
+        return <Spinner animation="border" />;
+    }
+
     return (
-        <Form onSubmit={handleSubmit} className="p-4 border rounded bg-light">
-            <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                    type="email"
-                    value={customer_email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    placeholder="Enter email"
-                    isInvalid={!!emailError}
-                />
-                <Form.Control.Feedback type="invalid">
-                    {emailError}
-                </Form.Control.Feedback>
-            </Form.Group>
+        <div className="container py-5">
+            <ToastContainer /> {/* Toast container for displaying toast messages */}
+            <div className="flex items-center gap-4">
+                <h2 className="page-titles text-3xl font-bold">
+                    Edit: {customer_first_name} {customer_last_name}
+                </h2>
+                <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+            </div>
+            <p><strong>Customer email:</strong> {customer_email}</p>
 
-            <Form.Group controlId="formFirstName">
-                <Form.Label>First Name</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={customer_first_name}
-                    onChange={(event) => setFirstName(event.target.value)}
-                    placeholder="Enter first name"
-                    isInvalid={!!firstNameRequired}
-                />
-                <Form.Control.Feedback type="invalid">
-                    {firstNameRequired}
-                </Form.Control.Feedback>
-            </Form.Group>
+            <Form onSubmit={handleSubmit} className="p-4" style={{ maxWidth: "600px", margin: "0 auto" }}>
+                {/* Email */}
+                <Form.Group controlId="formEmail" className="mt-3">
+                    <Form.Control
+                        type="email"
+                        value={customer_email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        placeholder="Enter email"
+                        isInvalid={!!emailError}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        {emailError}
+                    </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formLastName">
-                <Form.Label>Last Name</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={customer_last_name}
-                    onChange={(event) => setLastName(event.target.value)}
-                    placeholder="Enter last name"
-                />
-            </Form.Group>
+                {/* First Name */}
+                <Form.Group controlId="formFirstName" className="mt-3">
+                    <Form.Control
+                        type="text"
+                        value={customer_first_name}
+                        onChange={(event) => setFirstName(event.target.value)}
+                        placeholder="Enter first name"
+                        isInvalid={!!firstNameRequired}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        {firstNameRequired}
+                    </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formPhone">
-                <Form.Label>Phone Number</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={customer_phone}
-                    onChange={(event) => setPhoneNumber(event.target.value)}
-                    placeholder="Enter phone number"
-                />
-            </Form.Group>
+                {/* Last Name */}
+                <Form.Group controlId="formLastName" className="mt-3">
+                    <Form.Control
+                        type="text"
+                        value={customer_last_name}
+                        onChange={(event) => setLastName(event.target.value)}
+                        placeholder="Enter last name"
+                    />
+                </Form.Group>
 
-            <Form.Group controlId="formPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                    type="password"
-                    value={customer_password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    placeholder="Enter password"
-                    isInvalid={!!passwordError}
-                />
-                <Form.Control.Feedback type="invalid">
-                    {passwordError}
-                </Form.Control.Feedback>
-            </Form.Group>
+                {/* Phone Number */}
+                <Form.Group controlId="formPhone" className="mt-3">
+                    <Form.Control
+                        type="text"
+                        value={customer_phone}
+                        onChange={(event) => setPhoneNumber(event.target.value)}
+                        placeholder="Enter phone number"
+                    />
+                </Form.Group>
 
-            <Form.Group controlId="formActive">
-                <Form.Label>Active</Form.Label>
-                <Form.Control
-                    as="select"
-                    value={active_customer}
-                    onChange={(event) => setActive_customer(Number(event.target.value))}
-                >
-                    <option value={1}>Yes</option>
-                    <option value={0}>No</option>
-                </Form.Control>
-            </Form.Group>
+                {/* Password */}
+                <Form.Group controlId="formPassword" className="mt-3">
+                    <Form.Label>Password (optional)</Form.Label>
+                    <Form.Control
+                        type="password"
+                        value={customer_password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        placeholder="Enter password (leave blank if not changing)"
+                        isInvalid={!!passwordError}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        {passwordError}
+                    </Form.Control.Feedback>
+                </Form.Group>
 
-            <Button variant="primary" type="submit">
-                Update Customer
-            </Button>
+                {/* Active Customer */}
+                <Form.Group controlId="formActive" className="mt-3">
+                    <Form.Check
+                        type="checkbox"
+                        label="Is active customer"
+                        checked={active_customer === 1}
+                        onChange={(event) => setActive_customer(event.target.checked ? 1 : 0)}
+                    />
+                </Form.Group>
 
-            {serverError && (
-                <Alert variant="danger" className="mt-3">
-                    {serverError}
-                </Alert>
-            )}
-            {success && (
-                <Alert variant="success" className="mt-3">
-                    Customer updated successfully
-                </Alert>
-            )}
-        </Form>
+                <button type="submit" className="buttonStyle mt-4 w-36">
+                    UPDATE
+                </button>
+            </Form>
+        </div>
     );
 }
 

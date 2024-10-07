@@ -9,8 +9,10 @@ import PrivateAuthRoute from "./Components/Auth/PrivateAuthRoute";
 // import Customer from "./Components/customer/Customer";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
+import EditEmployee from './pages/admin/EditEmployee'
 import EmployeeProfile from "./pages/EmployeeProfile"
 import Customers from './pages/admin/Customers';
+import EditCustomer from './pages/admin/EditCustomer';
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
 import HomeService from "./pages/Services"
@@ -67,6 +69,14 @@ function App() {
             }
           />
           <Route
+            path="/admin/employee/:employee_id"
+            element={
+              <PrivateAuthRoute roles={[3, 2]}>
+                <EditEmployee />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
             path="/admin/employee-profile/:employee_id"
             element={
               <PrivateAuthRoute roles={[3, 1]}>
@@ -95,6 +105,14 @@ function App() {
             element={
               <PrivateAuthRoute roles={[3, 1]}>
                 <Customers />
+              </PrivateAuthRoute>
+            }
+          />
+          <Route
+            path="/admin/customer/:customer_id"
+            element={
+              <PrivateAuthRoute roles={[3, 2]}>
+                <EditCustomer />
               </PrivateAuthRoute>
             }
           />
