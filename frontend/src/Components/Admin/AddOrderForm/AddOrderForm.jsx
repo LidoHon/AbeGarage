@@ -192,21 +192,23 @@ const AddOrderForm = () => {
   return (
     <div className="container pb-5">
       <div className="flex items-center gap-4 mt-4 mb-4">
-        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Create a new order</h2>
+        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">
+          Create a new order
+        </h2>
         <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
       </div>
       {selectedCustomer ? (
-        <div className="selected-customer-details card p-3">
-          <div className="row">
-            <div className="col-10">
-              <h3>
+        <div className="selected-customer-detail p-3">
+          <div className="flex container justify-between bg-slate-50 py-10 px-5 border rounded-lg ">
+            <div className=" ">
+              <h3 className="font-bold text-2xl text-blue-900 uppercase">
                 {selectedCustomer.customer_first_name}{" "}
                 {selectedCustomer.customer_last_name}
               </h3>
               <p>Email: {selectedCustomer.customer_email}</p>
               <p>Phone Number: {selectedCustomer.customer_phone}</p>
             </div>
-            <div className="col-2 text-right">
+            <div className="text-right mt-0">
               <button
                 className="btn btn-sm btn-danger"
                 onClick={() => {
@@ -226,13 +228,16 @@ const AddOrderForm = () => {
               {vehicles.length === 0 ? (
                 <>
                   <p>No vehicles found for this customer.</p>
-                  <button className="theme-btn btn-style-one w-56" type="submit">
+                  <button
+                    className="theme-btn btn-style-one w-56"
+                    type="submit"
+                  >
                     <span>Add Vehicle</span>
                   </button>
                 </>
               ) : (
                 <>
-                  <table className="table table-hover mt-3">
+                  <table className="table table-bordered table-hover mt-3">
                     <thead>
                       <tr>
                         <th>Make</th>
@@ -247,7 +252,10 @@ const AddOrderForm = () => {
                     </thead>
                     <tbody>
                       {vehicles.map((vehicle) => (
-                        <tr key={vehicle.vehicle_id}>
+                        <tr
+                          key={vehicle.vehicle_id}
+                          onClick={() => handleSelectVehicle(vehicle)}
+                        >
                           <td>{vehicle.vehicle_make}</td>
                           <td>{vehicle.vehicle_model}</td>
                           <td>{vehicle.vehicle_year}</td>
@@ -257,17 +265,26 @@ const AddOrderForm = () => {
                           <td>{vehicle.vehicle_serial}</td>
                           <td>
                             <button
-                              className={`btn btn-sm ${selectedVehicle === vehicle ? "btn-success" : "btn-primary"}`}
+                              className={`btn btn-sm ${
+                                selectedVehicle === vehicle
+                                  ? "btn-success"
+                                  : "btn-primary"
+                              }`}
                               onClick={() => handleSelectVehicle(vehicle)}
                             >
-                              {selectedVehicle === vehicle ? "Selected" : "Select"}
+                              {selectedVehicle === vehicle
+                                ? "Selected"
+                                : "Select"}
                             </button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  <button className="theme-btn btn-style-one w-56" type="submit">
+                  <button
+                    className="theme-btn btn-style-one w-56"
+                    type="submit"
+                  >
                     <span>Add Vehicle</span>
                   </button>
                 </>
@@ -277,13 +294,29 @@ const AddOrderForm = () => {
 
           {selectedVehicle && (
             <>
-              <div className="selected-vehicle-details card p-3 mt-4">
-                <h4>{selectedVehicle.vehicle_model}</h4>
-                <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
-                <p>Vehicle Type: {selectedVehicle.vehicle_type}</p>
-                <p>Vehicle Mileage: {selectedVehicle.vehicle_mileage}</p>
-                <p>Tag: {selectedVehicle.vehicle_tag}</p>
-                <p>Plate: {selectedVehicle.vehicle_serial}</p>
+              <div className="flex container justify-between bg-slate-50 py-6 px-5 border rounded-lg my-4">
+                <div className="selected-vehicle-details">
+                  <h4 className="font-bold text-2xl text-blue-900 uppercase">
+                    {selectedVehicle.vehicle_model}
+                  </h4>
+                  <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
+                  <p>Vehicle Type: {selectedVehicle.vehicle_type}</p>
+                  <p>Vehicle Mileage: {selectedVehicle.vehicle_mileage}</p>
+                  <p>Tag: {selectedVehicle.vehicle_tag}</p>
+                  <p>Plate: {selectedVehicle.vehicle_serial}</p>
+                </div>
+                <div className="text-right mt-0">
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => {
+                      setSelectedCustomer(null);
+                      setSelectedVehicle(null);
+                      setVehicles([]);
+                    }}
+                  >
+                    <i className="fa fa-times"></i>
+                  </button>
+                </div>
               </div>
 
               <div className="flex pb-10">
@@ -305,7 +338,10 @@ const AddOrderForm = () => {
                         >
                           <option value="">Select an Employee</option>
                           {employees.map((emp) => (
-                            <option key={emp.employee_id} value={emp.employee_id}>
+                            <option
+                              key={emp.employee_id}
+                              value={emp.employee_id}
+                            >
                               {`${emp.employee_first_name} ${emp.employee_last_name}`}
                             </option>
                           ))}
@@ -334,7 +370,9 @@ const AddOrderForm = () => {
                         type="date"
                         className="form-control mt-3"
                         value={estimatedCompletionDate}
-                        onChange={(e) => setEstimatedCompletionDate(e.target.value)}
+                        onChange={(e) =>
+                          setEstimatedCompletionDate(e.target.value)
+                        }
                       />
                       <button
                         className="btn btn-danger mt-4"
@@ -391,17 +429,17 @@ const AddOrderForm = () => {
               <tbody>
                 {filteredCustomers.length > 0 ? (
                   filteredCustomers.map((customer) => (
-                    <tr key={customer.customer_id}>
+                    <tr
+                      key={customer.customer_id}
+                      onClick={() => handleSelectCustomer(customer)}
+                    >
                       <td>{customer.customer_first_name}</td>
                       <td>{customer.customer_last_name}</td>
                       <td>{customer.customer_email}</td>
                       <td>{customer.customer_phone}</td>
                       <td>
-                        <button
-                          className="btn btn-sm "
-                          onClick={() => handleSelectCustomer(customer)}
-                        >
-                          <i className="fas fa-hand-pointer"></i>
+                        <button className="btn btn-sm ">
+                          <i className="fas fa-hand-pointer hover:text-blue-700"></i>
                         </button>
                       </td>
                     </tr>

@@ -43,6 +43,7 @@ const EmployeeProfile = () => {
     const fetchAssignedTasks = async () => {
       try {
         const tasksResponse = await employeeService.getEmployeeTasks(employee_id, token);
+        console.log("task response for emp profile", tasksResponse)
         setTasks(tasksResponse); 
       } catch (err) {
         console.error("An error occurred fetching tasks:", err);

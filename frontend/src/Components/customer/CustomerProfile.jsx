@@ -5,6 +5,7 @@ import { Button, Row, Col, Card, Modal, Form } from "react-bootstrap";
 import AddVehicleForm from "../../Components/Admin/AddVehicleForm/AddVehicleForm";
 const api_url = import.meta.env.VITE_API_URL;
 import { FcFullTrash } from "react-icons/fc";
+import { FaEdit } from "react-icons/fa";
 const CustomerProfile = () => {
   const { customer_id } = useParams();
 
@@ -62,7 +63,7 @@ const CustomerProfile = () => {
   useEffect(() => {
     const fetchCustomerOrders = async () => {
       try {
-        const res = await customerService.getCustomerOrders(customer_id); 
+        const res = await customerService.getCustomerOrders(customer_id);
         const data = await res.json();
         console.log("Orders data response:", data);
         if (data.status === "success") {
@@ -110,6 +111,18 @@ const CustomerProfile = () => {
     setShowEditModal(true);
   };
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Handles updating a vehicle when the user submits the edit form.
+   *
+   * Sends a PUT request to the API with the updated vehicle data.
+   * If the request is successful, updates the vehicle list with the new data
+   * and closes the edit modal.
+   * If the request fails, logs an error message to the console.
+   *
+   * @function
+   */
+  /******  dfd45ce8-0566-44b5-afb7-15d12aee2758  *******/
   const handleUpdateVehicle = async () => {
     try {
       const res = await fetch(
@@ -145,104 +158,180 @@ const CustomerProfile = () => {
   if (!customerData) {
     return <div>Loading...</div>;
   }
+  const handleEdit = (customerData) => {
+    setSelectedCustomer(customerData);
+    setShowEditModal(true);
+  };
 
   return (
     <div className="container mt-4">
       <Row>
         <Col md={3}>
-          <div className="d-flex flex-column align-items-center">
+          <div className="d-flex flex-column align-items-center position-relative">
+            <div
+              style={{
+                position: "absolute",
+                top: "50px",
+                bottom: "50px",
+                width: "2px",
+                backgroundColor: "#e0e0e0",
+                zIndex: 0,
+              }}
+            ></div>
+
             <Button
               variant="danger"
-              className="rounded-circle mb-3"
-              style={{ width: "100px", height: "100px" }}
+              className="rounded-circle mb-24"
+              style={{
+                width: "100px",
+                height: "100px",
+                position: "relative",
+                zIndex: 1,
+              }}
             >
               Info
             </Button>
             <Button
               variant="danger"
-              className="rounded-circle mb-3"
-              style={{ width: "100px", height: "100px" }}
+              className="rounded-circle mb-24"
+              style={{
+                width: "100px",
+                height: "100px",
+                position: "relative",
+                zIndex: 1,
+              }}
             >
               Cars
             </Button>
             <Button
               variant="danger"
-              className="rounded-circle mb-3"
-              style={{ width: "100px", height: "100px" }}
+              className="rounded-circle"
+              style={{
+                width: "100px",
+                height: "100px",
+                position: "relative",
+                zIndex: 1,
+              }}
             >
               Orders
             </Button>
           </div>
         </Col>
         <Col md={9}>
-          <Card className="mb-4">
-            <Card.Body>
-              <h3>
-                Customer: {customerData.customer_first_name}{" "}
-                {customerData.customer_last_name}
-              </h3>
-              <p>
-                <strong>Email:</strong> {customerData.customer_email}
-              </p>
-              <p>
-                <strong>Phone Number:</strong> {customerData.customer_phone}
-              </p>
-              <p>
-                <strong>Active Customer:</strong>{" "}
+          <div className="my-6">
+            <h3 className="text-2xl font-bold text-blue-800">
+              Customer: {customerData.customer_first_name}{" "}
+              {customerData.customer_last_name}
+            </h3>
+            <p></p>
+            <strong>Email:</strong>{" "}
+            <span className="text-gray-400">{customerData.customer_email}</span>
+            <p>
+              <strong>Phone Number:</strong>
+              <span className="text-gray-400">
+                {" "}
+                {customerData.customer_phone}
+              </span>
+            </p>
+            <p>
+              <strong>Active Customer:</strong>{" "}
+              <span className="text-gray-400">
                 {customerData.active_customer ? "Yes" : "No"}
-              </p>
-              {/* <Button
+              </span>
+            </p>
+            <p className="flex items-center gap-6">
+              <strong>Edit Customer info:</strong>{" "}
+              <FaEdit
+                className="me-3 text-green-600"
+                style={{ cursor: "pointer" }}
+                onClick={() => handleEdit(customerData)}
+              />
+            </p>
+            {/* <Button
                 variant="link"
                 href={/admin/edit-customer/${customer_id}}
               >
                 <i className="fa fa-edit"></i> Edit customer info
               </Button> */}
-            </Card.Body>
-          </Card>
+          </div>
 
-          <Card className="mb-4">
-            <Card.Body>
-              <h3 className="text-xl font-bold mb-2">
-                Vehicles of {customerData.customer_first_name}
-              </h3>
-              {vehicles.length > 0 ? (
-                <ul>
-                  {vehicles.map((vehicle) => (
-                    <li key={vehicle.vehicle_id}>
-                      <strong>
+          <div>
+            <h3 className="text-2xl font-bold text-blue-800">
+              Vehicles of {customerData.customer_first_name}
+            </h3>
+
+            {vehicles.length > 0 ? (
+              <div className="d-flex flex-wrap gap-3">
+                {vehicles.map((vehicle) => (
+                  <div
+                    key={vehicle.vehicle_id}
+                    className="card shadow p-3 my-2 bg-white rounded"
+                    style={{ width: "18rem" }}
+                  >
+                    <div className="card-body">
+                      <h5 className="card-title">
                         {vehicle.vehicle_make} {vehicle.vehicle_model}
-                      </strong>
-                      <p>Vehicle color: {vehicle.vehicle_color}</p>
-                      <p>Vehicle tag: {vehicle.vehicle_tag}</p>
-                      <p>Vehicle year: {vehicle.vehicle_year}</p>
-                      <p>Vehicle mileage: {vehicle.vehicle_mileage}</p>
-                      <p>Vehicle serial: {vehicle.vehicle_serial}</p>
-                      <Button
-                        variant="link"
-                        onClick={() => handleEditVehicleClick(vehicle)}
-                      >
-                        <i className="fa fa-edit"></i> Edit vehicle info
-                      </Button>
-                      <Button
-                        className="bg-inherit border-0"
-                        // variant="danger"
-                        onClick={() => handleDeleteVehicle(vehicle.vehicle_id)}
-                      >
-                        <FcFullTrash />
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No vehicles found</p>
-              )}
-              {!showAddVehicleForm && (
-                <Button variant="danger" onClick={handleAddVehicleClick}>
-                  Add New Vehicle
-                </Button>
-              )}
-            </Card.Body>
-          </Card>
+                      </h5>
+                      <p className="card-text">
+                        <strong>Vehicle color:</strong>{" "}
+                        <span className="text-gray-400">
+                          {vehicle.vehicle_color}
+                        </span>
+                      </p>
+                      <p className="card-text">
+                        <strong>Vehicle tag:</strong>{" "}
+                        <span className="text-gray-400">
+                          {vehicle.vehicle_tag}
+                        </span>
+                      </p>
+                      <p className="card-text">
+                        <strong>Vehicle year:</strong>{" "}
+                        <span className="text-gray-400">
+                          {vehicle.vehicle_year}
+                        </span>
+                      </p>
+                      <p className="card-text">
+                        <strong>Vehicle mileage:</strong>{" "}
+                        <span className="text-gray-400">
+                          {vehicle.vehicle_mileage}
+                        </span>
+                      </p>
+                      <p className="card-text">
+                        <strong>Vehicle serial:</strong>{" "}
+                        <span className="text-gray-400">
+                          {vehicle.vehicle_serial}
+                        </span>
+                      </p>
+                      <div className="d-flex justify-content-between">
+                        <Button
+                          variant="link"
+                          onClick={() => handleEditVehicleClick(vehicle)}
+                        >
+                          <i className="fa fa-edit"></i> Edit
+                        </Button>
+                        <Button
+                          className="bg-inherit border-0"
+                          onClick={() =>
+                            handleDeleteVehicle(vehicle.vehicle_id)
+                          }
+                        >
+                          <FcFullTrash />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No vehicles found</p>
+            )}
+
+            {!showAddVehicleForm && (
+              <Button variant="danger" onClick={handleAddVehicleClick}>
+                Add New Vehicle
+              </Button>
+            )}
+          </div>
 
           {showAddVehicleForm && (
             <Card className="mb-4">
@@ -254,37 +343,35 @@ const CustomerProfile = () => {
               </Card.Body>
             </Card>
           )}
-
-          <Card>
-            <Card.Body>
-              <h3 className="text-xl font-bold mb-2">
-                Orders of {customerData.customer_first_name}
-              </h3>
-              {orders.length > 0 ? (
-                <ul>
-                  {orders.map((order) => (
-                    <li key={order.order_id} className="mb-2">
-                      <div className="flex flex-row gap-4 ">
-                        <p className="text-lg font-bold mt-1">
-                          Order #{order.order_id}{" "}
-                        </p>
-                        <Link to={`/admin/order/${order.order_id}`}>
-                          <button
-                            // variant="danger"
-                            className="bg-gray-700 text-white px-2  py-1 hover:bg-gray-500 hover:translate-x-2  "
-                          >
-                            View Order Details
-                          </button>
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>Orders will be displayed here</p>
-              )}
-            </Card.Body>
-          </Card>
+          {/* orders */}
+          <div className="my-6">
+            <h3 className="text-2xl font-bold text-blue-800">
+              Orders of {customerData.customer_first_name}
+            </h3>
+            {orders.length > 0 ? (
+              <ul>
+                {orders.map((order) => (
+                  <li key={order.order_id} className="mb-2">
+                    <div className="flex flex-row gap-4 ">
+                      <p className="text-lg font-bold mt-1">
+                        Order #{order.order_id}{" "}
+                      </p>
+                      <Link to={`/admin/order/${order.order_id}`}>
+                        <button
+                          // variant="danger"
+                          className="bg-gray-700 text-white px-2  py-1 hover:bg-gray-500 hover:translate-x-2  "
+                        >
+                          View Order Details
+                        </button>
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Orders will be displayed here</p>
+            )}
+          </div>
         </Col>
       </Row>
 
