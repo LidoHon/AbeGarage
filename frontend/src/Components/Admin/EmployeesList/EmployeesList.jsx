@@ -70,14 +70,14 @@ const EmployeesList = () => {
   };
 
   const handleNavigateToProfile = (employeeId) => {
-    navigate(`/admin/employee-profile/${employeeId}`); // Navigate to the profile page
+    navigate(`/admin/employee-profile/${employeeId}`); 
   };
 
   const handleEdit = (employeeId) => {
-    navigate(`/admin/employee/${employeeId}`); // Navigate to the edit route
+    navigate(`/admin/employee/${employeeId}`); 
   };
 
-  // Add a utility function to map role IDs to role names
+  
   const getRoleName = (roleId) => {
     switch (roleId) {
       case 1:
@@ -146,7 +146,7 @@ const EmployeesList = () => {
                           className="me-2 text-gray-800"
                           style={{ cursor: "pointer" }}
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click from triggering
+                            e.stopPropagation(); 
                             handleEdit(employee.employee_id);
                           }}
                         />
@@ -154,7 +154,7 @@ const EmployeesList = () => {
                           className="text-gray-800"
                           style={{ cursor: "pointer" }}
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click from triggering
+                            e.stopPropagation(); 
                             handleDelete(employee.employee_id);
                           }}
                         />

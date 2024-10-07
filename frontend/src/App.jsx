@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";  
+import 'react-toastify/dist/ReactToastify.css';  
+
 import MainLayout from "./layouts/MainLayout";
 import Home from "./Components/Home";
 import Login from "./pages/Login";
@@ -6,24 +9,24 @@ import AddEmployee from "./pages/admin/AddEmployee";
 import "./assets/styles/custom.css";
 import Unauthorized from "./pages/Unauthorized";
 import PrivateAuthRoute from "./Components/Auth/PrivateAuthRoute";
-// import Customer from "./Components/customer/Customer";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
-import EditEmployee from './pages/admin/EditEmployee'
-import EmployeeProfile from "./pages/EmployeeProfile"
+import EditEmployee from './pages/admin/EditEmployee';
+import EmployeeProfile from "./pages/EmployeeProfile";
 import Customers from './pages/admin/Customers';
 import EditCustomer from './pages/admin/EditCustomer';
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
-import HomeService from "./pages/Services"
+import HomeService from "./pages/Services";
 import AdminLanding from "./pages/admin/AdminLanding";
 import AddCustomer from "./pages/admin/AddCustomer";
 import CustomerProfile from "./pages/CustomerProfile";
 import AddOrder from "./pages/admin/AddOrder";
-import Orders from "./pages/admin/Orders"
-import OrderDetails from "./pages/admin/OrderDetails"
+import Orders from "./pages/admin/Orders";
+import OrderDetails from "./pages/admin/OrderDetails";
 import Services from "./pages/admin/Services";
 import EditOrderForm from "./Components/Admin/EditOrderForm/EditOrderForm";
+
 function App() {
   return (
     <Router>
@@ -51,7 +54,6 @@ function App() {
             }
           />
           <Route path="/unauthorized" element={<Unauthorized />} />
-          {/* <Route path="/admin/add-employee" element={<AddEmployee />} /> */}
           <Route
             path="/admin/add-employee"
             element={
@@ -80,7 +82,7 @@ function App() {
             path="/admin/employee-profile/:employee_id"
             element={
               <PrivateAuthRoute roles={[3, 1]}>
-                <EmployeeProfile/>
+                <EmployeeProfile />
               </PrivateAuthRoute>
             }
           />
@@ -88,7 +90,7 @@ function App() {
             path="/admin/order/:orderId"
             element={
               <PrivateAuthRoute roles={[3]}>
-                <OrderDetails/>
+                <OrderDetails />
               </PrivateAuthRoute>
             }
           />
@@ -136,7 +138,7 @@ function App() {
             path="/admin/orders"
             element={
               <PrivateAuthRoute roles={[3]}>
-                <Orders/>
+                <Orders />
               </PrivateAuthRoute>
             }
           />
@@ -144,7 +146,7 @@ function App() {
             path="/admin/edit-order/:orderId"
             element={
               <PrivateAuthRoute roles={[3]}>
-                <EditOrderForm/>
+                <EditOrderForm />
               </PrivateAuthRoute>
             }
           />
@@ -159,6 +161,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      <ToastContainer /> 
     </Router>
   );
 }

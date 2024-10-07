@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Service from "../../services/order.service";
 import ServiceSelection from "../AddServiceForm/SelectService";
 import getAuth from "../../util/auth";
-import {Table, Form} from 'react-bootstrap';
-
+import { Table, Form } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [customers, setCustomers] = useState([]);
@@ -53,7 +54,7 @@ const AddOrderForm = () => {
           const response = await Service.getEmployeesByRole(1);
           setEmployees(response);
         } catch (error) {
-          console.error('Error fetching employees:', error);
+          console.error("Error fetching employees:", error);
         }
       };
       fetchEmployees();
@@ -65,8 +66,12 @@ const AddOrderForm = () => {
     if (searchQuery && Array.isArray(customers)) {
       const filtered = customers.filter(
         (customer) =>
-          customer.customer_first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          customer.customer_last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          customer.customer_first_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          customer.customer_last_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
           customer.customer_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           customer.customer_phone.includes(searchQuery)
       );
@@ -94,8 +99,9 @@ const AddOrderForm = () => {
   };
 
   const handleSelectServices = (services) => {
-    const updatedServiceData = services.map((serviceId) => ({
-      service_id: serviceId,
+    const updatedServiceData = services.map((service) => ({
+      service_id: service.service_id,
+      service_name: service.service_name,
       service_completed: 0,
     }));
     setSelectedServices(updatedServiceData);
@@ -117,9 +123,6 @@ const AddOrderForm = () => {
     setServiceAssignments(updatedAssignments);
   };
 
-  const allEmployeesAssigned = selectedServices.length > 0 &&
-    serviceAssignments.every((assignment) => assignment.employee_id !== null);
-
     const handleCreateOrder = async () => {
       if (
         !selectedCustomer ||
@@ -130,7 +133,7 @@ const AddOrderForm = () => {
         selectedServices.length === 0 ||
         serviceAssignments.length === 0
       ) {
-        alert("Please fill in all required fields.");
+        toast.error("Please fill in all required fields.");
         return;
       }
     
@@ -141,7 +144,7 @@ const AddOrderForm = () => {
           throw new Error("Employee not found or not authenticated.");
         }
     
-        // Log data for order creation
+        
         const orderData = {
           customer_id: selectedCustomer.customer_id,
           vehicle_id: selectedVehicle.vehicle_id,
@@ -158,29 +161,32 @@ const AddOrderForm = () => {
           additional_requests_completed: 0,
         };
     
-        
         const orderServiceData = serviceAssignments.map((assignment) => ({
           service_id: assignment.service_id,
           employee_id: assignment.employee_id,
-          service_completed: 0, 
+          service_completed: 0,
         }));
     
-        // Send the order creation request to the backend
+        console.log("Order Data:", orderData);
+        console.log("Order Info Data:", orderInfoData);
+        console.log("Order Service Data:", orderServiceData);
+    
+        
         await Service.createOrder({
           orderData,
           orderInfoData,
           orderServiceData,
         });
     
-        alert("Order created successfully.");
+        
+        toast.success("Order created successfully!");
         navigate("/admin/orders");
       } catch (err) {
-        setError("Error creating the order. Please try again.");
         console.error("Error in handleCreateOrder:", err);
+        toast.error("Error creating the order. Please try again.");
       }
     };
     
-  
 
   const generateOrderHash = () => {
     return (
@@ -191,22 +197,26 @@ const AddOrderForm = () => {
 
   return (
     <div className="container pb-5">
+      <ToastContainer /> 
       <div className="flex items-center gap-4 mt-4 mb-4">
-        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">Create a new order</h2>
+        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">
+          Create a new order
+        </h2>
         <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
       </div>
+
       {selectedCustomer ? (
-        <div className="selected-customer-details card p-3">
-          <div className="row">
-            <div className="col-10">
-              <h3>
+        <div className="selected-customer-detail py-3 px-10">
+          <div className="flex container justify-between bg-white py-10 px-5 border ">
+            <div className=" ">
+              <h3 className="font-bold text-xl text-blue-900 uppercase">
                 {selectedCustomer.customer_first_name}{" "}
                 {selectedCustomer.customer_last_name}
               </h3>
               <p>Email: {selectedCustomer.customer_email}</p>
               <p>Phone Number: {selectedCustomer.customer_phone}</p>
             </div>
-            <div className="col-2 text-right">
+            <div className="text-right mt-0">
               <button
                 className="btn btn-sm btn-danger"
                 onClick={() => {
@@ -222,17 +232,24 @@ const AddOrderForm = () => {
 
           {!selectedVehicle && (
             <>
-              <h4 className="mt-4">Select a Vehicle</h4>
+              <div className="flex items-center gap-4 mt-4 mb-4">
+                <h2 className="page-titles text-xl font-bold">
+                  Choose a vehicle
+                </h2>
+              </div>
               {vehicles.length === 0 ? (
                 <>
                   <p>No vehicles found for this customer.</p>
-                  <button className="theme-btn btn-style-one w-56" type="submit">
+                  <button
+                    className="theme-btn btn-style-one w-56"
+                    type="submit"
+                  >
                     <span>Add Vehicle</span>
                   </button>
                 </>
               ) : (
                 <>
-                  <table className="table table-hover mt-3">
+                  <Table striped bordered hover responsive className="">
                     <thead>
                       <tr>
                         <th>Make</th>
@@ -247,7 +264,10 @@ const AddOrderForm = () => {
                     </thead>
                     <tbody>
                       {vehicles.map((vehicle) => (
-                        <tr key={vehicle.vehicle_id}>
+                        <tr
+                          key={vehicle.vehicle_id}
+                          onClick={() => handleSelectVehicle(vehicle)}
+                        >
                           <td>{vehicle.vehicle_make}</td>
                           <td>{vehicle.vehicle_model}</td>
                           <td>{vehicle.vehicle_year}</td>
@@ -255,21 +275,15 @@ const AddOrderForm = () => {
                           <td>{vehicle.vehicle_mileage}</td>
                           <td>{vehicle.vehicle_tag}</td>
                           <td>{vehicle.vehicle_serial}</td>
-                          <td>
-                            <button
-                              className={`btn btn-sm ${selectedVehicle === vehicle ? "btn-success" : "btn-primary"}`}
-                              onClick={() => handleSelectVehicle(vehicle)}
-                            >
-                              {selectedVehicle === vehicle ? "Selected" : "Select"}
+                          <td className="text-center">
+                            <button className="btn btn-sm">
+                              <i className="fas fa-hand-pointer hover:text-blue-700"></i>
                             </button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
-                  </table>
-                  <button className="theme-btn btn-style-one w-56" type="submit">
-                    <span>Add Vehicle</span>
-                  </button>
+                  </Table>
                 </>
               )}
             </>
@@ -277,75 +291,121 @@ const AddOrderForm = () => {
 
           {selectedVehicle && (
             <>
-              <div className="selected-vehicle-details card p-3 mt-4">
-                <h4>{selectedVehicle.vehicle_model}</h4>
-                <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
-                <p>Vehicle Type: {selectedVehicle.vehicle_type}</p>
-                <p>Vehicle Mileage: {selectedVehicle.vehicle_mileage}</p>
-                <p>Tag: {selectedVehicle.vehicle_tag}</p>
-                <p>Plate: {selectedVehicle.vehicle_serial}</p>
-              </div>
-
-              <div className="flex pb-10">
-                <ServiceSelection onSelectServices={handleSelectServices} />
-                <div className="ml-20">
-                  <h4 className="mt-4">Assign Employees</h4>
-                  <div className="form-group">
-                    {selectedServices.map((service) => (
-                      <div key={service.service_id} className="mt-3">
-                        <h5>{`Assign Employee to ${service.service_id}`}</h5>
-                        <select
-                          className="form-control"
-                          onChange={(e) =>
-                            handleAssignEmployeeToService(
-                              service.service_id,
-                              e.target.value
-                            )
-                          }
-                        >
-                          <option value="">Select an Employee</option>
-                          {employees.map((emp) => (
-                            <option key={emp.employee_id} value={emp.employee_id}>
-                              {`${emp.employee_first_name} ${emp.employee_last_name}`}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
-                  </div>
-
-                  {allEmployeesAssigned && (
-                    <div>
-                      <input
-                        type="text"
-                        className="form-control mt-3"
-                        placeholder="Enter service description"
-                        value={additionalRequest}
-                        onChange={(e) => setAdditionalRequest(e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        className="form-control mt-3"
-                        placeholder="Enter price"
-                        value={orderPrice}
-                        onChange={(e) => setOrderPrice(e.target.value)}
-                      />
-                      <input
-                        type="date"
-                        className="form-control mt-3"
-                        value={estimatedCompletionDate}
-                        onChange={(e) => setEstimatedCompletionDate(e.target.value)}
-                      />
-                      <button
-                        className="btn btn-danger mt-4"
-                        onClick={handleCreateOrder}
-                      >
-                        Submit Order
-                      </button>
-                    </div>
-                  )}
+              <div className="flex container justify-between bg-white py-6 px-5 border my-4">
+                <div className="selected-vehicle-details">
+                  <h4 className="font-bold text-xl text-blue-900 uppercase">
+                    {selectedVehicle.vehicle_model}
+                  </h4>
+                  <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
+                  <p>Vehicle Type: {selectedVehicle.vehicle_type}</p>
+                  <p>Vehicle Mileage: {selectedVehicle.vehicle_mileage}</p>
+                  <p>Tag: {selectedVehicle.vehicle_tag}</p>
+                  <p>Plate: {selectedVehicle.vehicle_serial}</p>
+                </div>
+                <div className="text-right mt-0">
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => {
+                      setSelectedCustomer(null);
+                      setSelectedVehicle(null);
+                      setVehicles([]);
+                    }}
+                  >
+                    <i className="fa fa-times"></i>
+                  </button>
                 </div>
               </div>
+
+
+              <div className="flex">
+                <div
+                  className={`${
+                    selectedServices.length === 0 ? "w-full" : "w-2/3 h-full"
+                  } transition-all duration-300`}
+                >
+                  <ServiceSelection onSelectServices={handleSelectServices} />
+                </div>
+
+                {/* Assign Employees Section */}
+                {selectedServices.length > 0 && (
+                  <div className="w-1/3 ml-4 mt-12 h-full">
+                    <div className="form-group mt-16 ml-8">
+                      {selectedServices.map((service) => (
+                        <div key={service.service_id} className="mb-2">
+                          <h5 className="italic text-blue-900 text-sm ">{`Assign Employee to ${service.service_name}`}</h5>
+                          <select
+                            className="form-control"
+                            onChange={(e) =>
+                              handleAssignEmployeeToService(
+                                service.service_id,
+                                e.target.value
+                              )
+                            }
+                          >
+                            <option value="">Select an Employee</option>
+                            {employees.map((emp) => (
+                              <option
+                                key={emp.employee_id}
+                                value={emp.employee_id}
+                              >
+                                {`${emp.employee_first_name} ${emp.employee_last_name}`}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Additional Fields Section */}
+              {selectedServices.length > 0 && (
+                <div className="additional-requests mt-8  bg-white p-10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <h5 className="text-2xl font-bold text-blue-900">
+                      Additional requests
+                    </h5>
+                    <div className="h-1 w-16 bg-red-500"></div>
+                  </div>
+
+                  <div className="mb-4">
+                    <textarea
+                      className="form-control border-1  border-gray-300 focus:ring-0 focus:border-blue-500 text-lg placeholder-gray-400 py-2"
+                      placeholder="Service description"
+                      value={additionalRequest}
+                      onChange={(e) => setAdditionalRequest(e.target.value)}
+                      rows={6}
+                    ></textarea>
+                  </div>
+
+                  <div className="mb-4">
+                    <input
+                      type="number"
+                      className="form-control border-1  border-gray-300 focus:ring-0 focus:border-blue-500 text-lg placeholder-gray-400 py-2"
+                      placeholder="Price"
+                      value={orderPrice}
+                      onChange={(e) => setOrderPrice(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mb-6">
+                    <input
+                      type="date"
+                      className="form-control border-1 border-gray-300 focus:ring-0 focus:border-blue-500 text-lg py-2"
+                      value={estimatedCompletionDate}
+                      onChange={(e) => setEstimatedCompletionDate(e.target.value)}
+                    />
+                  </div>
+
+                  <button
+                    className="buttonStyle bg-red-500 px-6 py-2 text-white text-sm font-semibold"
+                    onClick={handleCreateOrder}
+                  >
+                    SUBMIT ORDER
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -391,17 +451,17 @@ const AddOrderForm = () => {
               <tbody>
                 {filteredCustomers.length > 0 ? (
                   filteredCustomers.map((customer) => (
-                    <tr key={customer.customer_id}>
+                    <tr
+                      key={customer.customer_id}
+                      onClick={() => handleSelectCustomer(customer)}
+                    >
                       <td>{customer.customer_first_name}</td>
                       <td>{customer.customer_last_name}</td>
                       <td>{customer.customer_email}</td>
                       <td>{customer.customer_phone}</td>
-                      <td>
-                        <button
-                          className="btn btn-sm "
-                          onClick={() => handleSelectCustomer(customer)}
-                        >
-                          <i className="fas fa-hand-pointer"></i>
+                      <td className="text-center">
+                        <button className="btn btn-sm">
+                          <i className="fas fa-hand-pointer hover:text-blue-700"></i>
                         </button>
                       </td>
                     </tr>

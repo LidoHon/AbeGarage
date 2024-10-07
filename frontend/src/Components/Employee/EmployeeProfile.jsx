@@ -23,7 +23,7 @@ const EmployeeProfile = () => {
     const fetchEmployeeDetails = async () => {
       try {
         setLoading(true);
-        const response = await employeeService.getEmployeeById(employee_id, token); // Fetch employee by ID
+        const response = await employeeService.getEmployeeById(employee_id, token); 
         const employeeData = await response.json();
         
         if (employeeData.status !== "success" || !employeeData.data) {
@@ -31,12 +31,12 @@ const EmployeeProfile = () => {
           return;
         }
 
-        setEmployee(employeeData.data); // Set employee data
+        setEmployee(employeeData.data); 
       } catch (err) {
         console.error("Error occurred fetching employee details:", err);
         setError("An error occurred. Please try again.");
       } finally {
-        setLoading(false); // Stop loading after fetching
+        setLoading(false); 
       }
     };
 
@@ -51,8 +51,8 @@ const EmployeeProfile = () => {
     };
 
     if (employee_id) {
-      fetchEmployeeDetails();  // Fetch employee details
-      fetchAssignedTasks();    // Fetch employee tasks
+      fetchEmployeeDetails();  
+      fetchAssignedTasks();    
     } else {
       setError("No employee ID found.");
       setLoading(false);

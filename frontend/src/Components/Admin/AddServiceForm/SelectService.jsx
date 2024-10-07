@@ -24,35 +24,39 @@ const ServiceSelection = ({ onSelectServices }) => {
     fetchServices();
   }, []);
 
-  const handleServiceSelect = (serviceId) => {
-    const updatedServices = selectedServices.includes(serviceId)
-      ? selectedServices.filter((id) => id !== serviceId)
-      : [...selectedServices, serviceId];
-
+  const handleServiceSelect = (service) => {
+    
+    const updatedServices = selectedServices.some((s) => s.service_id === service.service_id)
+      ? selectedServices.filter((s) => s.service_id !== service.service_id)
+      : [...selectedServices, service];
+  
     setSelectedServices(updatedServices);
-
-    // Now only call onSelectServices after updating selectedServices
-    onSelectServices(updatedServices);
+    onSelectServices(updatedServices); 
   };
 
   return (
-    <div className="service-selection mt-4 container-width">
-      <h4>Choose Service & Assign Employee</h4>
+    <div className="service-selection mt-4 w-full">
+      <div className="flex items-center gap-4 mt-4 mb-4">
+        <h2 className="page-titles text-2xl font-bold  ">
+          Choose service and assign employee
+        </h2>
+        <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+      </div>
       {loading && <p>Loading services...</p>}
       {error && <p className="text-danger">{error}</p>}
       {!loading && services.length > 0 && (
         <div className="list-group">
           {services.map((service) => (
-            <div key={service.service_id} className="list-group-item">
+            <div key={service.service_id} className="list-group-item w-full">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h5>{service.service_name}</h5>
-                  <p>{service.service_description}</p>
+                  <h5 className="text-blue-900 text-lg font-semibold">{service.service_name}</h5>
+                  <p className="text-sm">{service.service_description}</p>
                 </div>
                 <input
                   type="checkbox"
-                  checked={selectedServices.includes(service.service_id)}
-                  onChange={() => handleServiceSelect(service.service_id)}
+                  checked={selectedServices.some((s) => s.service_id === service.service_id)}
+                  onChange={() => handleServiceSelect(service)} 
                 />
               </div>
             </div>

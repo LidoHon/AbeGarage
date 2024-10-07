@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";  // Import useNavigate
 import Avatar from "react-avatar";
 import logo from "../assets/images/logo.png";
 import { loginService } from "./services/login.service.js";
 import { useAuth } from "../Contexts/AuthContext.jsx";
 import getAuth from "./util/auth.js";
-// import jwtDecode from 'jwt-decode';
+
 function Header(props) {
   const {
     isLogged,
@@ -15,9 +15,11 @@ function Header(props) {
     setEmployee,
     setCustomer,
   } = useAuth();
-  // console.log(customer);
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const navigate = useNavigate();  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -27,10 +29,6 @@ function Header(props) {
           setEmployee(loggedInUser);
         } else {
           setCustomer(loggedInUser);
-          console.log("Customer Data:", {
-            firstName: loggedInUser.customer_first_name,
-            id: loggedInUser.customer_id,
-          });
         }
       }
     };
@@ -43,6 +41,7 @@ function Header(props) {
     setIsLogged(false);
     localStorage.removeItem("employee");
     localStorage.removeItem("customer");
+    navigate("/");
   };
 
   const toggleMobileMenu = () => {
@@ -58,7 +57,6 @@ function Header(props) {
   };
 
   const isAdmin = employee && employee.employee_role === 3;
-  const isEmployee = employee && employee.employee_role === 1;
 
   return (
     <header className="main-header bg-white shadow-md">
@@ -82,18 +80,6 @@ function Header(props) {
                       : customer?.customer_first_name}
                   </strong>
                   <div className="relative">
-                    {/* <div onClick={toggleDropdown} className="cursor-pointer">
-                      <Avatar
-                        name={
-                          employee
-                            ? employee.employee_first_name
-                            : customer?.customer_first_name
-                        }
-                        size="40"
-                        round={true}
-                        src={employee?.profile_image || customer?.profile_image}
-                      />
-                    </div> */}
                     {isDropdownOpen && (
                       <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded shadow-lg z-10">
                         {!isAdmin && employee && (
@@ -114,25 +100,17 @@ function Header(props) {
                             Profile
                           </Link>
                         )}
-                        {/* {isAdmin && (
-                          <Link
-                            to="/admin/admin-landing"
-                            className="block px-4 py-2 hover:bg-gray-100"
-                            onClick={closeDropdown}
-                          >
-                            Profile
-                          </Link>
-                        )} */}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="link-btn ml-4">
-                <Link to="/login" className="theme-btn btn-style-one">
-                  Login
-                </Link>
+              <div>
+                <div className="flex items-center">
+                  <span>Call Abe:</span>
+                  <span className="font-bold text-xl pl-4">555 555 555</span>
+                </div>
               </div>
             )}
           </div>
@@ -194,38 +172,45 @@ function Header(props) {
             >
               <ul className="navigation flex flex-col lg:flex-row lg:space-x-4">
                 <li className="dropdown">
-                  <Link to="/" className="hover:text-blue-500">
+                  <Link
+                    to="/"
+                    style={{ textDecoration: "none" }}
+                    className="hover:text-blue-500 "
+                  >
                     Home
                   </Link>
                 </li>
-                {/* {isAdmin && (
-                  <li className="dropdown">
-                    <Link
-                      to="/admin/admin-landing"
-                      className="hover:text-blue-500"
-                    >
-                      Dashboard
-                    </Link>
-                  </li>
-                )} */}
                 <li className="dropdown">
-                  <Link to="/about" className="hover:text-blue-500">
+                  <Link
+                    to="/about"
+                    style={{ textDecoration: "none" }}
+                    className="hover:text-blue-500"
+                  >
                     About Us
                   </Link>
                 </li>
                 <li className="dropdown">
-                  <Link to="/services" className="hover:text-blue-500">
+                  <Link
+                    to="/services"
+                    style={{ textDecoration: "none" }}
+                    className="hover:text-blue-500"
+                  >
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="hover:text-blue-500">
+                  <Link
+                    to="/contact"
+                    style={{ textDecoration: "none" }}
+                    className="hover:text-blue-500"
+                  >
                     Contact Us
                   </Link>
                 </li>
                 {isAdmin && (
                   <li>
                     <Link
+                      style={{ textDecoration: "none" }}
                       to="/admin/admin-landing"
                       className="hover:text-blue-500"
                     >
@@ -233,17 +218,18 @@ function Header(props) {
                     </Link>
                   </li>
                 )}
-                <li></li>
+                <li>
+                  <div
+                    style={{
+                      width: "2px",
+                      backgroundColor: "gray",
+                      height: "30px",
+                      margin: "0 8px",
+                    }}
+                  ></div>
+                </li>
                 {isLogged && (
                   <>
-                    <div
-                      style={{
-                        width: "2px", 
-                        backgroundColor: "gray", 
-                        height: "30px", 
-                        margin: "0 8px", 
-                      }}
-                    ></div>
                     <li>
                       <button
                         onClick={logOut}
@@ -252,6 +238,17 @@ function Header(props) {
                         Logout
                       </button>
                     </li>
+                  </>
+                )}
+                {!isLogged && (
+                  <>
+                    <Link
+                      style={{ textDecoration: "none" }}
+                      to="/login"
+                      className="hover:text-red-500 bg-red-600 text-white hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium  text-sm px-4 py-2.5 text-center dark:bg-red-600 "
+                    >
+                      Login
+                    </Link>
                   </>
                 )}
               </ul>
@@ -274,16 +271,6 @@ function Header(props) {
                   Home
                 </Link>
               </li>
-              {/* {isAdmin && (
-                <li className="dropdown">
-                  <Link
-                    to="/admin/admin-landing"
-                    className="hover:text-blue-500"
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-              )} */}
               <li className="dropdown">
                 <Link to="/about" className="hover:text-blue-500">
                   About Us
@@ -318,6 +305,17 @@ function Header(props) {
                     Logout
                   </button>
                 </li>
+              )}
+              {!isLogged && (
+                <div>
+                  <Link
+                    style={{ textDecoration: "none" }}
+                    to="/login"
+                    className=" p-[12px] bg-red-600 text-white font-semibold underline-none rounded-md hover:bg-red-700"
+                  >
+                    Login
+                  </Link>
+                </div>
               )}
             </ul>
           </div>

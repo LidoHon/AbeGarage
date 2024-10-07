@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button, Form, Spinner } from "react-bootstrap";
 import employeeService from "../../services/employee.service";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useParams, useNavigate } from "react-router-dom";avigate
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const UpdateEmployeeForm = ({ onSuccess }) => {
   const { employee_id } = useParams(); 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [employee_email, setEmail] = useState("");
   const [employee_first_name, setFirstName] = useState("");
   const [employee_last_name, setLastName] = useState("");
@@ -88,10 +88,10 @@ const UpdateEmployeeForm = ({ onSuccess }) => {
         } else {
           toast.success("Employee updated successfully");
 
-          // Redirect to employee list after successful update
+          
           setTimeout(() => {
-            navigate("/admin/employees"); // Navigate to employee list
-          }, 2000); // Allow time to display the toast message
+            navigate("/admin/employees"); 
+          }, 2000);
         }
       })
       .catch((error) => {
