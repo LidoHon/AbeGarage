@@ -1,70 +1,73 @@
 import { useState, useEffect } from "react";
-import { Button, Form, Alert, Row,Col } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import employeeService from "../../services/employee.service";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
+const UpdateEmployeeForm = ({ onSuccess }) => {
+  const { employee_id } = useParams(); 
+  const navigate = useNavigate(); // Initialize useNavigate
   const [employee_email, setEmail] = useState("");
   const [employee_first_name, setFirstName] = useState("");
   const [employee_last_name, setLastName] = useState("");
   const [employee_phone, setPhoneNumber] = useState("");
   const [employee_password, setPassword] = useState("");
-  const [active_employee, setActive_employee] = useState(1);
-  const [company_role_id, setCompany_role_id] = useState(1);
+  const [active_employee, setActive_employee] = useState(1); 
+  const [company_role_id, setCompany_role_id] = useState(1); 
   const [emailError, setEmailError] = useState("");
   const [firstNameRequired, setFirstNameRequired] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (employee) {
-      setEmail(employee.employee_email);
-      setFirstName(employee.employee_first_name);
-      setLastName(employee.employee_last_name);
-      setPhoneNumber(employee.employee_phone);
-      setActive_employee(employee.active_employee);
-      setCompany_role_id(employee.company_role_id);
-    }
-  }, [employee]);
+    const fetchEmployee = async () => {
+      try {
+        const response = await employeeService.getEmployeeById(employee_id);
+        const data = await response.json();
+        if (data.status === "success" && data.data) {
+          const employeeData = data.data;
+          setEmail(employeeData.employee_email || "");
+          setFirstName(employeeData.employee_first_name || "");
+          setLastName(employeeData.employee_last_name || "");
+          setPhoneNumber(employeeData.employee_phone || "");
+          setActive_employee(employeeData.active_employee !== undefined ? employeeData.active_employee : 1);
+          setCompany_role_id(employeeData.company_role_id || 1);
+        } else {
+          toast.error("No employee data found.");
+        }
+        setLoading(false);
+      } catch (error) {
+        toast.error("Failed to load employee data");
+        setLoading(false);
+      }
+    };
+    fetchEmployee();
+  }, [employee_id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     let valid = true;
+    setEmailError("");
+    setFirstNameRequired("");
+    setPasswordError("");
 
     if (!employee_first_name) {
       setFirstNameRequired("First name is required");
       valid = false;
-    } else {
-      setFirstNameRequired("");
     }
-
     if (!employee_email) {
       setEmailError("Email is required");
       valid = false;
     } else if (!employee_email.includes("@")) {
       setEmailError("Invalid email format");
       valid = false;
-    } else {
-      const regex = /^\S+@\S+\.\S+$/;
-      if (!regex.test(employee_email)) {
-        setEmailError("Invalid email format");
-        valid = false;
-      } else {
-        setEmailError("");
-      }
     }
-
-    if (!employee_password || employee_password.length < 6) {
+    if (employee_password && employee_password.length < 6) {
       setPasswordError("Password must be at least 6 characters long");
       valid = false;
-    } else {
-      setPasswordError("");
     }
-
-    if (!valid) {
-      return;
-    }
+    if (!valid) return;
 
     const formData = {
       employee_email,
@@ -77,143 +80,129 @@ function UpdateEmployeeForm({ employee, onClose, onSuccess }) {
     };
 
     employeeService
-      .updateEmployee(employee.employee_id, formData, employee.employee_token)
+      .updateEmployee(employee_id, formData)
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          setServerError(data.error);
+          toast.error(data.error);
         } else {
-          setSuccess(true);
-          setServerError("");
-          onSuccess();
+          toast.success("Employee updated successfully");
+
+          // Redirect to employee list after successful update
+          setTimeout(() => {
+            navigate("/admin/employees"); // Navigate to employee list
+          }, 2000); // Allow time to display the toast message
         }
       })
       .catch((error) => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-        setServerError(resMessage);
+        toast.error("An error occurred. Please try again later.");
       });
   };
 
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <Spinner animation="border" role="status">
+          <span className="sr-only">Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
   return (
-    <Form
-      onSubmit={handleSubmit}
-      className="p-4 border rounded bg-light"
-      style={{ maxWidth: "400px", margin: "0 auto" }} // Set max width for the form
-    >
-      <Row>
-        <Col md={6}>
-          <Form.Group controlId="formEmail">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              value={employee_email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="Enter email"
-              isInvalid={!!emailError}
-            />
-            <Form.Control.Feedback type="invalid">
-              {emailError}
-            </Form.Control.Feedback>
-          </Form.Group>
+    <div className="container py-5">
+      <ToastContainer />
+      <div className="flex items-center gap-4">
+            <h2 className="page-titles text-3xl font-bold"> Edit: 
+                {employee_first_name} {employee_last_name}
+            </h2>
+            <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
+      </div>
+      <p><strong>Employee email:</strong> {employee_email}</p>
 
-          <Form.Group controlId="formFirstName">
-            <Form.Label>First Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={employee_first_name}
-              onChange={(event) => setFirstName(event.target.value)}
-              placeholder="Enter first name"
-              isInvalid={!!firstNameRequired}
-            />
-            <Form.Control.Feedback type="invalid">
-              {firstNameRequired}
-            </Form.Control.Feedback>
-          </Form.Group>
+      <Form onSubmit={handleSubmit} className="p-4 " style={{ maxWidth: "600px", margin: "0 auto" }}>
+        <Form.Group controlId="formEmail">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            value={employee_email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="Enter email"
+            isInvalid={!!emailError}
+          />
+          <Form.Control.Feedback type="invalid">{emailError}</Form.Control.Feedback>
+        </Form.Group>
 
-          <Form.Group controlId="formLastName">
-            <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={employee_last_name}
-              onChange={(event) => setLastName(event.target.value)}
-              placeholder="Enter last name"
-            />
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          {" "}
-          <Form.Group controlId="formPhone">
-            <Form.Label>Phone Number</Form.Label>
-            <Form.Control
-              type="text"
-              value={employee_phone}
-              onChange={(event) => setPhoneNumber(event.target.value)}
-              placeholder="Enter phone number"
-            />
-          </Form.Group>
-          <Form.Group controlId="formPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              value={employee_password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter password"
-              isInvalid={!!passwordError}
-            />
-            <Form.Control.Feedback type="invalid">
-              {passwordError}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group controlId="formActive">
-            <Form.Label>Active</Form.Label>
-            <Form.Control
-              as="select"
-              value={active_employee}
-              onChange={(event) =>
-                setActive_employee(Number(event.target.value))
-              }
-            >
-              <option value={1}>Yes</option>
-              <option value={0}>No</option>
-            </Form.Control>
-          </Form.Group>
-        </Col>
-      </Row>
+        <Form.Group controlId="formFirstName" className="mt-3">
+          <Form.Label>First Name</Form.Label>
+          <Form.Control
+            type="text"
+            value={employee_first_name}
+            onChange={(event) => setFirstName(event.target.value)}
+            placeholder="Enter first name"
+            isInvalid={!!firstNameRequired}
+          />
+          <Form.Control.Feedback type="invalid">{firstNameRequired}</Form.Control.Feedback>
+        </Form.Group>
 
-      <Form.Group controlId="formRole">
-        <Form.Label>Role</Form.Label>
-        <Form.Control
-          as="select"
-          value={company_role_id}
-          onChange={(event) => setCompany_role_id(Number(event.target.value))}
-        >
-          <option value={1}>Employee</option>
-          <option value={2}>Manager</option>
-          <option value={3}>Admin</option>
-        </Form.Control>
-      </Form.Group>
+        <Form.Group controlId="formLastName" className="mt-3">
+          <Form.Label>Last Name</Form.Label>
+          <Form.Control
+            type="text"
+            value={employee_last_name}
+            onChange={(event) => setLastName(event.target.value)}
+            placeholder="Enter last name"
+          />
+        </Form.Group>
 
-      <Button variant="primary" type="submit" className="mt-3">
-        Update Employee
-      </Button>
+        <Form.Group controlId="formPhone" className="mt-3">
+          <Form.Label>Phone Number</Form.Label>
+          <Form.Control
+            type="text"
+            value={employee_phone}
+            onChange={(event) => setPhoneNumber(event.target.value)}
+            placeholder="Enter phone number"
+          />
+        </Form.Group>
 
-      {serverError && (
-        <Alert variant="danger" className="mt-3">
-          {serverError}
-        </Alert>
-      )}
-      {success && (
-        <Alert variant="success" className="mt-3">
-          Employee updated successfully
-        </Alert>
-      )}
-    </Form>
+        <Form.Group controlId="formPassword" className="mt-3">
+          <Form.Label>Password (optional)</Form.Label>
+          <Form.Control
+            type="password"
+            value={employee_password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Enter new password (leave blank if not changing)"
+            isInvalid={!!passwordError}
+          />
+          <Form.Control.Feedback type="invalid">{passwordError}</Form.Control.Feedback>
+        </Form.Group>
+
+        <Form.Group controlId="formRole" className="mt-3">
+          <Form.Label>Role</Form.Label>
+          <Form.Control
+            as="select"
+            value={company_role_id}
+            onChange={(event) => setCompany_role_id(Number(event.target.value))}
+          >
+            <option value={1}>Employee</option>
+            <option value={2}>Manager</option>
+            <option value={3}>Admin</option>
+          </Form.Control>
+        </Form.Group>
+        <Form.Group controlId="formActive" className="mt-3">
+          <Form.Check
+            type="checkbox"
+            label="Is active employee"
+            checked={active_employee === 1}
+            onChange={(event) => setActive_employee(event.target.checked ? 1 : 0)}
+          />
+        </Form.Group>
+        <button  type="submit" className=" buttonStyle mt-4 w-36">
+          UPDATE
+        </button>
+      </Form>
+    </div>
   );
-}
+};
 
 export default UpdateEmployeeForm;
