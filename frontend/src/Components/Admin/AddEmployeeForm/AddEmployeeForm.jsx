@@ -13,7 +13,6 @@ function AddEmployeeForm(props) {
   const [employee_password, setPassword] = useState("");
   const [active_employee, setActive_employee] = useState(1);
   const [company_role_id, setCompany_role_id] = useState(1);
-  // Errors
   const [emailError, setEmailError] = useState("");
   const [firstNameRequired, setFirstNameRequired] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -205,7 +204,7 @@ function AddEmployeeForm(props) {
                       {" "}
                       {/* Add relative positioning */}
                       <input
-                        type={showPassword ? "text" : "password"} // Toggle input type
+                        type={showPassword ? "text" : "password"} 
                         name="employee_password"
                         value={employee_password}
                         onChange={(event) => setPassword(event.target.value)}

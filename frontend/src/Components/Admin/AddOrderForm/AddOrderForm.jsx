@@ -4,7 +4,8 @@ import Service from "../../services/order.service";
 import ServiceSelection from "../AddServiceForm/SelectService";
 import getAuth from "../../util/auth";
 import { Table, Form } from "react-bootstrap";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [customers, setCustomers] = useState([]);
@@ -45,7 +46,7 @@ const AddOrderForm = () => {
     }
   }, [searchQuery]);
 
-  // Fetch employees only after services have been selected
+  
   useEffect(() => {
     if (selectedServices.length > 0) {
 console.log(first)
@@ -72,9 +73,7 @@ console.log(first)
           customer.customer_last_name
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
-          customer.customer_email
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
+          customer.customer_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           customer.customer_phone.includes(searchQuery)
       );
       setFilteredCustomers(filtered);
@@ -101,9 +100,9 @@ console.log(first)
   };
 
   const handleSelectServices = (services) => {
-
-    const updatedServiceData = services.map((serviceId) => ({
-      service_id: serviceId,
+    const updatedServiceData = services.map((service) => ({
+      service_id: service.service_id,
+      service_name: service.service_name,
       service_completed: 0,
     }));
     setSelectedServices(updatedServiceData);
@@ -129,64 +128,70 @@ console.log(first)
     selectedServices.length > 0 &&
     serviceAssignments.every((assignment) => assignment.employee_id !== null);
 
-  const handleCreateOrder = async () => {
-    if (
-      !selectedCustomer ||
-      !selectedVehicle ||
-      !orderPrice ||
-      !estimatedCompletionDate ||
-      !additionalRequest ||
-      selectedServices.length === 0 ||
-      serviceAssignments.length === 0
-    ) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    try {
-      const employee = await getAuth();
-
-      if (!employee || !employee.employee_id) {
-        throw new Error("Employee not found or not authenticated.");
+    const handleCreateOrder = async () => {
+      if (
+        !selectedCustomer ||
+        !selectedVehicle ||
+        !orderPrice ||
+        !estimatedCompletionDate ||
+        !additionalRequest ||
+        selectedServices.length === 0 ||
+        serviceAssignments.length === 0
+      ) {
+        toast.error("Please fill in all required fields.");
+        return;
       }
-
-      // Log data for order creation
-      const orderData = {
-        customer_id: selectedCustomer.customer_id,
-        vehicle_id: selectedVehicle.vehicle_id,
-        employee_id: employee.employee_id,
-        active_order: 1,
-        order_hash: generateOrderHash(),
-        order_status: 1,
-      };
-
-      const orderInfoData = {
-        order_total_price: orderPrice,
-        additional_request: additionalRequest,
-        estimated_completion_date: estimatedCompletionDate,
-        additional_requests_completed: 0,
-      };
-
-      const orderServiceData = serviceAssignments.map((assignment) => ({
-        service_id: assignment.service_id,
-        employee_id: assignment.employee_id,
-        service_completed: 0,
-      }));
-
-      // Send the order creation request to the backend
-      await Service.createOrder({
-        orderData,
-        orderInfoData,
-        orderServiceData,
-      });
-
-      alert("Order created successfully.");
-      navigate("/admin/orders");
-    } catch (err) {
-      setError("Error creating the order. Please try again.");
-      console.error("Error in handleCreateOrder:", err);
-    }
-  };
+    
+      try {
+        const employee = await getAuth();
+    
+        if (!employee || !employee.employee_id) {
+          throw new Error("Employee not found or not authenticated.");
+        }
+    
+        
+        const orderData = {
+          customer_id: selectedCustomer.customer_id,
+          vehicle_id: selectedVehicle.vehicle_id,
+          employee_id: employee.employee_id,
+          active_order: 1,
+          order_hash: generateOrderHash(),
+          order_status: 1,
+        };
+    
+        const orderInfoData = {
+          order_total_price: orderPrice,
+          additional_request: additionalRequest,
+          estimated_completion_date: estimatedCompletionDate,
+          additional_requests_completed: 0,
+        };
+    
+        const orderServiceData = serviceAssignments.map((assignment) => ({
+          service_id: assignment.service_id,
+          employee_id: assignment.employee_id,
+          service_completed: 0,
+        }));
+    
+        console.log("Order Data:", orderData);
+        console.log("Order Info Data:", orderInfoData);
+        console.log("Order Service Data:", orderServiceData);
+    
+        
+        await Service.createOrder({
+          orderData,
+          orderInfoData,
+          orderServiceData,
+        });
+    
+        
+        toast.success("Order created successfully!");
+        navigate("/admin/orders");
+      } catch (err) {
+        console.error("Error in handleCreateOrder:", err);
+        toast.error("Error creating the order. Please try again.");
+      }
+    };
+    
 
   const generateOrderHash = () => {
     return (
@@ -197,17 +202,22 @@ console.log(first)
 
   return (
     <div className="container pb-5">
+      <ToastContainer /> 
       <div className="flex items-center gap-4 mt-4 mb-4">
+        <h2 className="page-titles text-3xl font-bold mb-4 mt-4">
+          Create a new order
+        </h2>
         <h2 className="page-titles text-3xl font-bold mb-4 mt-4">
           Create a new order
         </h2>
         <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
       </div>
+
       {selectedCustomer ? (
-        <div className="selected-customer-detail p-3">
-          <div className="flex container justify-between bg-slate-50 py-10 px-5 border rounded-lg ">
+        <div className="selected-customer-detail py-3 px-10">
+          <div className="flex container justify-between bg-white py-10 px-5 border ">
             <div className=" ">
-              <h3 className="font-bold text-2xl text-blue-900 uppercase">
+              <h3 className="font-bold text-xl text-blue-900 uppercase">
                 {selectedCustomer.customer_first_name}{" "}
                 {selectedCustomer.customer_last_name}
               </h3>
@@ -230,7 +240,11 @@ console.log(first)
 
           {!selectedVehicle && (
             <>
-              <h4 className="mt-4">Select a Vehicle</h4>
+              <div className="flex items-center gap-4 mt-4 mb-4">
+                <h2 className="page-titles text-xl font-bold">
+                  Choose a vehicle
+                </h2>
+              </div>
               {vehicles.length === 0 ? (
                 <>
                   <p>No vehicles found for this customer.</p>
@@ -300,9 +314,9 @@ console.log(first)
 
           {selectedVehicle && (
             <>
-              <div className="flex container justify-between bg-slate-50 py-6 px-5 border rounded-lg my-4">
+              <div className="flex container justify-between bg-white py-6 px-5 border my-4">
                 <div className="selected-vehicle-details">
-                  <h4 className="font-bold text-2xl text-blue-900 uppercase">
+                  <h4 className="font-bold text-xl text-blue-900 uppercase">
                     {selectedVehicle.vehicle_model}
                   </h4>
                   <p>Vehicle Year: {selectedVehicle.vehicle_year}</p>
@@ -325,74 +339,96 @@ console.log(first)
                 </div>
               </div>
 
-              <div className="pb-10">
-                <ServiceSelection onSelectServices={handleSelectServices} />
-                <div className="container p-6 bg-white rounded-lg border my-4">
-                  <h4 className="text-xl font-bold my-4 text-blue-800">
-                    Assign Employees
-                  </h4>
-                  <div className="form-group">
-                    {
-                    selectedServices.map((service) => (
-                      <div key={service.service_id} className="mt-3">
-                        <h5 className="font-bold text-blue-800">{`Assign Employee to service: ${service.service_id}`}</h5>
-                        <select
-                          className="form-control my-3"
-                          onChange={(e) =>
-                            handleAssignEmployeeToService(
-                              service.service_id,
-                              e.target.value
-                            )
-                          }
-                        >
-                          <option value="">Select an Employee</option>
-                          {employees.map((emp) => (
-                            <option
-                              key={emp.employee_id}
-                              value={emp.employee_id}
-                            >
-                              {`${emp.employee_first_name} ${emp.employee_last_name}`}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
+
+              <div className="flex">
+                <div
+                  className={`${
+                    selectedServices.length === 0 ? "w-full" : "w-2/3 h-full"
+                  } transition-all duration-300`}
+                >
+                  <ServiceSelection onSelectServices={handleSelectServices} />
+                </div>
+
+                {/* Assign Employees Section */}
+                {selectedServices.length > 0 && (
+                  <div className="w-1/3 ml-4 mt-12 h-full">
+                    <div className="form-group mt-16 ml-8">
+                      {selectedServices.map((service) => (
+                        <div key={service.service_id} className="mb-2">
+                          <h5 className="italic text-blue-900 text-sm ">{`Assign Employee to ${service.service_name}`}</h5>
+                          <select
+                            className="form-control"
+                            onChange={(e) =>
+                              handleAssignEmployeeToService(
+                                service.service_id,
+                                e.target.value
+                              )
+                            }
+                          >
+                            <option value="">Select an Employee</option>
+                            {employees.map((emp) => (
+                              <option
+                                key={emp.employee_id}
+                                value={emp.employee_id}
+                              >
+                                {`${emp.employee_first_name} ${emp.employee_last_name}`}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Additional Fields Section */}
+              {selectedServices.length > 0 && (
+                <div className="additional-requests mt-8  bg-white p-10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <h5 className="text-2xl font-bold text-blue-900">
+                      Additional requests
+                    </h5>
+                    <div className="h-1 w-16 bg-red-500"></div>
                   </div>
 
-                  {allEmployeesAssigned && (
-                    <div>
-                      <input
-                        type="text"
-                        className="form-control mt-3"
-                        placeholder="Enter service description"
-                        value={additionalRequest}
-                        onChange={(e) => setAdditionalRequest(e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        className="form-control mt-3"
-                        placeholder="Enter price"
-                        value={orderPrice}
-                        onChange={(e) => setOrderPrice(e.target.value)}
-                      />
-                      <input
-                        type="date"
-                        className="form-control mt-3"
-                        value={estimatedCompletionDate}
-                        onChange={(e) =>
-                          setEstimatedCompletionDate(e.target.value)
-                        }
-                      />
-                      <button
-                        className="btn btn-danger mt-4"
-                        onClick={handleCreateOrder}
-                      >
-                        Submit Order
-                      </button>
-                    </div>
-                  )}
+                  <div className="mb-4">
+                    <textarea
+                      className="form-control border-1  border-gray-300 focus:ring-0 focus:border-blue-500 text-lg placeholder-gray-400 py-2"
+                      placeholder="Service description"
+                      value={additionalRequest}
+                      onChange={(e) => setAdditionalRequest(e.target.value)}
+                      rows={6}
+                    ></textarea>
+                  </div>
+
+                  <div className="mb-4">
+                    <input
+                      type="number"
+                      className="form-control border-1  border-gray-300 focus:ring-0 focus:border-blue-500 text-lg placeholder-gray-400 py-2"
+                      placeholder="Price"
+                      value={orderPrice}
+                      onChange={(e) => setOrderPrice(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mb-6">
+                    <input
+                      type="date"
+                      className="form-control border-1 border-gray-300 focus:ring-0 focus:border-blue-500 text-lg py-2"
+                      value={estimatedCompletionDate}
+                      onChange={(e) => setEstimatedCompletionDate(e.target.value)}
+                    />
+                  </div>
+
+                  <button
+                    className="buttonStyle bg-red-500 px-6 py-2 text-white text-sm font-semibold"
+                    onClick={handleCreateOrder}
+                  >
+                    SUBMIT ORDER
+                  </button>
                 </div>
-              </div>
+              )}
             </>
           )}
         </div>

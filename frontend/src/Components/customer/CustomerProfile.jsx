@@ -247,12 +247,6 @@ const CustomerProfile = () => {
                 onClick={() => handleEdit(customerData)}
               />
             </p>
-            {/* <Button
-                variant="link"
-                href={/admin/edit-customer/${customer_id}}
-              >
-                <i className="fa fa-edit"></i> Edit customer info
-              </Button> */}
           </div>
 
           <div>
@@ -310,7 +304,7 @@ const CustomerProfile = () => {
                           <i className="fa fa-edit"></i> Edit
                         </Button>
                         <Button
-                          className="bg-inherit border-0"
+                          className=" border-0"
                           onClick={() =>
                             handleDeleteVehicle(vehicle.vehicle_id)
                           }
@@ -346,7 +340,7 @@ const CustomerProfile = () => {
           {/* orders */}
           <div className="my-6">
             <h3 className="text-2xl font-bold text-blue-800">
-              Orders of {customerData.customer_first_name}
+              Your orders: 
             </h3>
             {orders.length > 0 ? (
               <ul>
@@ -358,7 +352,6 @@ const CustomerProfile = () => {
                       </p>
                       <Link to={`/admin/order/${order.order_id}`}>
                         <button
-                          // variant="danger"
                           className="bg-gray-700 text-white px-2  py-1 hover:bg-gray-500 hover:translate-x-2  "
                         >
                           View Order Details

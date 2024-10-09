@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import employeeService from "../../Components/services/employee.service";
-import Service from "../../Components/services/order.service";
 import { useAuth } from "../../Contexts/AuthContext";
 import { Spinner, Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { FaEllipsisV } from "react-icons/fa"; 
@@ -19,22 +18,25 @@ const EmployeeProfile = () => {
 
   const employee_id = paramEmployeeId || (isEmployee ? authEmployee.employee_id : null);
 
+  // Fetch employee details using getEmployeeById instead of getEmployeesByRole
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
       try {
         setLoading(true);
-        const employees = await Service.getEmployeesByRole(1); 
-        const employee = employees.find(emp => emp.employee_id === parseInt(employee_id));
-
-        if (!employee) {
+        const response = await employeeService.getEmployeeById(employee_id, token); 
+        const employeeData = await response.json();
+        
+        if (employeeData.status !== "success" || !employeeData.data) {
           setError("Employee not found.");
           return;
         }
 
-        setEmployee(employee);
+        setEmployee(employeeData.data); 
       } catch (err) {
         console.error("Error occurred fetching employee details:", err);
         setError("An error occurred. Please try again.");
+      } finally {
+        setLoading(false); 
       }
     };
 
@@ -46,14 +48,12 @@ const EmployeeProfile = () => {
       } catch (err) {
         console.error("An error occurred fetching tasks:", err);
         setError("Failed to load assigned tasks.");
-      } finally {
-        setLoading(false);
       }
     };
 
     if (employee_id) {
-      fetchAssignedTasks();
-      fetchEmployeeDetails();
+      fetchEmployeeDetails();  
+      fetchAssignedTasks();    
     } else {
       setError("No employee ID found.");
       setLoading(false);
@@ -245,8 +245,8 @@ const EmployeeProfile = () => {
 
       <Row>
         {Object.keys(orders)
-          .sort((a, b) => b - a) // Sort order_id keys in descending order
-          .map((order_id) => (
+          .sort((a, b) => b - a) 
+          .map(order_id => (
             <Col key={order_id} md={12} className="mb-4">
               <Card className="shadow-sm w-100">
                 <Card.Body>
@@ -368,7 +368,6 @@ const EmployeeProfile = () => {
       </Row>
     </Container>
   );
-
 };
 
 export default EmployeeProfile;

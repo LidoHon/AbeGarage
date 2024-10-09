@@ -192,6 +192,7 @@ async function updateCustomer(customer_id, customerData) {
   try {
     console.log("Customer data received for update:", customerData);
 
+    // Update customer email, if provided
     if (customerData.customer_email) {
       const query1 =
         "UPDATE customer SET customer_email = ? WHERE customer_id = ?";
@@ -200,6 +201,7 @@ async function updateCustomer(customer_id, customerData) {
         .catch((err) => console.log("Error in updating customer email:", err));
     }
 
+    // Update customer info (first name, last name, phone)
     const query2 =
       "UPDATE customer_info SET customer_first_name = ?, customer_last_name = ?, customer_phone = ? WHERE customer_id = ?";
     await conn
@@ -211,16 +213,28 @@ async function updateCustomer(customer_id, customerData) {
       ])
       .catch((err) => console.log("Error in updating customer info:", err));
 
+    // Update active_customer status
+    if (customerData.active_customer !== undefined) {
+      const query3 =
+        "UPDATE customer SET active_customer = ? WHERE customer_id = ?";
+      await conn
+        .query(query3, [customerData.active_customer, customer_id])
+        .catch((err) =>
+          console.log("Error in updating active customer status:", err)
+        );
+    }
+
+    // If password needs to be updated
     if (customerData.customer_password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(
         customerData.customer_password,
         salt
       );
-      const query3 =
+      const query4 =
         "UPDATE customer_pass SET customer_password_hashed = ? WHERE customer_id = ?";
       await conn
-        .query(query3, [hashedPassword, customer_id])
+        .query(query4, [hashedPassword, customer_id])
         .catch((err) =>
           console.log("Error in updating customer password:", err)
         );

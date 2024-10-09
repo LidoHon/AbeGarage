@@ -1,24 +1,22 @@
 import { useState, useEffect } from "react";
-import { Table, Modal, Button, Form, Pagination } from "react-bootstrap"; // Added Pagination
+import { Table, Button, Form, Pagination } from "react-bootstrap";
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
 import customerService from "../../services/customer.service";
-import UpdateCustomerForm from "./UpdateCustomer";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 
 const CustomersList = () => {
     const [customers, setCustomers] = useState([]);
     const [apiError, setApiError] = useState(false);
     const [apiErrorMessage, setApiErrorMessage] = useState(null);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [showModal, setShowModal] = useState(false);
     const { employee } = useAuth();
     const [searchQuery, setSearchQuery] = useState(''); 
     const [currentPage, setCurrentPage] = useState(1); 
     const itemsPerPage = 4; 
+    const navigate = useNavigate(); // useNavigate hook
 
     const token = employee?.employee_token || localStorage.getItem("employee_token");
 
@@ -93,9 +91,14 @@ const CustomersList = () => {
         }
     };
 
-    const handleEdit = (customer) => {
-        setSelectedCustomer(customer);
-        setShowModal(true);
+    // Navigate to the EditCustomer page
+    const handleEdit = (customerId) => {
+        navigate(`/admin/customer/${customerId}`);
+    };
+
+    // New function to handle navigation to the customer profile
+    const handleRowClick = (customerId) => {
+        navigate(`/admin/customer-profile/${customerId}`);
     };
 
     // Pagination Logic
@@ -141,136 +144,95 @@ const CustomersList = () => {
                 </div>
               </Form>
 
-              {/* Customers Table */}
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Added Date</th>
-                    <th>Active</th>
-                    <th>Edit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentCustomers.map((customer) => (
-                    <tr
-                      key={customer.customer_id}
-                      style={{ cursor: "pointer" }}
-                      onClick={() =>
-                        (window.location.href = `/admin/customer-profile/${customer.customer_id}`)
-                      }
-                    >
-                      <td>
-                        <Link
-                          to={`/admin/customer-profile/${customer.customer_id}`}
-                        >
-                          {customer.customer_id}
-                        </Link>
-                      </td>
-                      <td>
-                        <strong>{customer.customer_first_name}</strong>
-                      </td>
-                      <td>
-                        <strong>{customer.customer_last_name}</strong>
-                      </td>
-                      <td>{customer.customer_email}</td>
-                      <td>{customer.customer_phone}</td>
-                      <td>
-                        {customer.customer_added_date
-                          ? format(
-                              new Date(customer.customer_added_date),
-                              "MM/dd/yyyy | HH:mm"
-                            )
-                          : "N/A"}
-                      </td>
-                      <td>{customer.active_customer ? "Yes" : "No"}</td>
-                      <td>
-                        <div className="d-flex">
-                          <FaEdit
-                            className="me-3 text-green-600"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handleEdit(customer)}
-                          />
-                          <FaTrashAlt
-                            className="text-red-800"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handleDelete(customer.customer_id)}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+                        {/* Customers Table */}
+                        <Table striped bordered hover responsive>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Added Date</th>
+                                    <th>Active</th>
+                                    <th>Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {currentCustomers.map((customer) => (
+                                    <tr 
+                                        key={customer.customer_id} 
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => handleRowClick(customer.customer_id)} // Navigate to customer profile
+                                    >
+                                        <td>{customer.customer_id}</td>
+                                        <td><strong>{customer.customer_first_name}</strong></td>
+                                        <td><strong>{customer.customer_last_name}</strong></td>
+                                        <td>{customer.customer_email}</td>
+                                        <td>{customer.customer_phone}</td>
+                                        <td>
+                                            {customer.customer_added_date
+                                                ? format(new Date(customer.customer_added_date), "MM/dd/yyyy | HH:mm")
+                                                : "N/A"}
+                                        </td>
+                                        <td>{customer.active_customer ? "Yes" : "No"}</td>
+                                        <td>
+                                            <div className="d-flex">
+                                                <FaEdit
+                                                    className="me-3 text-gray-800"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Prevent row click
+                                                        handleEdit(customer.customer_id); // Navigate to EditCustomer page
+                                                    }}
+                                                />
+                                                <FaTrashAlt
+                                                    className="text-gray-800"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Prevent row click
+                                                        handleDelete(customer.customer_id);
+                                                    }}
+                                                />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
 
-              {/* Pagination */}
-              {filteredCustomers.length > itemsPerPage && (
-                <Pagination className="custom-pagination justify-content-center">
-                  <Pagination.First
-                    onClick={() => paginate(1)}
-                    disabled={currentPage === 1}
-                  >
-                    « First
-                  </Pagination.First>
-                  <Pagination.Prev
-                    onClick={() =>
-                      paginate(currentPage > 1 ? currentPage - 1 : 1)
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    ‹ Previous
-                  </Pagination.Prev>
-                  <Pagination.Next
-                    onClick={() =>
-                      paginate(
-                        currentPage < totalPages ? currentPage + 1 : currentPage
-                      )
-                    }
-                    disabled={currentPage === totalPages}
-                  >
-                    Next ›
-                  </Pagination.Next>
-                  <Pagination.Last
-                    onClick={() => paginate(totalPages)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Last »
-                  </Pagination.Last>
-                </Pagination>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* Bootstrap Modal for Editing Customer */}
-        <Modal
-          show={showModal}
-          onHide={() => setShowModal(false)}
-          className="z-index-1000"
-          centered
-        >
-          <Modal.Dialog className="mx-4">
-            <Modal.Header closeButton>
-              <Modal.Title>Edit Customer</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {selectedCustomer && (
-                <UpdateCustomerForm
-                  customer={selectedCustomer}
-                  onClose={() => setShowModal(false)}
-                  onSuccess={() => {
-                    setShowModal(false);
-                    window.location.reload();
-                  }}
-                />
-              )}
-            </Modal.Body>
-          </Modal.Dialog>
-        </Modal>
+                        {/* Pagination */}
+                        {filteredCustomers.length > itemsPerPage && ( 
+                            <Pagination className="custom-pagination justify-content-center">
+                            <Pagination.First 
+                                onClick={() => paginate(1)} 
+                                disabled={currentPage === 1}
+                            >
+                                « First
+                            </Pagination.First>
+                            <Pagination.Prev 
+                                onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)} 
+                                disabled={currentPage === 1}
+                            >
+                                ‹ Previous
+                            </Pagination.Prev>
+                            <Pagination.Next 
+                                onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : currentPage)} 
+                                disabled={currentPage === totalPages}
+                            >
+                                Next ›
+                            </Pagination.Next>
+                            <Pagination.Last 
+                                onClick={() => paginate(totalPages)} 
+                                disabled={currentPage === totalPages}
+                            >
+                                Last »
+                            </Pagination.Last>
+                        </Pagination>
+                        )}
+                    </div>
+                </section>
+            )}
 
         {/* ToastContainer */}
         <ToastContainer />

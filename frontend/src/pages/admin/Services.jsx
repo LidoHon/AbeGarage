@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AdminMenu from '../../Components/Admin/AdminMenu/AdminMenu'; 
 import AddServiceForm from '../../Components/Admin/AddServiceForm/AddServiceForm';
 import Service from '../../Components/services/service.service'; 
+import { toast } from "react-toastify"; 
 
 const Services = () => {
     const [services, setServices] = useState([]);
@@ -20,9 +21,11 @@ const Services = () => {
                     setNoServices(response.services.length === 0);
                 } else {
                     setError('Failed to fetch services.');
+                    toast.error('Failed to fetch services.');
                 }
             } catch (error) {
                 setError('An error occurred while fetching services.');
+                toast.error('An error occurred while fetching services.');
             } finally {
                 setLoading(false);
             }
@@ -37,10 +40,11 @@ const Services = () => {
 
         try {
             await Service.deleteService(serviceId);
-            // Immediately remove the deleted service from the list
             setServices((prevServices) => prevServices.filter(service => service.service_id !== serviceId));
+            toast.success("Service deleted successfully!");
         } catch (error) {
             setError('Failed to delete the service.');
+            toast.error("Failed to delete service.");
         }
     };
 
@@ -49,7 +53,6 @@ const Services = () => {
     };
 
     const handleServiceUpdated = (updatedService) => {
-        // Update the UI immediately after editing 
         if (editingService) {
             setServices((prevServices) =>
                 prevServices.map(service =>
@@ -59,8 +62,25 @@ const Services = () => {
         } else {
             setServices((prevServices) => [...prevServices, updatedService]);
         }
-
-        setEditingService(null); 
+    
+        setEditingService(null);
+        refetchServices();
+    };
+    
+    const refetchServices = async () => {
+        try {
+            const response = await Service.getAllServices();
+            if (response.status === 'success' && Array.isArray(response.services)) {
+                setServices(response.services);
+                setNoServices(response.services.length === 0);
+            } else {
+                setError('Failed to fetch services.');
+                toast.error('Failed to fetch services.');
+            }
+        } catch (error) {
+            setError('An error occurred while fetching services.');
+            toast.error('An error occurred while fetching services.');
+        }
     };
 
     return (
@@ -87,14 +107,14 @@ const Services = () => {
                         ) : (
                             <ul className="list-group mb-4">
                                 {services.map((service) => (
-                                    <li key={service.service_id} className="list-group-item d-flex justify-content-between align-items-center mb-1 ">
+                                    <li key={service.service_id} className="list-group-item d-flex justify-content-between align-items-center mb-1">
                                         <div>
                                             <h4 className="font-bold page-titles">{service.service_name}</h4>
                                             <p className="text-sm">{service.service_description}</p>
                                         </div>
                                         <div>
                                             <button
-                                                className="btn btn-sm text-red-500 "
+                                                className="btn btn-sm text-red-500"
                                                 onClick={() => handleEditService(service)}
                                             >
                                                 <i className="fa fa-edit"></i>
@@ -111,10 +131,10 @@ const Services = () => {
                             </ul>
                         )}
                         <div className="bg-white p-4">
-                        <div className="flex items-center gap-3 mb-2">
-                            <h4 className="page-titles font-bold text-xl">{editingService ? 'Edit' : 'Add a new'} Service</h4>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h4 className="page-titles font-bold text-xl">{editingService ? 'Edit' : 'Add a new'} Service</h4>
                                 <div className="h-1 w-14 bg-red-500 mr-2 mt-2"></div>
-                        </div>
+                            </div>
                             <AddServiceForm
                                 editingService={editingService}
                                 onServiceUpdated={handleServiceUpdated}

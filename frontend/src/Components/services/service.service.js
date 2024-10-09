@@ -11,7 +11,7 @@ const getAllServices = async () => {
         }
     });
 
-    console.log('Raw response from the API:', response);
+    console.log('Services from the API:', response);
     
     const parsedResponse = await response.json();
     console.log('Parsed response data:', parsedResponse);

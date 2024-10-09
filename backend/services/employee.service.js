@@ -162,6 +162,17 @@ async function updateEmployee(employee_id, employeeData) {
         .catch((err) => console.log("Error in updating employee role:", err));
     }
 
+    // Update active_employee status, if provided
+    if (employeeData.active_employee !== undefined) {
+      const query4 =
+        "UPDATE employee SET active_employee = ? WHERE employee_id = ?";
+      await conn
+        .query(query4, [employeeData.active_employee, employee_id])
+        .catch((err) =>
+          console.log("Error in updating active employee status:", err)
+        );
+    }
+
     // If password needs to be updated
     if (employeeData.employee_password) {
       const salt = await bcrypt.genSalt(10);
@@ -169,10 +180,10 @@ async function updateEmployee(employee_id, employeeData) {
         employeeData.employee_password,
         salt
       );
-      const query4 =
+      const query5 =
         "UPDATE employee_pass SET employee_password_hashed = ? WHERE employee_id = ?";
       await conn
-        .query(query4, [hashedPassword, employee_id])
+        .query(query5, [hashedPassword, employee_id])
         .catch((err) =>
           console.log("Error in updating employee password:", err)
         );

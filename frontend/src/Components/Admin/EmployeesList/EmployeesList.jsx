@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
-import { Table, Modal, Button, Pagination } from "react-bootstrap"; 
+import { Table, Button, Pagination } from "react-bootstrap"; 
 import { useAuth } from "../../../Contexts/AuthContext";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import employeeService from "../../services/employee.service";
-import UpdateEmployeeForm from "./UpdateEmployeeForm";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
   const [apiError, setApiError] = useState(false);
   const [apiErrorMessage, setApiErrorMessage] = useState(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [showModal, setShowModal] = useState(false);
   const { employee } = useAuth();
   const token = employee?.employee_token || null;
   const navigate = useNavigate();
@@ -24,8 +21,6 @@ const EmployeesList = () => {
     const fetchEmployees = async () => {
       try {
         const res = await employeeService.getAllEmployees(token);
-        console.log("Employee response:", res);
-
         if (!res.ok) {
           setApiError(true);
           setApiErrorMessage(getErrorMessage(res.status));
@@ -33,7 +28,6 @@ const EmployeesList = () => {
         }
 
         const data = await res.json();
-        console.log("Parsed Employee Data:", data);
 
         if (data.data.length !== 0) {
           setEmployees(data.data);
@@ -75,16 +69,15 @@ const EmployeesList = () => {
     }
   };
 
-  const handleEdit = (employee) => {
-    setSelectedEmployee(employee);
-    setShowModal(true);
-  };
-
   const handleNavigateToProfile = (employeeId) => {
-    navigate(`/admin/employee-profile/${employeeId}`);
+    navigate(`/admin/employee-profile/${employeeId}`); 
   };
 
-  // Add a utility function to map role IDs to role names
+  const handleEdit = (employeeId) => {
+    navigate(`/admin/employee/${employeeId}`); 
+  };
+
+  
   const getRoleName = (roleId) => {
     switch (roleId) {
       case 1:
@@ -142,23 +135,8 @@ const EmployeesList = () => {
               </thead>
               <tbody>
                 {currentEmployees.map((employee) => (
-                  <tr
-                    key={employee.employee_id}
-                    onClick={() =>
-                      handleNavigateToProfile(employee.employee_id)
-                    }
-                  >
-                    <td>
-                      <Button
-                        variant="link"
-                        className="p-0 text-gray-800 no-underline"
-                        onClick={() =>
-                          handleNavigateToProfile(employee.employee_id)
-                        }
-                      >
-                        {employee.employee_id}
-                      </Button>
-                    </td>
+                  <tr key={employee.employee_id} onClick={() => handleNavigateToProfile(employee.employee_id)} style={{ cursor: "pointer" }}>
+                    <td>{employee.employee_id}</td>
                     <td>{employee.active_employee ? "Yes" : "No"}</td>
                     <td>{employee.employee_first_name}</td>
                     <td>{employee.employee_last_name}</td>
@@ -180,12 +158,18 @@ const EmployeesList = () => {
                         <FaEdit
                           className="me-2 text-green-600"
                           style={{ cursor: "pointer" }}
-                          onClick={() => handleEdit(employee)}
+                          onClick={(e) => {
+                            e.stopPropagation(); 
+                            handleEdit(employee.employee_id);
+                          }}
                         />
                         <FaTrashAlt
                           className="text-red-800"
                           style={{ cursor: "pointer" }}
-                          onClick={() => handleDelete(employee.employee_id)}
+                          onClick={(e) => {
+                            e.stopPropagation(); 
+                            handleDelete(employee.employee_id);
+                          }}
                         />
                       </div>
                     </td>
@@ -232,32 +216,6 @@ const EmployeesList = () => {
           </div>
         </section>
       )}
-
-      {/* Bootstrap Modal for Editing Employee */}
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        size="md"
-        centered
-      >
-        <Modal.Dialog className="modal-dialog-custom ">
-          <Modal.Header closeButton>
-            <Modal.Title>Edit Employee</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {selectedEmployee && (
-              <UpdateEmployeeForm
-                employee={selectedEmployee}
-                onClose={() => setShowModal(false)}
-                onSuccess={() => {
-                  setShowModal(false);
-                  window.location.reload();
-                }}
-              />
-            )}
-          </Modal.Body>
-        </Modal.Dialog>
-      </Modal>
     </div>
   );
 };

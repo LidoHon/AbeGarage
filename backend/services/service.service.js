@@ -5,6 +5,7 @@ const getAllServices = async () => {
     try {
         const query = 'SELECT * FROM common_services';
         const services = await db.query(query); 
+        console.log('Fetched services from the database:', services);
         return services;
     } catch (error) {
         console.error('Error fetching services from the database:', error);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Service from "../../services/service.service";
+import { toast } from "react-toastify"; 
 
 const AddServiceForm = ({ editingService, onServiceUpdated }) => {
   const [serviceName, setServiceName] = useState("");
@@ -21,59 +22,61 @@ const AddServiceForm = ({ editingService, onServiceUpdated }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     const serviceData = {
       service_name: serviceName,
       service_description: serviceDescription,
     };
-
+  
     try {
+      let response;
       if (editingService) {
-        // Edit existing service
-        const updatedService = await Service.updateService(
-          editingService.service_id,
-          serviceData
-        );
-        onServiceUpdated(updatedService);
+        response = await Service.updateService(editingService.service_id, serviceData);
       } else {
-        // Add new service
-        const newService = await Service.addService(serviceData);
-        onServiceUpdated(newService);
+        response = await Service.addService(serviceData);
       }
-
-      // Clear the form inputs
-      setServiceName("");
-      setServiceDescription("");
+  
+      if (response && response.status === "success") {
+        onServiceUpdated(response.service); 
+        toast.success(`${editingService ? "Service updated" : "Service added"} successfully!`);
+  
+        // Reset form fields
+        setServiceName("");
+        setServiceDescription("");
+      } else {
+        setError("Failed to add or update service. Please try again.");
+        toast.error("Failed to save service.");
+      }
     } catch (error) {
       setError("An error occurred. Please try again.");
+      toast.error("An error occurred.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       <div className="form-group mb-3">
-        {/* <label htmlFor="serviceName">Service Name</label> */}
         <input
           type="text"
           className="form-control form-control-sm py-2 rounded-none px-4"
           id="serviceName"
           value={serviceName}
           onChange={(e) => setServiceName(e.target.value)}
-          placeholder="service name"
+          placeholder="Service Name"
         />
       </div>
 
       <div className="form-group mb-3">
-        {/* <label htmlFor="serviceDescription">Service Description</label> */}
         <textarea
           className="form-control form-control-sm py-2 rounded-none px-4"
           id="serviceDescription"
           rows="8"
           value={serviceDescription}
           onChange={(e) => setServiceDescription(e.target.value)}
-          placeholder="service description"
+          placeholder="Service Description"
         ></textarea>
       </div>
 
