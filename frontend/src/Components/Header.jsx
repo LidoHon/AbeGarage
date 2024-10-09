@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";  // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";  
 import Avatar from "react-avatar";
 import logo from "../assets/images/logo.png";
 import { loginService } from "./services/login.service.js";
