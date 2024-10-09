@@ -46,7 +46,7 @@ const AddOrderForm = () => {
     }
   }, [searchQuery]);
 
-  // Fetch employees only after services have been selected
+  
   useEffect(() => {
     if (selectedServices.length > 0) {
       const fetchEmployees = async () => {
