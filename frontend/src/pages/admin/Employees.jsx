@@ -1,15 +1,24 @@
-
-// Import the auth hook
+import { useEffect, useState } from "react";
 import { useAuth } from "../../Contexts/AuthContext";
-// Import the login form component
 import LoginForm from "../../Components/LoginForm/LoginForm";
-// Import the admin menu component
 import AdminMenu from "../../Components/Admin/AdminMenu/AdminMenu";
-// Import the EmployeesList component
 import EmployeesList from "../../Components/Admin/EmployeesList/EmployeesList";
+import Unauthorized from "../Unauthorized";
+
 function Employees() {
-  // Destructure the auth hook
   const { isLogged, isAdmin } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  // Simulate a loading period to ensure auth state is properly checked
+  useEffect(() => {
+    if (isLogged !== undefined && isAdmin !== undefined) {
+      setLoading(false);
+    }
+  }, [isLogged, isAdmin]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (isLogged) {
     if (isAdmin) {
@@ -28,18 +37,10 @@ function Employees() {
         </div>
       );
     } else {
-      return (
-        <div>
-          <h1>You are not authorized to access this page</h1>
-        </div>
-      );
+      return <Unauthorized />;
     }
   } else {
-    return (
-      <div>
-        <LoginForm />
-      </div>
-    );
+    return <LoginForm />;
   }
 }
 

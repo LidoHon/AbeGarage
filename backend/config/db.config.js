@@ -1,4 +1,11 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config(); // Load environment variables here
+
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASS:', process.env.DB_PASS);
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_NAME:', process.env.DB_NAME);
+
 const dbConfig = {
   connectionLimit: 10,
   password: process.env.DB_PASS,

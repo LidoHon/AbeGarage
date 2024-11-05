@@ -130,7 +130,6 @@ const getEmployeeTasks = async (employee_id) => {
 const updateTaskStatus = async (task_id, status, token) => {
   try {
     console.log(`[UpdateTaskStatus] New status to send: ${status}`);
-    
 
     const response = await fetch(`${api_url}/api/employees/tasks/${task_id}/status`, {
       method: "PUT",
@@ -138,21 +137,32 @@ const updateTaskStatus = async (task_id, status, token) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ status: Number(status) }),  // Ensure it's a number
+      body: JSON.stringify({ status: Number(status) }),
     });
-   
+
+    console.log("[UpdateTaskStatus] Raw Response:", response);
+
     if (!response.ok) {
       const errorMsg = `Failed to update task status. Status: ${response.status}, StatusText: ${response.statusText}`;
       console.error(`[UpdateTaskStatus] ${errorMsg}`);
       throw new Error(errorMsg);
     }
 
-    return await response.json();
+    // Parsing the JSON response and adding additional logging
+    const parsedResponse = await response.json();
+    console.log("[UpdateTaskStatus] Parsed Response:", parsedResponse);
+
+    if (!parsedResponse.success) {
+      throw new Error("API response does not contain 'success: true'");
+    }
+
+    return parsedResponse;
   } catch (error) {
     console.error(`[UpdateTaskStatus] Error occurred while updating task status:`, error);
     throw error;
   }
 };
+
 
 
 

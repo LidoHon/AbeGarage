@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Service from "../../services/order.service";
 import ServiceSelection from "../AddServiceForm/SelectService";
+import AddVehicleForm from "../AddVehicleForm/AddVehicleForm";
 import getAuth from "../../util/auth";
-import { Table, Form } from "react-bootstrap";
+import { Table, Form, Button, Card } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; 
+import "react-toastify/dist/ReactToastify.css";
+
 const AddOrderForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [customers, setCustomers] = useState([]);
@@ -17,13 +19,17 @@ const AddOrderForm = () => {
   const [error, setError] = useState("");
   const [selectedServices, setSelectedServices] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [serviceAssignments, setServiceAssignments] = useState([]);
+  const [serviceAssignments, setServiceAssignments] = useState({});
   const [additionalRequest, setAdditionalRequest] = useState("");
   const [orderPrice, setOrderPrice] = useState("");
   const [estimatedCompletionDate, setEstimatedCompletionDate] = useState("");
+  const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
 
   const navigate = useNavigate();
 
+  const handleCloseAddVehicleForm = () => {
+    setShowAddVehicleForm(false); // Close Add Vehicle Form
+  };
   // Fetch customers based on the search query
   useEffect(() => {
     if (searchQuery) {
@@ -46,7 +52,6 @@ const AddOrderForm = () => {
     }
   }, [searchQuery]);
 
-  
   useEffect(() => {
     if (selectedServices.length > 0) {
       const fetchEmployees = async () => {
@@ -106,93 +111,100 @@ const AddOrderForm = () => {
     }));
     setSelectedServices(updatedServiceData);
 
-    const assignments = updatedServiceData.map((service) => ({
-      service_id: service.service_id,
-      employee_id: null,
+    const newAssignments = updatedServiceData.reduce((acc, service) => {
+      if (!serviceAssignments[service.service_id]) {
+        acc[service.service_id] = null;
+      }
+      return acc;
+    }, {});
+    setServiceAssignments((prevAssignments) => ({
+      ...prevAssignments,
+      ...newAssignments,
     }));
-    setServiceAssignments(assignments);
   };
 
   const handleAssignEmployeeToService = (serviceId, employeeId) => {
-    const updatedAssignments = serviceAssignments.map((assignment) => {
-      if (assignment.service_id === serviceId) {
-        return { ...assignment, employee_id: employeeId };
-      }
-      return assignment;
-    });
-    setServiceAssignments(updatedAssignments);
+    setServiceAssignments((prevAssignments) => ({
+      ...prevAssignments,
+      [serviceId]: employeeId,
+    }));
   };
 
-    const handleCreateOrder = async () => {
-      if (
-        !selectedCustomer ||
-        !selectedVehicle ||
-        !orderPrice ||
-        !estimatedCompletionDate ||
-        !additionalRequest ||
-        selectedServices.length === 0 ||
-        serviceAssignments.length === 0
-      ) {
-        toast.error("Please fill in all required fields.");
-        return;
+  const handleCreateOrder = async () => {
+    if (
+      !selectedCustomer ||
+      !selectedVehicle ||
+      !orderPrice ||
+      !estimatedCompletionDate ||
+      !additionalRequest ||
+      selectedServices.length === 0 ||
+      Object.values(serviceAssignments).some((employeeId) => employeeId === null) // Ensure all services have an employee
+    ) {
+      toast.error("Please fill in all required fields and assign employees to each service.");
+      return;
+    }
+
+    try {
+      const employee = await getAuth();
+
+      if (!employee || !employee.employee_id) {
+        throw new Error("Employee not found or not authenticated.");
       }
-    
-      try {
-        const employee = await getAuth();
-    
-        if (!employee || !employee.employee_id) {
-          throw new Error("Employee not found or not authenticated.");
-        }
-    
-        
-        const orderData = {
-          customer_id: selectedCustomer.customer_id,
-          vehicle_id: selectedVehicle.vehicle_id,
-          employee_id: employee.employee_id,
-          active_order: 1,
-          order_hash: generateOrderHash(),
-          order_status: 1,
-        };
-    
-        const orderInfoData = {
-          order_total_price: orderPrice,
-          additional_request: additionalRequest,
-          estimated_completion_date: estimatedCompletionDate,
-          additional_requests_completed: 0,
-        };
-    
-        const orderServiceData = serviceAssignments.map((assignment) => ({
-          service_id: assignment.service_id,
-          employee_id: assignment.employee_id,
-          service_completed: 0,
-        }));
-    
-        console.log("Order Data:", orderData);
-        console.log("Order Info Data:", orderInfoData);
-        console.log("Order Service Data:", orderServiceData);
-    
-        
-        await Service.createOrder({
-          orderData,
-          orderInfoData,
-          orderServiceData,
-        });
-    
-        
-        toast.success("Order created successfully!");
-        navigate("/admin/orders");
-      } catch (err) {
-        console.error("Error in handleCreateOrder:", err);
-        toast.error("Error creating the order. Please try again.");
-      }
-    };
-    
+
+      const orderData = {
+        customer_id: selectedCustomer.customer_id,
+        vehicle_id: selectedVehicle.vehicle_id,
+        employee_id: employee.employee_id,
+        active_order: 1,
+        order_hash: generateOrderHash(),
+        order_status: 1,
+      };
+
+      const orderInfoData = {
+        order_total_price: orderPrice,
+        additional_request: additionalRequest,
+        estimated_completion_date: estimatedCompletionDate,
+        additional_requests_completed: 0,
+      };
+
+      const orderServiceData = selectedServices.map((service) => ({
+        service_id: service.service_id,
+        employee_id: serviceAssignments[service.service_id],
+        service_completed: 0,
+      }));
+
+      console.log("Order Data:", orderData);
+      console.log("Order Info Data:", orderInfoData);
+      console.log("Order Service Data:", orderServiceData);
+
+      await Service.createOrder({
+        orderData,
+        orderInfoData,
+        orderServiceData,
+      });
+
+      toast.success("Order created successfully!");
+      navigate("/admin/orders");
+    } catch (err) {
+      console.error("Error in handleCreateOrder:", err);
+      toast.error("Error creating the order. Please try again.");
+    }
+  };
 
   const generateOrderHash = () => {
     return (
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15)
     );
+  };
+
+  const handleAddVehicleClick = () => {
+    setShowAddVehicleForm(true);
+  };
+
+  const handleVehicleAdded = (newVehicle) => {
+    setVehicles((prevVehicles) => [...prevVehicles, newVehicle]);
+    setShowAddVehicleForm(false);
   };
 
   return (
@@ -237,16 +249,38 @@ const AddOrderForm = () => {
                   Choose a vehicle
                 </h2>
               </div>
-              {vehicles.length === 0 ? (
-                <>
-                  <p>No vehicles found for this customer.</p>
-                  <button
-                    className="theme-btn btn-style-one w-56"
-                    type="submit"
-                  >
-                    <span>Add Vehicle</span>
-                  </button>
-                </>
+                {vehicles.length === 0 ? (
+                  <>
+                    <p>No vehicles found for this customer.</p>
+                    {!showAddVehicleForm && (
+                      <Button
+                        variant="danger"
+                        className="mt-3"
+                        onClick={handleAddVehicleClick}
+                      >
+                        ADD VEHICLE
+                      </Button>
+                    )}
+  
+                    {showAddVehicleForm && (
+                      <Card className="mb-4">
+                        <Card.Body>
+                          <div className="flex justify-end">
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={handleCloseAddVehicleForm}
+                            >
+                              X
+                            </button>
+                          </div>
+                          <AddVehicleForm
+                            customer_id={selectedCustomer.customer_id}
+                            onVehicleAdded={handleVehicleAdded}
+                          />
+                        </Card.Body>
+                      </Card>
+                    )}
+                  </>
               ) : (
                 <>
                   <Table striped bordered hover responsive className="">
@@ -289,7 +323,18 @@ const AddOrderForm = () => {
             </>
           )}
 
-          {selectedVehicle && (
+          {showAddVehicleForm && (
+            <Card className="mb-4">
+              <Card.Body>
+                <AddVehicleForm
+                  customer_id={selectedCustomer.customer_id}
+                  onVehicleAdded={handleVehicleAdded}
+                />
+              </Card.Body>
+            </Card>
+          )}
+
+{selectedVehicle && (
             <>
               <div className="flex container justify-between bg-white py-6 px-5 border my-4">
                 <div className="selected-vehicle-details">
@@ -335,6 +380,7 @@ const AddOrderForm = () => {
                           <h5 className="italic text-blue-900 text-sm ">{`Assign Employee to ${service.service_name}`}</h5>
                           <select
                             className="form-control"
+                            value={serviceAssignments[service.service_id] || ""}
                             onChange={(e) =>
                               handleAssignEmployeeToService(
                                 service.service_id,

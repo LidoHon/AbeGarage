@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Pagination } from "react-bootstrap"; 
+import { Table,  Pagination } from "react-bootstrap"; 
 import Service from "../../services/order.service";
 
 const OrderList = () => {

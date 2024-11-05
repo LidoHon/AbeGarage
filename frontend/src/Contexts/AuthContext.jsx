@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [isEmployee, setIsEmployee] = useState(false);
   const [employee, setEmployee] = useState(null);
   const [customer, setCustomer] = useState(null);
+  
 
   // Function to check localStorage and update the auth state
   useEffect(() => {

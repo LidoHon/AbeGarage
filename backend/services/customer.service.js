@@ -58,33 +58,43 @@ async function createCustomer(customer) {
 
 // A function to get the customer by email
 async function getCustomerByEmail(customer_email) {
-    console.log("Customer email being used for login:", customer_email);
+  console.log("Customer email being used for login:", customer_email);
 
-    if (!customer_email) {
-        throw new Error("Customer email is undefined or invalid");
-    }
+  if (!customer_email) {
+      throw new Error("Customer email is undefined or invalid");
+  }
 
-    const query = `
-    SELECT * 
-    FROM customer 
-    INNER JOIN customer_info ON customer.customer_id = customer_info.customer_id
-    INNER JOIN customer_pass ON customer.customer_id = customer_pass.customer_id
-    WHERE customer.customer_email = ?`;
+  // Explicitly select all the fields needed from both tables, including customer_password_hashed
+  const query = `
+  SELECT 
+    customer.customer_id, 
+    customer.customer_email, 
+    customer_info.customer_first_name, 
+    customer_info.customer_last_name, 
+    customer_info.customer_phone, 
+    customer_pass.customer_password_hashed  -- Add this field for password verification
+  FROM customer 
+  INNER JOIN customer_info ON customer.customer_id = customer_info.customer_id
+  INNER JOIN customer_pass ON customer.customer_id = customer_pass.customer_id
+  WHERE customer.customer_email = ?`;
 
-    try {
-    const rows = await conn.query(query, [customer_email]);
+  try {
+      const rows = await conn.query(query, [customer_email]);
 
-    if (rows.length === 0) {
-        console.log("No customer found with this email:", customer_email);
-        return null;
-    }
+      if (rows.length === 0) {
+          console.log("No customer found with this email:", customer_email);
+          return null;
+      }
 
-    return rows;
-    } catch (error) {
-        console.error("Error fetching customer by email:", error);
-        throw error;
-    }
+      console.log("Fetched customer data:", rows);
+      return rows;
+  } catch (error) {
+      console.error("Error fetching customer by email:", error);
+      throw error;
+  }
 }
+
+
 
 
 // Modified backend code to handle both listing and searching of customers

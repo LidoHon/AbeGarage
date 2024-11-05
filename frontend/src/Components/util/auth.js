@@ -1,29 +1,72 @@
-// Function to read the data from the user's local storage  
-const getAuth = async () => {
-  const employee = await JSON.parse(localStorage.getItem('employee'));
-  if (employee && employee.employee_token) {
-    const decodedToken = await decodeTokenPayload(employee.employee_token);
-    employee.employee_role = decodedToken.employee_role;
-    employee.employee_id = decodedToken.employee_id;
-    employee.employee_first_name = decodedToken.employee_first_name;
-    return employee;
-  } else {
-    return {};
+export const decodeTokenPayload = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+        .join('')
+    );
+
+    const decodedPayload = JSON.parse(jsonPayload);
+    console.log("Decoded Payload:", decodedPayload);
+    return decodedPayload;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return {}; // Return an empty object to avoid undefined errors
   }
 };
 
-// Function to decode the payload from the token
-// The purpose of this code is to take a JWT token, extract its payload, decode it from Base64Url encoding, and then convert the decoded payload into a JavaScript object for further use and manipulation
-const decodeTokenPayload = (token) => {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-      .join('')
-  );
-  return JSON.parse(jsonPayload);
+const getAuth = async () => {
+  const storedEmployee = localStorage.getItem("employee");
+  const storedCustomer = localStorage.getItem("customer");
+
+  console.log("Stored Employee Data:", storedEmployee);
+  console.log("Stored Customer Data:", storedCustomer);
+
+  if (storedEmployee) {
+    try {
+      const parsedEmployee = JSON.parse(storedEmployee);
+      console.log("Parsed Employee from LocalStorage:", parsedEmployee);
+
+      if (parsedEmployee.employee_token) {
+        const decodedEmployee = decodeTokenPayload(parsedEmployee.employee_token);
+        parsedEmployee.employee_id = decodedEmployee.employee_id;
+        console.log("Decoded Employee Data:", parsedEmployee);
+      }
+
+      return parsedEmployee;
+    } catch (error) {
+      console.error("Failed to parse or decode employee from localStorage:", error);
+    }
+  }
+
+  if (storedCustomer) {
+    try {
+      const parsedCustomer = JSON.parse(storedCustomer);
+      console.log("Parsed Customer from LocalStorage:", parsedCustomer);
+
+      if (parsedCustomer.customer_token) {
+        const decodedCustomer = decodeTokenPayload(parsedCustomer.customer_token);
+        console.log("Decoded Customer Payload:", decodedCustomer);
+
+        // Add `customer_id` from the decoded payload to the customer object
+        parsedCustomer.customer_id = decodedCustomer.customer_id;
+
+        if (!parsedCustomer.customer_id) {
+          console.error("customer_id is missing from decoded token!");
+        }
+      }
+
+      return parsedCustomer;
+    } catch (error) {
+      console.error("Failed to parse or decode customer from localStorage:", error);
+    }
+  }
+
+  console.warn("No valid employee or customer data found in localStorage.");
+  return {}; // Return an empty object if nothing is found
 };
 
 export default getAuth;

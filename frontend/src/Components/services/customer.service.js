@@ -90,6 +90,32 @@ const getCustomer = async (customerId, token) => {
     return response;
 };
 
+const getCustomerByEmail = async (email) => {
+    try {
+        const response = await fetch(`${api_url}/api/customer/email`, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }), 
+        });
+    
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.log("Error fetching customer by email:", errorData);
+            throw new Error(errorData.message || "Failed to fetch customer by email");
+        }
+    
+        const data = await response.json();
+        console.log("Customer fetched successfully by email:", data);
+        return data;
+    }
+    catch (error) {
+        console.error("Error occurred while fetching customer by email:", error);
+        throw error;
+    }
+};
+
 // A function to fetch all vehicles for a customer by customer ID
 const getCustomerVehicles = async (customerId, token) => {
     const requestOptions = {
@@ -124,6 +150,7 @@ const customerService = {
     deleteCustomer,
     updateCustomer,
     getCustomer,
+    getCustomerByEmail,
     getCustomerVehicles, 
     getCustomerOrders,    
 };

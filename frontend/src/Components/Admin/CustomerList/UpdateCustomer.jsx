@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import customerService from "../../services/customer.service";
-import { Button, Form, Spinner } from "react-bootstrap";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Form, Spinner } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom"; 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function UpdateCustomerForm() {
-    const { customer_id } = useParams(); // Fetch customer ID from route params
-    const navigate = useNavigate(); // Initialize useNavigate for redirection
+    const { customer_id } = useParams(); 
+    const navigate = useNavigate();
     const [customer_email, setEmail] = useState("");
     const [customer_first_name, setFirstName] = useState("");
     const [customer_last_name, setLastName] = useState("");
@@ -95,11 +95,9 @@ function UpdateCustomerForm() {
                     toast.error(data.error);
                 } else {
                     toast.success("Customer updated successfully");
-
-                    // Delay for 2 seconds before navigating to the customers page
                     setTimeout(() => {
                         navigate("/admin/customers");
-                    }, 2000); // Adjust the delay as necessary
+                    }, 2000); 
                 }
             })
             .catch((error) => {
@@ -113,9 +111,9 @@ function UpdateCustomerForm() {
     }
 
     return (
-        <div className="container py-5">
-            <ToastContainer /> {/* Toast container for displaying toast messages */}
-            <div className="flex items-center gap-4">
+        <div className="container py-5" style={{ maxWidth: "600px", margin: "0 60px" }}>
+            <ToastContainer /> 
+            <div className="flex items-center gap-4 ">
                 <h2 className="page-titles text-3xl font-bold">
                     Edit: {customer_first_name} {customer_last_name}
                 </h2>
@@ -123,7 +121,7 @@ function UpdateCustomerForm() {
             </div>
             <p><strong>Customer email:</strong> {customer_email}</p>
 
-            <Form onSubmit={handleSubmit} className="p-4" style={{ maxWidth: "600px", margin: "0 auto" }}>
+            <Form onSubmit={handleSubmit} className="p-4" >
                 {/* Email */}
                 <Form.Group controlId="formEmail" className="mt-3">
                     <Form.Control

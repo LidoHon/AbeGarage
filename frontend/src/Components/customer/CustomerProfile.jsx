@@ -3,11 +3,17 @@ import { Link, useParams } from "react-router-dom";
 import customerService from "../../Components/services/customer.service";
 import { Button, Row, Col, Card, Modal, Form } from "react-bootstrap";
 import AddVehicleForm from "../../Components/Admin/AddVehicleForm/AddVehicleForm";
+import { useAuth } from "../../Contexts/AuthContext";
 const api_url = import.meta.env.VITE_API_URL;
 import { FcFullTrash } from "react-icons/fc";
 import { FaEdit } from "react-icons/fa";
 const CustomerProfile = () => {
-  const { customer_id } = useParams();
+
+
+  const { customer_id: paramCustomerId } = useParams(); 
+  const { employee, customer } = useAuth(); 
+  // Determine which customer_id to use
+  const customer_id = employee ? paramCustomerId : customer?.customer_id;
 
   const [customerData, setCustomerData] = useState(null);
   const [vehicles, setVehicles] = useState([]);
@@ -15,6 +21,7 @@ const CustomerProfile = () => {
   const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [formData, setFormData] = useState({
     vehicle_make: "",

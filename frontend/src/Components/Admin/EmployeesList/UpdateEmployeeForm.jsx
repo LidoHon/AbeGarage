@@ -101,7 +101,7 @@ const UpdateEmployeeForm = ({ onSuccess }) => {
 
   if (loading) {
     return (
-      <div className="text-center py-5">
+      <div className="text-center py-5" >
         <Spinner animation="border" role="status">
           <span className="sr-only">Loading...</span>
         </Spinner>
@@ -110,7 +110,7 @@ const UpdateEmployeeForm = ({ onSuccess }) => {
   }
 
   return (
-    <div className="container py-5">
+    <div className="container py-5" style={{ maxWidth: "600px", margin: "0 60px" }}>
       <ToastContainer />
       <div className="flex items-center gap-4">
             <h2 className="page-titles text-3xl font-bold"> Edit: 
@@ -120,7 +120,7 @@ const UpdateEmployeeForm = ({ onSuccess }) => {
       </div>
       <p><strong>Employee email:</strong> {employee_email}</p>
 
-      <Form onSubmit={handleSubmit} className="p-4 " style={{ maxWidth: "600px", margin: "0 auto" }}>
+      <Form onSubmit={handleSubmit} className="p-4 " >
         <Form.Group controlId="formEmail">
           <Form.Label>Email</Form.Label>
           <Form.Control

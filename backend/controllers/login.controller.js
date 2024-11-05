@@ -50,11 +50,13 @@ async function logInCustomer(req, res, next) {
       return res.status(403).json({ status: customer.status, message: customer.message });
     }
 
-    // Create JWT payload with customer type
+    // Create JWT payload with customer data
     const payload = {
       customer_id: customer.data.customer_id,
       customer_email: customer.data.customer_email,
       customer_first_name: customer.data.customer_first_name,
+      customer_last_name: customer.data.customer_last_name,
+      customer_phone: customer.data.customer_phone,
       type: "customer"  
     };
 
@@ -68,6 +70,10 @@ async function logInCustomer(req, res, next) {
       data: {
         customer_token: token,
         customer_first_name: customer.data.customer_first_name,
+        customer_last_name: customer.data.customer_last_name,
+        customer_id: customer.data.customer_id,
+        customer_phone: customer.data.customer_phone,
+        customer_email: customer.data.customer_email
       },
     });
   } catch (error) {

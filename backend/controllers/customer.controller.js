@@ -51,6 +51,32 @@ async function getAllCustomers(req, res, next) {
     }
 }
 
+// Controller to get a customer by their ID
+async function getCustomer(req, res) {
+    const { customerId } = req.params;
+    try {
+        const customer = await customerService.getCustomer(customerId);
+    
+        if (!customer) {
+            return res.status(404).json({
+            status: 'fail',
+            message: `No customer found with ID ${customerId}`,
+            });
+        }
+    
+        return res.status(200).json({
+            status: 'success',
+            data: customer,
+        });
+        } catch (error) {
+        console.error('Error fetching customer:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'An error occurred while fetching the customer',
+        });
+        }
+}
+
 // Controller to get a customer profile by ID
 async function getCustomerProfile(req, res, next) {
     const customerId = req.params.customerId;
@@ -176,13 +202,41 @@ async function deleteCustomer(req, res) {
     }
 }
 
+// Controller function to handle fetching a customer by email
+const getCustomerByEmail = async (req, res) => {
+    try {
+        const email = req.body.email;  
+    
+        console.log("Received request to fetch customer by email:", email);
+    
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+    
+        const customer = await customerService.getCustomerByEmail(email);
+    
+        if (!customer) {
+            console.log("Customer not found with email:", email);
+            return res.status(404).json({ message: "Customer not found" });
+        }
+    
+        console.log("Customer fetched successfully:", customer);
+        res.status(200).json(customer); 
+        } catch (error) {
+        console.error("Error fetching customer:", error);
+        res.status(500).json({ message: "An error occurred while fetching customer" });
+        }
+};
+
 // Export the customer controllers
 module.exports = {
     createCustomer,
     getAllCustomers,
+    getCustomer,
     getCustomerProfile,   
     getCustomerVehicles,  
     getCustomerOrders,    
     updateCustomer,
     deleteCustomer,
+    getCustomerByEmail,
 };

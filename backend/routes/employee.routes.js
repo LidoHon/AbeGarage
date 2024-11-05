@@ -6,6 +6,7 @@ const router = express.Router();
 const employeeController = require("../controllers/employee.controller");
 // Import middleware
 const authMiddleware = require("../middlewares/auth.middleware");
+
 // Create a route to handle the add employee request on post
 router.post(
   "/api/employee",
@@ -24,7 +25,7 @@ router.get(
   employeeController.getAllEmployees
 );
 
-// Create a route to handle getting an employee by ID
+// Create a route for admin to handle getting an employee by ID
 router.get(
   "/api/employees/:id", 
   // [authMiddleware.verifyToken, authMiddleware.isAdmin],

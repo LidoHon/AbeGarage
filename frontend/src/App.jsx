@@ -121,7 +121,7 @@ function App() {
           <Route
             path="/admin/customer-profile/:customer_id"
             element={
-              <PrivateAuthRoute roles={[3]}>
+              <PrivateAuthRoute >
                 <CustomerProfile />
               </PrivateAuthRoute>
             }

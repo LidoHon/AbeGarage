@@ -7,6 +7,8 @@ import LoginForm from "../../Components/LoginForm/LoginForm";
 import AdminMenu from "../../Components/Admin/AdminMenu/AdminMenu";
 // Import the EmployeesList component
 import CustomersList from "../../Components/Admin/CustomerList/CustomerList";
+// Import the Unauthorized component
+import Unauthorized from "../Unauthorized";
 function Customers() {
   // Destructure the auth hook
   const { isLogged, isAdmin } = useAuth();
@@ -30,7 +32,7 @@ function Customers() {
     } else {
       return (
         <div>
-          <h1>You are not authorized to access this page</h1>
+          <Unauthorized/>
         </div>
       );
     }

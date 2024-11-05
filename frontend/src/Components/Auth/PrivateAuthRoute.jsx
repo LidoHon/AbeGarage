@@ -1,53 +1,66 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navigate } from "react-router";
-import getAuth from "../util/auth"; // Function to get authenticated user from localStorage
+import getAuth from "../util/auth";
 
 const PrivateAuthRoute = ({ roles, children }) => {
-  const [isChecked, setIsChecked] = useState(false); // Indicates if auth check is done
-  const [isLogged, setIsLogged] = useState(false); // Tracks if user is logged in
-  const [isAuthorized, setIsAuthorized] = useState(false); // Tracks if user has access to the route
+  const [isChecked, setIsChecked] = useState(false);
+  const [isLogged, setIsLogged] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     const checkAuthorization = async () => {
       try {
-        const loggedInUser = await getAuth(); // Await the getAuth function to ensure it's resolved
+        const loggedInUser = await getAuth();
         console.log("Logged in user:", loggedInUser);
-        
-        if (loggedInUser && loggedInUser.employee_token) {
-          // User is logged in
-          setIsLogged(true);
 
-          // Check if the user's role matches the required roles for the route
-          if (roles && roles.includes(loggedInUser.employee_role)) {
+        if (loggedInUser) {
+          if (loggedInUser.employee_token) {
+            setIsLogged(true);
+            console.log("User role:", loggedInUser.employee_role);
+
+            if (roles && roles.includes(loggedInUser.employee_role)) {
+              console.log("Authorization success: User role matches required roles.");
+              setIsAuthorized(true);
+            } else {
+              console.warn("Authorization failure: User role does not match.");
+              setIsAuthorized(false);
+            }
+          } else if (loggedInUser.customer_token) {
+            setIsLogged(true);
+            console.log("Customer ID:", loggedInUser.customer_id); 
             setIsAuthorized(true);
+          } else {
+            setIsAuthorized(false);
           }
         }
       } catch (error) {
         console.error("Error during auth check:", error);
       } finally {
-        setIsChecked(true); // Mark the check as done
+        setIsChecked(true);
       }
     };
 
     checkAuthorization();
   }, [roles]);
 
+  // Wait for the auth check to complete before rendering anything
   if (!isChecked) {
-    // Optionally, you can show a loading spinner or placeholder until the auth check is done
     return <div>Loading...</div>;
   }
 
+  // Check if user is logged in
   if (!isLogged) {
-    // Redirect to login if not logged in
+    console.log("Redirecting to login: User is not logged in.");
     return <Navigate to="/login" />;
   }
 
+  // Check if user is authorized
   if (!isAuthorized) {
-    // Redirect to unauthorized page if the user doesn't have access
+    console.log("Redirecting to unauthorized: User is not authorized.");
     return <Navigate to="/unauthorized" />;
   }
 
-  // If everything is fine, render the children (the protected component)
+  // If logged in and authorized, render the children components
   return children;
 };
 

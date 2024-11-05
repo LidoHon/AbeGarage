@@ -16,7 +16,7 @@ const CustomersList = () => {
     const [searchQuery, setSearchQuery] = useState(''); 
     const [currentPage, setCurrentPage] = useState(1); 
     const itemsPerPage = 4; 
-    const navigate = useNavigate(); // useNavigate hook
+    const navigate = useNavigate();
 
     const token = employee?.employee_token || localStorage.getItem("employee_token");
 
@@ -137,13 +137,13 @@ const CustomersList = () => {
                                     className="form-control"
                                 />
                                 <span className="input-group-text bg-white text-gray-800">
-                                    <i className="fas fa-search"></i> {/* Search Icon */}
+                                    <i className="fas fa-search"></i>
                                 </span>
                             </div>
                         </Form>
 
                         {/* Customers Table */}
-                        <Table striped bordered hover responsive>
+                        <Table striped bordered hover responsive >
                             <thead>
                                 <tr>
                                     <th>ID</th>

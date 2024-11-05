@@ -236,7 +236,8 @@ const getEmployeeTasks = async (employee_id) => {
         v.vehicle_model,
         v.vehicle_year,
         v.vehicle_mileage,
-        v.vehicle_tag
+        v.vehicle_tag,
+        oi.estimated_completion_date  -- Add this line for estimated completion date
     FROM order_service_employee ose
     INNER JOIN order_services os ON ose.order_service_id = os.order_service_id
     INNER JOIN common_services cs ON os.service_id = cs.service_id
@@ -248,7 +249,8 @@ const getEmployeeTasks = async (employee_id) => {
     ) ords ON ords.order_service_id = os.order_service_id
     INNER JOIN customer c ON o.customer_id = c.customer_id  
     INNER JOIN customer_info ci ON c.customer_id = ci.customer_id  
-    INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id  
+    INNER JOIN customer_vehicle_info v ON o.vehicle_id = v.vehicle_id
+    INNER JOIN order_info oi ON o.order_id = oi.order_id  -- Join with order_info to get estimated_completion_date
     WHERE ose.employee_id = ?;
   `;
 
@@ -270,7 +272,6 @@ const getEmployeeTasks = async (employee_id) => {
   }
 };
 
-// Update task status
 // Function to update task (order service) status
 const updateTaskStatus = async (task_id, status) => {
   try {
@@ -339,6 +340,8 @@ const updateTaskStatus = async (task_id, status) => {
     `;
     await conn.query(updateOrderStatusQuery, [overallOrderStatus, orderId]);
 
+    // Return response with success flag and message
+    console.log(`[Service] Response to frontend for task ID ${task_id}: { success: true, message: 'Task status updated successfully' }`);
     return { success: true, message: 'Task status updated successfully' };
 
   } catch (error) {
@@ -346,6 +349,7 @@ const updateTaskStatus = async (task_id, status) => {
     throw error;
   }
 };
+
 
 
 

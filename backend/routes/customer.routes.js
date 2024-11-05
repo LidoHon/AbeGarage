@@ -35,7 +35,7 @@ router.delete(
     customerController.deleteCustomer
 );
 
-// Create a route to handle getting customer profile by ID (includes basic info)
+// Create a route for admin to handle getting customer profile by ID 
 router.get(
     "/api/customers/:customerId", 
     // [authMiddleware.verifyToken], 
