@@ -1,6 +1,7 @@
 // Importing React library
 import React from "react";
 import bg1 from "../../assets/images/banner/bg-1.jpg";
+import { Link } from "react-router-dom";
 
 const Section = ({ className, style, children }) => (
   <section
@@ -114,10 +115,10 @@ function Contact() {
           <div className="right-column">
             <div className="phone">1800.456.7890</div>
             <div className="btn">
-              <a href="#" className="theme-btn btn-style-one">
+              <Link to="#" className="theme-btn btn-style-one">
                 <span>Appointment</span>
                 <i className="flaticon-right"></i>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

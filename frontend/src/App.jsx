@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";  
-import 'react-toastify/dist/ReactToastify.css';  
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import MainLayout from "./layouts/MainLayout";
 import Home from "./Components/Home";
@@ -11,10 +11,10 @@ import Unauthorized from "./pages/Unauthorized";
 import PrivateAuthRoute from "./Components/Auth/PrivateAuthRoute";
 import NotFound from "./pages/404";
 import Employees from "./pages/admin/Employees";
-import EditEmployee from './pages/admin/EditEmployee';
+import EditEmployee from "./pages/admin/EditEmployee";
 import EmployeeProfile from "./pages/EmployeeProfile";
-import Customers from './pages/admin/Customers';
-import EditCustomer from './pages/admin/EditCustomer';
+import Customers from "./pages/admin/Customers";
+import EditCustomer from "./pages/admin/EditCustomer";
 import Contact from "./pages/contactPage/Contact";
 import AboutUs from "./pages/About";
 import HomeService from "./pages/Services";
@@ -121,7 +121,7 @@ function App() {
           <Route
             path="/admin/customer-profile/:customer_id"
             element={
-              <PrivateAuthRoute >
+              <PrivateAuthRoute roles={[3, 2]}>
                 <CustomerProfile />
               </PrivateAuthRoute>
             }
@@ -161,7 +161,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-      <ToastContainer /> 
+      <ToastContainer />
     </Router>
   );
 }

@@ -4,9 +4,11 @@ import employeeService from "../../Components/services/employee.service";
 import { Row, Col } from "react-bootstrap";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaEllipsisV } from "react-icons/fa";
+import CompletedTasks from "./CompletedTasks";
 
 const EmployeeProfile = () => {
-  const localStorageEmployee = JSON.parse(localStorage.getItem("employee")) || {};
+  const localStorageEmployee =
+    JSON.parse(localStorage.getItem("employee")) || {};
   const employee_role = localStorageEmployee?.employee_role;
   const localEmployeeId = localStorageEmployee?.employee_id;
   const { employee_id: paramEmployeeId } = useParams();
@@ -26,7 +28,10 @@ const EmployeeProfile = () => {
     const fetchEmployeeDetails = async () => {
       try {
         setLoading(true);
-        const response = await employeeService.getEmployeeById(employee_id, token);
+        const response = await employeeService.getEmployeeById(
+          employee_id,
+          token
+        );
         const employeeData = await response.json();
 
         if (employeeData.status !== "success" || !employeeData.data) {
@@ -45,7 +50,10 @@ const EmployeeProfile = () => {
 
     const fetchAssignedTasks = async () => {
       try {
-        const tasksResponse = await employeeService.getEmployeeTasks(employee_id, token);
+        const tasksResponse = await employeeService.getEmployeeTasks(
+          employee_id,
+          token
+        );
         setTasks(tasksResponse);
       } catch (err) {
         console.error("An error occurred fetching tasks:", err);
@@ -75,9 +83,13 @@ const EmployeeProfile = () => {
 
   const handleSaveStatus = async (orderServiceId) => {
     const updatedStatus = selectedStatus[orderServiceId];
-  
+
     try {
-      const responseData = await employeeService.updateTaskStatus(orderServiceId, updatedStatus, token);
+      const responseData = await employeeService.updateTaskStatus(
+        orderServiceId,
+        updatedStatus,
+        token
+      );
       console.log("API Response Data in handleSaveStatus:", responseData);
 
       if (responseData && responseData.success === true) {
@@ -95,10 +107,15 @@ const EmployeeProfile = () => {
           [orderServiceId]: false,
         }));
       } else {
-        console.error(`Failed to update status for Order Service ID: ${orderServiceId}`);
+        console.error(
+          `Failed to update status for Order Service ID: ${orderServiceId}`
+        );
       }
     } catch (err) {
-      console.error(`Error updating status for Order Service ID: ${orderServiceId}`, err);
+      console.error(
+        `Error updating status for Order Service ID: ${orderServiceId}`,
+        err
+      );
     }
   };
 
@@ -129,8 +146,12 @@ const EmployeeProfile = () => {
   const getOrderStatusBadge = (order) => {
     const dueDate = new Date(order.services[0].estimated_completion_date);
     const currentDate = new Date();
-    const allTasksCompleted = order.services.every((service) => service.order_status === 3);
-    const anyIncompleteTasks = order.services.some((service) => service.order_status !== 3);
+    const allTasksCompleted = order.services.every(
+      (service) => service.order_status === 3
+    );
+    const anyIncompleteTasks = order.services.some(
+      (service) => service.order_status !== 3
+    );
 
     if (allTasksCompleted) {
       return (
@@ -190,7 +211,9 @@ const EmployeeProfile = () => {
     orders[order_id].services.some((service) => service.order_status === 3)
   );
 
-  const visibleOrders = showMore ? completedOrders : completedOrders.slice(0, 2);
+  const visibleOrders = showMore
+    ? completedOrders
+    : completedOrders.slice(0, 2);
 
   return (
     <section className="services-section">
@@ -198,13 +221,20 @@ const EmployeeProfile = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-4">
             <h2 className="text-uppercase page-titles text-3xl font-bold">
-              {employee ? `${employee.employee_first_name} ${employee.employee_last_name}` : "Loading..."}
+              {employee
+                ? `${employee.employee_first_name} ${employee.employee_last_name}`
+                : "Loading..."}
             </h2>
             <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
           </div>
         </div>
         <p className="text-gray-600 mb-6">
-          You can manage your assigned tasks on this page. As you work through your tasks, update the status to reflect the progress. Change the task status from 'Received' to 'In Progress' or 'Completed' as you complete each service. This will help keep the team informed and ensure all tasks are up to date. Once a task is marked 'Completed', it will be highlighted to indicate that it's finished.
+          You can manage your assigned tasks on this page. As you work through
+          your tasks, update the status to reflect the progress. Change the task
+          status from 'Received' to 'In Progress' or 'Completed' as you complete
+          each service. This will help keep the team informed and ensure all
+          tasks are up to date. Once a task is marked 'Completed', it will be
+          highlighted to indicate that it's finished.
         </p>
 
         <div className="flex flex-col md:flex-row gap-4 mx-20 service-block-one">
@@ -216,25 +246,35 @@ const EmployeeProfile = () => {
                   <p className="font-bold">
                     {employee.employee_first_name} {employee.employee_last_name}
                   </p>
-                  <p><strong>Email:</strong> {employee.employee_email}</p>
-                  <p><strong>Phone:</strong> {employee.employee_phone}</p>
+                  <p>
+                    <strong>Email:</strong> {employee.employee_email}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {employee.employee_phone}
+                  </p>
                   <p>
                     Active Employee:{" "}
                     <span
                       className={
-                        employee.active_employee ? "text-green-500" : "text-red-500"
+                        employee.active_employee
+                          ? "text-green-500"
+                          : "text-red-500"
                       }
                     >
                       {employee.active_employee ? "Yes" : "No"}
                     </span>
                   </p>
-                  <p><strong>Starting From:</strong> {new Date(employee.added_date).toLocaleString()}</p>
+                  <p>
+                    <strong>Starting From:</strong>{" "}
+                    {new Date(employee.added_date).toLocaleString()}
+                  </p>
                 </>
               )}
             </div>
           </div>
 
           {/* Completed tasks section */}
+          {/* <CompletedTasks/> */}
           <div className="inner-box hvr-float-shadow w-full md:w-1/2">
             <h5 className="font-semibold">Completed Tasks</h5>
             <div className="ml-4">
@@ -245,7 +285,8 @@ const EmployeeProfile = () => {
                   <div className="flex justify-between">
                     <div>
                       <p>
-                        <strong className="page-titles">Order ID:</strong> {order_id}{" "}
+                        <strong className="page-titles">Order ID:</strong>{" "}
+                        {order_id}{" "}
                         <strong className="page-titles">Vehicle:</strong>{" "}
                         {orders[order_id].vehicle.vehicle_make}{" "}
                         {orders[order_id].vehicle.vehicle_model}
@@ -260,7 +301,8 @@ const EmployeeProfile = () => {
                       <div key={service.order_service_id} className="ml-4">
                         <div className="flex">
                           <p className="text-[14px] ml-2">
-                            <strong className="page-titles">Task:</strong> {service.service_name}
+                            <strong className="page-titles">Task:</strong>{" "}
+                            {service.service_name}
                           </p>
                           <div className="ml-4">
                             <span className="badge bg-success">Completed</span>
@@ -279,7 +321,11 @@ const EmployeeProfile = () => {
                     onClick={toggleShowMore}
                   >
                     {showMore ? "Show Less" : "Show More"}
-                    {showMore ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+                    {showMore ? (
+                      <FaChevronUp className="ml-2" />
+                    ) : (
+                      <FaChevronDown className="ml-2" />
+                    )}
                   </button>
                 </div>
               )}
@@ -314,9 +360,12 @@ const EmployeeProfile = () => {
                         <div className="flex">
                           <span className="text-xs bg-yellow-300 text-black font-semibold px-3 py-1 rounded">
                             Due:{" "}
-                            {orders[order_id].services[0].estimated_completion_date
+                            {orders[order_id].services[0]
+                              .estimated_completion_date
                               ? new Date(
-                                  orders[order_id].services[0].estimated_completion_date
+                                  orders[
+                                    order_id
+                                  ].services[0].estimated_completion_date
                                 ).toLocaleDateString()
                               : "N/A"}
                           </span>
@@ -324,7 +373,11 @@ const EmployeeProfile = () => {
                             onClick={() => toggleOrderDetails(order_id)}
                             className="focus:outline-none"
                           >
-                            {openOrder[order_id] ? <FaChevronUp /> : <FaChevronDown />}
+                            {openOrder[order_id] ? (
+                              <FaChevronUp />
+                            ) : (
+                              <FaChevronDown />
+                            )}
                           </button>
                         </div>
                         {!openOrder[order_id] && (
@@ -339,30 +392,38 @@ const EmployeeProfile = () => {
                       <div className="mt-4">
                         <div className="grid grid-cols-2 gap-8 mt-4">
                           <div>
-                            <h6 className="text-gray-600 font-bold mb-2">Customer</h6>
+                            <h6 className="text-gray-600 font-bold mb-2">
+                              Customer
+                            </h6>
                             <p className="text-sm text-gray-700">
                               {orders[order_id].customer.customer_first_name}{" "}
                               {orders[order_id].customer.customer_last_name}
                             </p>
                             <p className="text-sm">
-                              <strong>Email:</strong> {orders[order_id].customer.customer_email}
+                              <strong>Email:</strong>{" "}
+                              {orders[order_id].customer.customer_email}
                             </p>
                             <p className="text-sm">
-                              <strong>Phone:</strong> {orders[order_id].customer.customer_phone}
+                              <strong>Phone:</strong>{" "}
+                              {orders[order_id].customer.customer_phone}
                             </p>
                           </div>
                           <div>
-                            <h6 className="text-gray-600 font-bold mb-2">Vehicle</h6>
+                            <h6 className="text-gray-600 font-bold mb-2">
+                              Vehicle
+                            </h6>
                             <p className="text-sm">
                               <strong>Model:</strong>{" "}
                               {orders[order_id].vehicle.vehicle_make}{" "}
                               {orders[order_id].vehicle.vehicle_model}
                             </p>
                             <p className="text-sm">
-                              <strong>Year:</strong> {orders[order_id].vehicle.vehicle_year}
+                              <strong>Year:</strong>{" "}
+                              {orders[order_id].vehicle.vehicle_year}
                             </p>
                             <p className="text-sm">
-                              <strong>Tag:</strong> {orders[order_id].vehicle.vehicle_tag}
+                              <strong>Tag:</strong>{" "}
+                              {orders[order_id].vehicle.vehicle_tag}
                             </p>
                           </div>
                         </div>
@@ -383,49 +444,59 @@ const EmployeeProfile = () => {
                                 <span className="mr-2">
                                   {getStatusBadge(service.order_status)}
                                 </span>
-                                {service.order_status !== 3 && employee_role === 1 && (
-                                  <div className="flex items-center">
-                                    {!isEditingStatus[service.order_service_id] ? (
-                                      <div
-                                        className="cursor-pointer"
-                                        onClick={() =>
-                                          setIsEditingStatus((prev) => ({
-                                            ...prev,
-                                            [service.order_service_id]: true,
-                                          }))
-                                        }
-                                      >
-                                        <FaEllipsisV />
-                                      </div>
-                                    ) : (
-                                      <>
-                                        <select
-                                          value={
-                                            selectedStatus[service.order_service_id] ||
-                                            service.order_status
+                                {service.order_status !== 3 &&
+                                  employee_role === 1 && (
+                                    <div className="flex items-center">
+                                      {!isEditingStatus[
+                                        service.order_service_id
+                                      ] ? (
+                                        <div
+                                          className="cursor-pointer"
+                                          onClick={() =>
+                                            setIsEditingStatus((prev) => ({
+                                              ...prev,
+                                              [service.order_service_id]: true,
+                                            }))
                                           }
-                                          onChange={(e) =>
-                                            handleStatusChange(
-                                              service.order_service_id,
-                                              e.target.value
-                                            )
-                                          }
-                                          className="ml-2 p-1 border rounded-md"
                                         >
-                                          <option value={1}>Received</option>
-                                          <option value={2}>In progress</option>
-                                          <option value={3}>Completed</option>
-                                        </select>
-                                        <button
-                                          className="ml-2 px-3 py-1 bg-green-500 text-white rounded-md"
-                                          onClick={() => handleSaveStatus(service.order_service_id)}
-                                        >
-                                          Save
-                                        </button>
-                                      </>
-                                    )}
-                                  </div>
-                                )}
+                                          <FaEllipsisV />
+                                        </div>
+                                      ) : (
+                                        <>
+                                          <select
+                                            value={
+                                              selectedStatus[
+                                                service.order_service_id
+                                              ] || service.order_status
+                                            }
+                                            onChange={(e) =>
+                                              handleStatusChange(
+                                                service.order_service_id,
+                                                e.target.value
+                                              )
+                                            }
+                                            className="ml-2 p-1 border rounded-md"
+                                          >
+                                            <option value={1}>Received</option>
+                                            <option value={2}>
+                                              In progress
+                                            </option>
+                                            <option value={3}>Completed</option>
+                                          </select>
+                                          <button
+                                            className="ml-2 px-3 py-1 bg-green-500 text-white rounded-md"
+                                            onClick={() =>
+                                              handleSaveStatus(
+                                                service.order_service_id
+                                              )
+                                            }
+                                          >
+                                            Save
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  )}
                               </div>
                             </div>
                           </div>

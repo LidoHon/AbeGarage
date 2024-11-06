@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 const BottomBanner = () => {
   return (
     <div>
@@ -57,8 +58,8 @@ const BottomBanner = () => {
         </h2>
         <div className="video-box" style={{ paddingLeft: "80px" }}>
           <div className="video-btn">
-            <a
-              href="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
+            <Link
+              to="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
               className="overlay-link lightbox-image video-fancybox ripple"
               style={{ textDecoration: "none" }}
             >
@@ -66,7 +67,7 @@ const BottomBanner = () => {
                 className="flaticon-play"
                 style={{ textDecoration: "none" }}
               ></i>
-            </a>
+            </Link>
           </div>
           <div className="text">
             Watch intro video <br /> about us
@@ -86,10 +87,10 @@ const BottomBanner = () => {
           <div className="right-column">
             <div className="phone">1800.456.7890</div>
             <div className="btn">
-              <a href="#" className="theme-btn btn-style-one">
+              <Link to="#" className="theme-btn btn-style-one">
                 <span>Appointment</span>
                 <i className="flaticon-right"></i>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

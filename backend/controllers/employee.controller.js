@@ -181,7 +181,7 @@ const getEmployeeTasks = async (req, res) => {
     console.log(`Fetching tasks for employee_id: ${employee_id}`);
 
     const tasks = await employeeService.getEmployeeTasks(employee_id);
-    console.log(`Tasks fetched for employee_id: ${employee_id}`, tasks);
+    // console.log(`Tasks fetched for employee_id: ${employee_id}`, tasks);
 
     res.status(200).json({ tasks });
   } catch (error) {

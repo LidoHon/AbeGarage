@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }) => {
 
     if (storedEmployee) {
       const parsedEmployee = JSON.parse(storedEmployee);
-      console.log("Parsed Employee:", parsedEmployee); 
-      setIsLogged(true);
+      // console.log("Parsed Employee:", parsedEmployee); 
+      // setIsLogged(true);
 
       // Check if the employee is an admin
       if (parsedEmployee.employee_role === 3) {

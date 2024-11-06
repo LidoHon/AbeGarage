@@ -10,49 +10,49 @@ const authMiddleware = require("../middlewares/auth.middleware");
 // Create a route to handle the add customer request on post
 router.post(
     "/api/customer",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+    [authMiddleware.verifyToken, authMiddleware.isAdmin],
     customerController.createCustomer
 );
 
 // Create a route to handle the get all customers request on get
 router.get(
     "/api/customers",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+    [authMiddleware.verifyToken, authMiddleware.isAdmin],
     customerController.getAllCustomers
 );
 
 // Create a route to handle updating a customer by ID on put
 router.put(
     "/api/customers/:id",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+    [authMiddleware.verifyToken, authMiddleware.isAdmin],
     customerController.updateCustomer
 );
 
 // Create a route to handle deleting a customer by ID on delete
 router.delete(
     "/api/customers/:id",
-    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
+    [authMiddleware.verifyToken, authMiddleware.isAdmin],
     customerController.deleteCustomer
 );
 
 // Create a route for admin to handle getting customer profile by ID 
 router.get(
     "/api/customers/:customerId", 
-    // [authMiddleware.verifyToken], 
+    [authMiddleware.verifyToken], 
     customerController.getCustomerProfile
 );
 
 // Create a route to handle getting vehicles for a customer by ID
 router.get(
     "/api/customers/:customerId/vehicles",
-    // [authMiddleware.verifyToken], 
+    [authMiddleware.verifyToken], 
     customerController.getCustomerVehicles
 );
 
 // Create a route to handle getting orders for a customer by ID
 router.get(
     "/api/customers/:customerId/orders",
-    // [authMiddleware.verifyToken], 
+    [authMiddleware.verifyToken], 
     customerController.getCustomerOrders
 );
 

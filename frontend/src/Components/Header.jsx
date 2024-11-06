@@ -15,8 +15,9 @@ function Header() {
   } = useAuth();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [userType, setUserType] = useState(""); 
+  const [userType, setUserType] = useState("");
   const navigate = useNavigate();
+
 
   // *Sync state with localStorage on mount and user changes*
   useEffect(() => {
@@ -62,7 +63,7 @@ function Header() {
     setUserType("");
     localStorage.removeItem("employee");
     localStorage.removeItem("customer");
-    navigate("/"); 
+    navigate("/");
   };
 
   const toggleMobileMenu = () => {
@@ -73,14 +74,13 @@ function Header() {
 
   const handleProfileNavigation = () => {
     if (employee && employee.employee_role === 1) {
-      // Navigate to the employee profile page only if employee_role is 1 
+      // Navigate to the employee profile page only if employee_role is 1
       navigate(`/admin/employee-profile/${employee.employee_id}`);
     } else if (customer) {
       // Navigate to the customer profile page
       navigate(`/admin/customer-profile/${customer.customer_id}`);
-    } 
+    }
   };
-  
 
   return (
     <header className="main-header bg-white shadow-md">
@@ -97,7 +97,12 @@ function Header() {
               <div className="link-btn flex items-center">
                 <div
                   className="phone-number flex items-center gap-2 cursor-pointer"
-                  onClick={employee?.employee_role === 1 || customer ? handleProfileNavigation : undefined}>
+                  onClick={
+                    employee?.employee_role === 1 || customer
+                      ? handleProfileNavigation
+                      : undefined
+                  }
+                >
                   <strong>
                     Welcome{" "}
                     {userType === "employee"
@@ -172,28 +177,38 @@ function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="hover:text-blue-500 no-underline">
+                  <Link
+                    to="/about"
+                    className="hover:text-blue-500 no-underline"
+                  >
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services" className="hover:text-blue-500 no-underline">
+                  <Link
+                    to="/services"
+                    className="hover:text-blue-500 no-underline"
+                  >
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="hover:text-blue-500 no-underline">
+                  <Link
+                    to="/contact"
+                    className="hover:text-blue-500 no-underline"
+                  >
                     Contact Us
                   </Link>
                 </li>
                 {isAdmin && (
                   <li>
-                    <Link
-                      to="/admin/admin-landing"
+                    <a
+                      href="/admin/admin-landing"
                       className="hover:text-blue-500 no-underline"
+                     
                     >
                       Admin
-                    </Link>
+                    </a>
                   </li>
                 )}
                 <li>

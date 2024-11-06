@@ -10,7 +10,7 @@ export const decodeTokenPayload = (token) => {
     );
 
     const decodedPayload = JSON.parse(jsonPayload);
-    console.log("Decoded Payload:", decodedPayload);
+    // console.log("Decoded Payload:", decodedPayload);
     return decodedPayload;
   } catch (error) {
     console.error("Error decoding token:", error);
@@ -22,18 +22,18 @@ const getAuth = async () => {
   const storedEmployee = localStorage.getItem("employee");
   const storedCustomer = localStorage.getItem("customer");
 
-  console.log("Stored Employee Data:", storedEmployee);
-  console.log("Stored Customer Data:", storedCustomer);
+  // console.log("Stored Employee Data:", storedEmployee);
+  // console.log("Stored Customer Data:", storedCustomer);
 
   if (storedEmployee) {
     try {
       const parsedEmployee = JSON.parse(storedEmployee);
-      console.log("Parsed Employee from LocalStorage:", parsedEmployee);
+      // console.log("Parsed Employee from LocalStorage:", parsedEmployee);
 
       if (parsedEmployee.employee_token) {
         const decodedEmployee = decodeTokenPayload(parsedEmployee.employee_token);
         parsedEmployee.employee_id = decodedEmployee.employee_id;
-        console.log("Decoded Employee Data:", parsedEmployee);
+        // console.log("Decoded Employee Data:", parsedEmployee);
       }
 
       return parsedEmployee;

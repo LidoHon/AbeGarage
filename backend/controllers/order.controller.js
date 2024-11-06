@@ -224,6 +224,33 @@ const deleteOrderById = async (req, res) => {
 
 
 
+
+// newly added  Controller to fetch completed tasks for a specific employee
+const getCompletedTasksByEmployee = async (req, res) => {
+  try {
+      const { employeeId } = req.params;
+
+      if (!employeeId) {
+          return res.status(400).json({ message: "Employee ID is required" });
+      }
+
+      // Call the service function to get completed tasks by employee
+      const completedTasks = await orderService.getCompletedTasksByEmployee(employeeId);
+
+      // Log the result from the service function
+      console.log("Completed tasks returned by service:", completedTasks);
+
+      if (!completedTasks || completedTasks.length === 0) {
+          return res.status(404).json({ message: "No completed tasks found for this employee" });
+      }
+
+      res.status(200).json(completedTasks);
+  } catch (error) {
+      console.error("Error fetching completed tasks for employee:", error);
+      res.status(500).json({ message: "Error fetching completed tasks for employee" });
+  }
+};
+
 // Export all at the end
 module.exports = {
   getAllCustomersForOrder,
@@ -235,4 +262,5 @@ module.exports = {
   getAllServicesForOrder,
   updateOrderStatus,
   deleteOrderById,
+  getCompletedTasksByEmployee
 };

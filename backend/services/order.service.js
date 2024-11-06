@@ -328,6 +328,53 @@ const deleteOrderById = async (orderId) => {
     }
 };
 
+
+
+// newly added code for fetching only the completed tasks by a certain employee
+const getCompletedTasksByEmployee = async (req, res) => {
+    const { employeeId } = req.params;  // Get employeeId from URL params
+
+    try {
+        const query = `
+            SELECT 
+                os.order_service_id,
+                os.order_id,
+                cs.service_name,
+                cs.service_description,
+                ci.customer_first_name,
+                ci.customer_last_name,
+                e.employee_first_name,
+                e.employee_last_name,
+                os_service.order_status AS service_status,
+                os.service_completed
+            FROM order_services os
+            JOIN common_services cs ON os.service_id = cs.service_id
+            JOIN orders o ON os.order_id = o.order_id
+            JOIN customer_info ci ON o.customer_id = ci.customer_id
+            JOIN employee_info e ON o.employee_id = e.employee_id
+            LEFT JOIN order_status os_service ON os.order_service_id = os_service.order_service_id
+            WHERE os_service.order_status = 3 
+            AND o.employee_id = ?
+            GROUP BY os.order_service_id;
+        `;
+        
+        const [completedTasks] = await db.query(query, [employeeId]);
+        
+        if (completedTasks.length === 0) {
+            return res.status(404).json({ message: 'No completed tasks found for this employee' });
+        }
+
+        console.log("Completed tasks fetched for employee:", completedTasks);  // Log the result
+        return res.status(200).json(completedTasks);  // Return the result as JSON
+    } catch (error) {
+        console.error("Error fetching completed tasks:", error);  // Log error details
+        return res.status(500).json({ message: 'Error fetching completed tasks for employee' });
+    }
+};
+
+
+
+
 // Export all functions at the end
 module.exports = {
     createOrder,
@@ -339,4 +386,5 @@ module.exports = {
     updateOrderStatus,
     updateOrderServices,
     deleteOrderById,
+    getCompletedTasksByEmployee
 };

@@ -50,7 +50,7 @@ const Services = () => {
             <h2 style={{ paddingLeft: "10px" }}>Our services</h2>
             <ul className="page-breadcrumb" style={{ paddingLeft: "10px" }}>
               <li style={{ display: "inline", marginRight: "10px" }}>
-                {/* Use Link for navigation instead of <a> */}
+                {/* Use Link for navigation instead of <Link */}
                 <Link to="/" style={{ color: "#f00", fontSize: "30px" }}>
                   Home
                 </Link>
@@ -81,9 +81,9 @@ const Services = () => {
               <div className="inner-box hvr-float-shadow">
                 <h5>Service and Repairs</h5>
                 <h2>Performance Upgrade</h2>
-                <a href="service-details.html" className="read-more">
+                <Link to="service-details.html" className="read-more">
                   read more +
-                </a>
+                </Link>
                 <div className="icon">
                   <span className="flaticon-power"></span>
                 </div>
@@ -93,9 +93,9 @@ const Services = () => {
               <div className="inner-box hvr-float-shadow">
                 <h5>Service and Repairs</h5>
                 <h2>Transmission Services</h2>
-                <a href="service-details.html" className="read-more">
+                <Link to="service-details.html" className="read-more">
                   read more +
-                </a>
+                </Link>
                 <div className="icon">
                   <span className="flaticon-gearbox"></span>
                 </div>
@@ -105,9 +105,9 @@ const Services = () => {
               <div className="inner-box hvr-float-shadow">
                 <h5>Service and Repairs</h5>
                 <h2>Break Repair & Service</h2>
-                <a href="service-details.html" className="read-more">
+                <Link to="service-details.html" className="read-more">
                   read more +
-                </a>
+                </Link>
                 <div className="icon">
                   <span className="flaticon-brake-disc"></span>
                 </div>
@@ -117,9 +117,9 @@ const Services = () => {
               <div className="inner-box hvr-float-shadow">
                 <h5>Service and Repairs</h5>
                 <h2>Engine Service & Repair</h2>
-                <a href="service-details.html" className="read-more">
+                <Link to="service-details.html" className="read-more">
                   read more +
-                </a>
+                </Link>
                 <div className="icon">
                   <span className="flaticon-car-engine"></span>
                 </div>
@@ -129,9 +129,9 @@ const Services = () => {
               <div className="inner-box hvr-float-shadow">
                 <h5>Service and Repairs</h5>
                 <h2>Tyre & Wheels</h2>
-                <a href="service-details.html" className="read-more">
+                <Link to="service-details.html" className="read-more">
                   read more +
-                </a>
+                </Link>
                 <div className="icon">
                   <span className="flaticon-tire"></span>
                 </div>
@@ -141,9 +141,9 @@ const Services = () => {
               <div className="inner-box hvr-float-shadow">
                 <h5>Service and Repairs</h5>
                 <h2>Denting & Painting</h2>
-                <a href="service-details.html" className="read-more">
+                <Link to="service-details.html" className="read-more">
                   read more +
-                </a>
+                </Link>
                 <div className="icon">
                   <span className="flaticon-spray-gun"></span>
                 </div>
@@ -205,8 +205,8 @@ const Services = () => {
         </h2>
         <div className="video-box" style={{ paddingLeft: "80px" }}>
           <div className="video-btn">
-            <a
-              href="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
+            <Link
+              to="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
               className="overlay-link lightbox-image video-fancybox ripple"
               style={{ textDecoration: "none" }}
             >
@@ -214,7 +214,7 @@ const Services = () => {
                 className="flaticon-play"
                 style={{ textDecoration: "none" }}
               ></i>
-            </a>
+            </Link>
           </div>
           <div className="text">
             Watch intro video <br /> about us
@@ -233,10 +233,10 @@ const Services = () => {
           <div className="right-column">
             <div className="phone">1800.456.7890</div>
             <div className="btn">
-              <a href="#" className="theme-btn btn-style-one">
+              <Link to="#" className="theme-btn btn-style-one">
                 <span>Appointment</span>
                 <i className="flaticon-right"></i>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

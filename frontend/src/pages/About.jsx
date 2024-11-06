@@ -75,7 +75,7 @@ function AboutUs() {
             <h2 style={{ paddingLeft: "10px" }}>About us</h2>
             <ul className="page-breadcrumb" style={{ paddingLeft: "10px" }}>
               <li style={{ display: "inline", marginRight: "10px" }}>
-                {/* Use Link for navigation instead of <a> */}
+                {/* Use Link for navigation instead of <Link> */}
                 <Link to="/" style={{ color: "#f00", fontSize: "30px" }}>
                   Home
                 </Link>
@@ -193,11 +193,11 @@ function AboutUs() {
                 </p>
               </div>
               <div className="link-btn mt-40">
-                <a href="/about" className="theme-btn btn-style-one style-two">
+                <Link to="/about" className="theme-btn btn-style-one style-two">
                   <span>
                     About Us <i className="flaticon-right"></i>
                   </span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -261,8 +261,8 @@ function AboutUs() {
         </h2>
         <div className="video-box" style={{ paddingLeft: "80px" }}>
           <div className="video-btn">
-            <a
-              href="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
+            <Link
+              to="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
               className="overlay-link lightbox-image video-fancybox ripple"
               style={{ textDecoration: "none" }}
             >
@@ -270,7 +270,7 @@ function AboutUs() {
                 className="flaticon-play"
                 style={{ textDecoration: "none" }}
               ></i>
-            </a>
+            </Link>
           </div>
           <div className="text">
             Watch intro video <br /> about us
@@ -290,10 +290,10 @@ function AboutUs() {
           <div className="right-column">
             <div className="phone">1800.456.7890</div>
             <div className="btn">
-              <a href="#" className="theme-btn btn-style-one">
+              <Link to="#" className="theme-btn btn-style-one">
                 <span>Appointment</span>
                 <i className="flaticon-right"></i>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

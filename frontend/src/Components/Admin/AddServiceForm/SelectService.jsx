@@ -10,7 +10,9 @@ const ServiceSelection = ({ onSelectServices }) => {
     const fetchServices = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:8000/api/services");
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/services`
+        );
         const data = await response.json();
         setServices(data.services);
         setError(null);
@@ -25,13 +27,14 @@ const ServiceSelection = ({ onSelectServices }) => {
   }, []);
 
   const handleServiceSelect = (service) => {
-    
-    const updatedServices = selectedServices.some((s) => s.service_id === service.service_id)
+    const updatedServices = selectedServices.some(
+      (s) => s.service_id === service.service_id
+    )
       ? selectedServices.filter((s) => s.service_id !== service.service_id)
       : [...selectedServices, service];
-  
+
     setSelectedServices(updatedServices);
-    onSelectServices(updatedServices); 
+    onSelectServices(updatedServices);
   };
 
   return (
@@ -50,13 +53,17 @@ const ServiceSelection = ({ onSelectServices }) => {
             <div key={service.service_id} className="list-group-item w-full">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h5 className="text-blue-900 text-lg font-semibold">{service.service_name}</h5>
+                  <h5 className="text-blue-900 text-lg font-semibold">
+                    {service.service_name}
+                  </h5>
                   <p className="text-sm">{service.service_description}</p>
                 </div>
                 <input
                   type="checkbox"
-                  checked={selectedServices.some((s) => s.service_id === service.service_id)}
-                  onChange={() => handleServiceSelect(service)} 
+                  checked={selectedServices.some(
+                    (s) => s.service_id === service.service_id
+                  )}
+                  onChange={() => handleServiceSelect(service)}
                 />
               </div>
             </div>

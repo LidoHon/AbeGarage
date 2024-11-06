@@ -1,4 +1,4 @@
-
+import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <div>
@@ -27,9 +27,9 @@ const Footer = () => {
                     </div>
                     <div className="text">
                       Email us : <br />{" "}
-                      <a href="mailto:contact.contact@Abe-Garage.com">
+                      <Link to="mailto:contact.contact@Abe-Garage.com">
                         contact@Abe-Garage.com
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -59,9 +59,9 @@ const Footer = () => {
                 <div className="footer-column col-lg-4">
                   <div className="widget widget_about">
                     <div className="logo">
-                      <a href="index.html">
+                      <Link to="index.html">
                         <img src="assets/images/logo-two.png" alt="" />
-                      </a>
+                      </Link>
                     </div>
                     <div className="text">
                       Capitalize on low hanging fruit to identify a ballpark
@@ -79,19 +79,19 @@ const Footer = () => {
                         <div className="widget-content">
                           <ul className="list">
                             <li>
-                              <a href="/">Home</a>
+                              <Link to="/">Home</Link>
                             </li>
                             <li>
-                              <a href="/about">About Us</a>
+                              <Link to="/about">About Us</Link>
                             </li>
                             <li>
-                              <a href="#">Appointment</a>
+                              <Link to="#">Appointment</Link>
                             </li>
                             <li>
-                              <a href="#">Testimonials</a>
+                              <Link to="#">Testimonials</Link>
                             </li>
                             <li>
-                              <a href="/contact">Contact Us</a>
+                              <Link to="/contact">Contact Us</Link>
                             </li>
                           </ul>
                         </div>
@@ -103,19 +103,19 @@ const Footer = () => {
                         <div className="widget-content">
                           <ul className="list">
                             <li>
-                              <a href="#">Performance Upgrade</a>
+                              <Link to="#">Performance Upgrade</Link>
                             </li>
                             <li>
-                              <a href="#">Transmission Service</a>
+                              <Link to="#">Transmission Service</Link>
                             </li>
                             <li>
-                              <a href="#">Break Repair & Service</a>
+                              <Link to="#">Break Repair & Service</Link>
                             </li>
                             <li>
-                              <a href="#">Engine Service & Repair</a>
+                              <Link to="#">Engine Service & Repair</Link>
                             </li>
                             <li>
-                              <a href="#">Trye & Wheels</a>
+                              <Link to="#">Trye & Wheels</Link>
                             </li>
                           </ul>
                         </div>
@@ -148,24 +148,24 @@ const Footer = () => {
                     </div>
                     <ul className="social-links">
                       <li>
-                        <a href="#">
+                        <Link to="#">
                           <span className="fab fa-facebook-f"></span>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="#">
+                        <Link to="#">
                           <span className="fab fa-linkedin-in"></span>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="#">
+                        <Link to="#">
                           <span className="fab fa-twitter"></span>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a href="#">
+                        <Link to="#">
                           <span className="fab fa-google-plus-g"></span>
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </div>
@@ -178,10 +178,11 @@ const Footer = () => {
         <div className="auto-container">
           <div className="footer-bottom">
             <div className="copyright-text">
-              © Copyright <a href="#">Abe-Garage</a> 2020 . All right reserved.
+              © Copyright <Link to="#">Abe-Garage</Link> 2020 . All right
+              reserved.
             </div>
             <div className="text">
-              Created by <a href="#">Evangadi group 2</a>
+              Created by <Link to="#">Evangadi group 2</Link>
             </div>
           </div>
         </div>

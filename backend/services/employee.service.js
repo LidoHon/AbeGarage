@@ -258,7 +258,7 @@ const getEmployeeTasks = async (employee_id) => {
     console.log(`Executing query for employee_id: ${employee_id}`);
 
     const rows = await conn.query(query, [employee_id]);
-    console.log(`Rows fetched for employee_id: ${employee_id}`, rows);
+    // console.log(`Rows fetched for employee_id: ${employee_id}`, rows);
 
     if (rows.length === 0) {
       console.warn(`No tasks found for employee_id: ${employee_id}`);

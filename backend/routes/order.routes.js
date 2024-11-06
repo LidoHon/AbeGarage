@@ -28,4 +28,12 @@ router.get("/api/order/:orderId/services", orderController.getAllServicesForOrde
 
 // Route to update the overall order status
 router.put("/api/order/:orderId/status", orderController.updateOrderStatus);
+
+// newly added Route to fetch all completed tasks
+// router.get('/api/completed-tasks', orderController.getCompletedTasksByEmployee);
+router.get('/api/completed-tasks/:employeeId', orderController.getCompletedTasksByEmployee);
+
+
+
+
 module.exports = router;

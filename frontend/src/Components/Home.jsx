@@ -5,7 +5,7 @@ import vban1 from "../assets/images/banner/vban1.jpg";
 import vban2 from "../assets/images/banner/vban2.jpg";
 import image3 from "../assets/images/banner/image-3.jpg";
 import image4 from "../assets/images/banner/image-4.jpg";
-
+import {Link} from "react-router-dom";
 // Defining an array of services with their titles and icons
 const services = [
   { title: "Performance Upgrade", icon: "flaticon-power" },
@@ -60,7 +60,7 @@ const ServiceBlock = ({ title, icon }) => (
     <div className="inner-box hvr-float-shadow">
       <h5>Service and Repairs</h5>
       <h2>{title}</h2>
-      <a href="#" className="read-more">read more +</a>
+      <Link to="#" className="read-more">read more +</Link>
       <div className="icon"><span className={icon}></span></div>
     </div>
   </div>
@@ -91,13 +91,13 @@ const Home = () => {
         <h2 style={{ paddingLeft: '80px' }}>Tuneup Your Car <br /> to Next Level</h2>
         <div className="video-box">
           <div className="video-btn" style={{ paddingLeft: '80px' }}>
-            <a
-              href="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
+            <Link
+              to="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
               className="overlay-link lightbox-image video-fancybox ripple"
               style={{ textDecoration: "none" }}
             >
               <i className="flaticon-play" style={{ textDecoration: "none" }}></i>
-            </a>
+            </Link>
           </div>
           <div className="text">Watch intro video <br /> about us</div>
         </div>
@@ -133,10 +133,10 @@ const Home = () => {
                 </p>
               </div>
               <div className="link-btn mt-40">
-                <a href="/about" className="theme-btn btn-style-one style-two">
+                <Link to="/about" className="theme-btn btn-style-one style-two">
                   <span>About Us <i className="flaticon-right"></i>
                   </span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -219,13 +219,13 @@ const Home = () => {
         <h2 style={{ paddingLeft: '80px' }}>We are leader <br /> in Car Mechanical Work</h2>
         <div className="video-box" style={{ paddingLeft: '80px' }}>
           <div className="video-btn">
-            <a
-            href="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
+            <Link
+            to="https://www.youtube.com/watch?v=nfP5N9Yc72A&t=28s"
             className="overlay-link lightbox-image video-fancybox ripple"
             style={{ textDecoration: "none" }}
             >
               <i className="flaticon-play" style={{ textDecoration: "none" }}></i>
-            </a>
+            </Link>
           </div>
           <div className="text">Watch intro video <br /> about us</div>
         </div>
@@ -242,9 +242,9 @@ const Home = () => {
           <div className="right-column">
             <div className="phone">1800.456.7890</div>
             <div className="btn">
-              <a href="#" className="theme-btn btn-style-one">
+              <Link to="#" className="theme-btn btn-style-one">
                 <span>Appointment</span><i className="flaticon-right"></i>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

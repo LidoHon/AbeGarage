@@ -11,7 +11,7 @@ const PrivateAuthRoute = ({ roles, children }) => {
     const checkAuthorization = async () => {
       try {
         const loggedInUser = await getAuth();
-        console.log("Logged in user:", loggedInUser);
+        // console.log("Logged in user:", loggedInUser);
 
         if (loggedInUser) {
           if (loggedInUser.employee_token) {
@@ -19,7 +19,7 @@ const PrivateAuthRoute = ({ roles, children }) => {
             console.log("User role:", loggedInUser.employee_role);
 
             if (roles && roles.includes(loggedInUser.employee_role)) {
-              console.log("Authorization success: User role matches required roles.");
+              // console.log("Authorization success: User role matches required roles.");
               setIsAuthorized(true);
             } else {
               console.warn("Authorization failure: User role does not match.");
@@ -27,7 +27,7 @@ const PrivateAuthRoute = ({ roles, children }) => {
             }
           } else if (loggedInUser.customer_token) {
             setIsLogged(true);
-            console.log("Customer ID:", loggedInUser.customer_id); 
+            console.log("Customer ID:", loggedInUser.customer_id);
             setIsAuthorized(true);
           } else {
             setIsAuthorized(false);
