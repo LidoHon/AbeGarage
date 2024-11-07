@@ -7,6 +7,7 @@ import { useAuth } from "../../Contexts/AuthContext";
 const api_url = import.meta.env.VITE_API_URL;
 import { FcFullTrash } from "react-icons/fc";
 import { FaEdit } from "react-icons/fa";
+import Skeleton from "../Skeleton";
 const CustomerProfile = () => {
 
 
@@ -151,7 +152,7 @@ const CustomerProfile = () => {
   };
 
   if (!customerData) {
-    return <div>Loading...</div>;
+    return <Skeleton width="100%" height={200}/>;
   }
   const handleEdit = (customerData) => {
     setSelectedCustomer(customerData);

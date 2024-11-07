@@ -123,7 +123,8 @@ function App() {
             element={
               <PrivateAuthRoute roles={[3, 2]}>
                 <CustomerProfile />
-              </PrivateAuthRoute>
+                </PrivateAuthRoute>
+             
             }
           />
           <Route

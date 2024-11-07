@@ -17,7 +17,7 @@ router.post(
 // Create a route to handle the get all customers request on get
 router.get(
     "/api/customers",
-    [authMiddleware.verifyToken, authMiddleware.isAdmin],
+    // [authMiddleware.verifyToken, authMiddleware.isAdmin],
     customerController.getAllCustomers
 );
 
@@ -38,21 +38,21 @@ router.delete(
 // Create a route for admin to handle getting customer profile by ID 
 router.get(
     "/api/customers/:customerId", 
-    [authMiddleware.verifyToken], 
+    // [authMiddleware.verifyToken], 
     customerController.getCustomerProfile
 );
 
 // Create a route to handle getting vehicles for a customer by ID
 router.get(
     "/api/customers/:customerId/vehicles",
-    [authMiddleware.verifyToken], 
+    // [authMiddleware.verifyToken], 
     customerController.getCustomerVehicles
 );
 
 // Create a route to handle getting orders for a customer by ID
 router.get(
     "/api/customers/:customerId/orders",
-    [authMiddleware.verifyToken], 
+    // [authMiddleware.verifyToken], 
     customerController.getCustomerOrders
 );
 

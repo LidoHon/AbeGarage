@@ -5,6 +5,7 @@ import { Row, Col } from "react-bootstrap";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaEllipsisV } from "react-icons/fa";
 import CompletedTasks from "./CompletedTasks";
+import Skeleton from "../Skeleton";
 
 const EmployeeProfile = () => {
   const localStorageEmployee =
@@ -23,6 +24,7 @@ const EmployeeProfile = () => {
   const [selectedStatus, setSelectedStatus] = useState({});
   const [isEditingStatus, setIsEditingStatus] = useState({});
   const [showMore, setShowMore] = useState(false);
+  // const [saveStatus, setSaveStatus] = useState({});
 
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
@@ -56,7 +58,7 @@ const EmployeeProfile = () => {
         );
         setTasks(tasksResponse);
       } catch (err) {
-        console.error("An error occurred fetching tasks:", err);
+        // console.error("An error occurred fetching tasks:", err)
         setError("Failed to load assigned tasks.");
       }
     };
@@ -119,6 +121,52 @@ const EmployeeProfile = () => {
     }
   };
 
+  // Handle Save Status with dynamic button text and update completion_date
+  //  const handleSaveStatus = async (orderServiceId) => {
+  //   const updatedStatus = selectedStatus[orderServiceId];
+  //   const currentDate = new Date().toISOString(); // Get current date for completed tasks
+
+  //   // Set status to "Saving"
+  //   setSaveStatus((prev) => ({ ...prev, [orderServiceId]: "Saving" }));
+
+  //   try {
+  //     const responseData = await employeeService.updateTaskStatus(
+  //       orderServiceId,
+  //       updatedStatus,
+  //       token
+  //     );
+  //     console.log("API Response Data in handleSaveStatus:", responseData);
+
+  //     if (responseData && responseData.success === true) {
+  //       // Update the tasks array with new status and possibly update completion_date if status is "Completed"
+  //       setTasks((prevTasks) =>
+  //         prevTasks.map((task) =>
+  //           task.order_service_id === orderServiceId
+  //             ? {
+  //                 ...task,
+  //                 order_status: parseInt(updatedStatus),
+  //                 completion_date:
+  //                   updatedStatus === "3" ? currentDate : task.completion_date,
+  //               }
+  //             : task
+  //         )
+  //       );
+
+  //       setSaveStatus((prev) => ({ ...prev, [orderServiceId]: "Saved" })); // Change button to "Saved"
+  //     } else {
+  //       console.error(
+  //         `Failed to update status for Order Service ID: ${orderServiceId}`
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.error(
+  //       `Error updating status for Order Service ID: ${orderServiceId}`,
+  //       err
+  //     );
+  //     setSaveStatus((prev) => ({ ...prev, [orderServiceId]: "Save" })); // Reset button to "Save" if error occurs
+  //   }
+  // };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 1:
@@ -152,6 +200,7 @@ const EmployeeProfile = () => {
     const anyIncompleteTasks = order.services.some(
       (service) => service.order_status !== 3
     );
+    
 
     if (allTasksCompleted) {
       return (
@@ -218,15 +267,15 @@ const EmployeeProfile = () => {
   return (
     <section className="services-section">
       <div className="px-32">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
-            <h2 className="text-uppercase page-titles text-3xl font-bold">
-              {employee
-                ? `${employee.employee_first_name} ${employee.employee_last_name}`
-                : "Loading..."}
-            </h2>
-            <div className="h-1 w-16 bg-red-500 mr-2 mt-4"></div>
-          </div>
+        <div className="flex items-center gap-4">
+          <h2 className="uppercase text-3xl font-bold">
+            {employee ? (
+              `${employee.employee_first_name} ${employee.employee_last_name}`
+            ) : (
+              <Skeleton width={200} height={30} />
+            )}
+          </h2>
+          <div className="h-1 w-16 bg-red-500 mt-1"></div>
         </div>
         <p className="text-gray-600 mb-6">
           You can manage your assigned tasks on this page. As you work through
@@ -296,20 +345,32 @@ const EmployeeProfile = () => {
 
                   {/* Display completed tasks under the order */}
                   {orders[order_id].services
-                    .filter((service) => service.order_status === 3)
-                    .map((service) => (
-                      <div key={service.order_service_id} className="ml-4">
-                        <div className="flex">
-                          <p className="text-[14px] ml-2">
-                            <strong className="page-titles">Task:</strong>{" "}
-                            {service.service_name}
-                          </p>
-                          <div className="ml-4">
-                            <span className="badge bg-success">Completed</span>
+                    .filter((service) => service.order_status === 3) // Filters completed services
+                    // .reverse() // Reverses the filtered array
+                    .sort(
+                      (a, b) =>
+                        new Date(b.completion_date) -
+                        new Date(a.completion_date) // Sorts by completion date, but reversed order is applied
+                    )
+                    .slice(0, 3)
+                    .map(
+                      (service, index, filteredServices) =>
+                        filteredServices.length > 0 && (
+                          <div key={service.order_service_id} className="ml-4">
+                            <div className="flex">
+                              <p className="text-[14px] ml-2">
+                                <strong className="page-titles">Task:</strong>{" "}
+                                {service.service_name}
+                              </p>
+                              <div className="ml-4">
+                                <span className="badge bg-success">
+                                  Completed
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    ))}
+                        )
+                    )}
                 </div>
               ))}
 
@@ -329,14 +390,28 @@ const EmployeeProfile = () => {
                   </button>
                 </div>
               )}
+              {completedOrders.length == 0 && (
+                <p className="ml-4 text-[24px] mt-10 text-gray-500 text-4xl font-bold ">
+                  No completed tasks yet!
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="bg-white mx-20 p-10 border-b-2 border-red-500">
+        <div
+         className="bg-white inner-box mx-20 p-10 border-b-2 border-red-500 transform transition-transform duration-300 ease-in-out hover:translate-y-1"
+          style={{ borderBottom: "3px solid #ee0d09" }}
+        >
           <div className="flex items-center gap-4 mb-4">
             <h2 className="page-titles text-2xl font-bold">All tasks</h2>
+            {Object.keys(orders).length === 0 && (
+              <p className="ml-4 text-[24px] mt-2 text-gray-500 text-4xl font-bold">
+                No tasks assigned yet!
+              </p>
+            )}
           </div>
+
           <Row>
             {Object.keys(orders)
               .sort((a, b) => b - a)
@@ -358,7 +433,7 @@ const EmployeeProfile = () => {
                       </div>
                       <div className="mb-3">
                         <div className="flex">
-                          <span className="text-xs bg-yellow-300 text-black font-semibold px-3 py-1 rounded">
+                          <span className="text-xs bg-yellow-300 text-black font-semibold px-3 py-1 rounded mr-6">
                             Due:{" "}
                             {orders[order_id].services[0]
                               .estimated_completion_date

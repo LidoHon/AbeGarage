@@ -4,6 +4,7 @@ import LoginForm from "../../Components/LoginForm/LoginForm";
 import AdminMenu from "../../Components/Admin/AdminMenu/AdminMenu";
 import EmployeesList from "../../Components/Admin/EmployeesList/EmployeesList";
 import Unauthorized from "../Unauthorized";
+import { Spinner } from "react-bootstrap";
 
 function Employees() {
   const { isLogged, isAdmin } = useAuth();
@@ -17,7 +18,7 @@ function Employees() {
   }, [isLogged, isAdmin]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner size="xl" />;
   }
 
   if (isLogged) {

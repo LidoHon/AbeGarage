@@ -261,7 +261,7 @@ const AddOrderForm = () => {
                         ADD VEHICLE
                       </Button>
                     )}
-  
+{/*   
                     {showAddVehicleForm && (
                       <Card className="mb-4">
                         <Card.Body>
@@ -272,14 +272,14 @@ const AddOrderForm = () => {
                             >
                               X
                             </button>
-                          </div>
-                          <AddVehicleForm
+                          </div> */}
+                          {/* <AddVehicleForm
                             customer_id={selectedCustomer.customer_id}
                             onVehicleAdded={handleVehicleAdded}
-                          />
-                        </Card.Body>
-                      </Card>
-                    )}
+                          /> */}
+                        {/* </Card.Body>
+                      </Card> */}
+                    {/* )} */}
                   </>
               ) : (
                 <>

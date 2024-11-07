@@ -5,13 +5,13 @@ import Footer from "../Components/Footer";
 import "react-toastify/dist/ReactToastify.css";
 const MainLayout = () => {
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Header />
       {/* <ToastContainer /> */}
       <div className="flex-grow background-image-class">
         <Outlet />
       </div>
-      <Footer />
+      <Footer className="mt-auto" />
     </div>
   );
 };

@@ -15,7 +15,7 @@ const logInEmployee = async (formData) => {
   }
 
   const data = await response.json();
-  console.log("Parsed data from server:", data);
+  // console.log("Parsed data from server:", data);
 
   if (data.status === "success") {
     const { employee_token, employee_first_name, employee_id, employee_role } = data.data;
@@ -28,12 +28,13 @@ const logInEmployee = async (formData) => {
       employee_token,
     };
 
-    console.log("Storing employee object in localStorage:", employee);
+    // console.log("Storing employee object in localStorage:", employee);
+
     localStorage.setItem("employee", JSON.stringify(employee));  
 
     // Check if the data was correctly stored in localStorage
     const storedEmployee = JSON.parse(localStorage.getItem("employee"));
-    console.log("Employee from localStorage after setting:", storedEmployee);
+    // console.log("Employee from localStorage after setting:", storedEmployee);
 
     if (!storedEmployee || !storedEmployee.employee_id) {
       console.error("Employee ID is missing from localStorage!");
@@ -52,7 +53,7 @@ const logInCustomer = async (formData) => {
     body: JSON.stringify(formData),
   };
 
-  console.log("Sending customer login request with form data:", formData);
+  // console.log("Sending customer login request with form data:", formData);
 
   const response = await fetch(`${api_url}/api/customer/login`, requestOptions);
 
@@ -62,7 +63,7 @@ const logInCustomer = async (formData) => {
   }
 
   const data = await response.json();
-  console.log("Parsed data from server:", data);
+  // console.log("Parsed data from server:", data);
 
   // If customer_id is missing from the response, stop the login process
   if (!data.data.customer_id) {
@@ -80,7 +81,7 @@ const logInCustomer = async (formData) => {
       customer_id,  // Make sure this is included
     };
 
-    console.log("Storing customer object in localStorage:", customer);
+    // console.log("Storing customer object in localStorage:", customer);
     localStorage.setItem("customer", JSON.stringify(customer));
 
     // Verify storage
@@ -105,7 +106,7 @@ const logOut = () => {
   localStorage.removeItem("employee_token");
   localStorage.removeItem("customer");
   localStorage.removeItem("employee");
-  console.log("All tokens and data removed from localStorage.");
+  // console.log("All tokens and data removed from localStorage.");
 };
 
 
